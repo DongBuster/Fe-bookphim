@@ -22,6 +22,7 @@ import {
 } from './data/spotlight-data';
 import { useSpotlightCarousel } from './hooks/useSpotlightCarousel';
 import { SlideItem } from './components/SlideItem/SlideItem';
+import { isFeatureEnabled } from '@/config/features.config';
 
 export const HeroSpotlight: FC = () => {
   const navigate = useNavigate();
@@ -203,7 +204,8 @@ export const HeroSpotlight: FC = () => {
       </S.BackgroundWrapper>
 
       {/* ── Quick Booking Bar ── */}
-      <S.QuickBookingBar ref={bookingBarRef} className="no-drag">
+      {isFeatureEnabled('quickBooking') && (
+        <S.QuickBookingBar ref={bookingBarRef} className="no-drag">
         {/* Step 1 – Movie */}
         <S.StepItem
           role="button"
@@ -392,6 +394,7 @@ export const HeroSpotlight: FC = () => {
           <span>{t('home:hero.quick_book_btn', 'ĐẶT VÉ NGAY')}</span>
         </S.QuickBookSubmitButton>
       </S.QuickBookingBar>
+      )}
     </S.SectionContainer>
   );
 };

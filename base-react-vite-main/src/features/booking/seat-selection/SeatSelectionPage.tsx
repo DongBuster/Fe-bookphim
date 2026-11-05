@@ -22,6 +22,7 @@ import { SeatSummarySidebar } from './components/SeatSummarySidebar/SeatSummaryS
 import { MobileStickyBar } from './components/MobileStickyBar/MobileStickyBar';
 import { CinePartyModal } from '@/features/cineparty/components/CinePartyModal';
 import { CineMateWidget } from '@/features/cinemate/components/CineMateWidget';
+import { isFeatureEnabled } from '@/config/features.config';
 import * as S from './SeatSelectionPage.styles';
 
 const DEFAULT_ACTIVE_SHOWTIME_ID = '5458e3dd-b719-4a76-a9df-904be8fcf493';
@@ -284,36 +285,40 @@ export const SeatSelectionPage: FC = () => {
             <SeatFeatures />
 
             {/* CineParty Group Booking CTA */}
-            <button
-              type="button"
-              onClick={() => setIsCinePartyOpen(true)}
-              style={{
-                width: '100%',
-                padding: '12px 18px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, rgba(255, 185, 85, 0.15) 0%, rgba(255, 83, 90, 0.15) 100%)',
-                border: '1px solid rgba(255, 185, 85, 0.4)',
-                color: '#ffb955',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                marginTop: '14px',
-                transition: 'all 0.2s',
-              }}
-            >
-              <Users size={16} />
-              <span>Đặt vé nhóm & Chia tiền tự động (CineParty)</span>
-            </button>
+            {isFeatureEnabled('cineParty') && (
+              <button
+                type="button"
+                onClick={() => setIsCinePartyOpen(true)}
+                style={{
+                  width: '100%',
+                  padding: '12px 18px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, rgba(255, 185, 85, 0.15) 0%, rgba(255, 83, 90, 0.15) 100%)',
+                  border: '1px solid rgba(255, 185, 85, 0.4)',
+                  color: '#ffb955',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: '14px',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <Users size={16} />
+                <span>Đặt vé nhóm & Chia tiền tự động (CineParty)</span>
+              </button>
+            )}
 
             {/* CineMate Solo Matchmaker */}
-            <CineMateWidget
-              showtimeId={currentShowtimeId}
-              selectedSeatLabel={state.selectedSeats[0]?.id}
-            />
+            {isFeatureEnabled('cineMate') && (
+              <CineMateWidget
+                showtimeId={currentShowtimeId}
+                selectedSeatLabel={state.selectedSeats[0]?.id}
+              />
+            )}
           </S.SeatSelectionArea>
 
           {/* Right Column: Booking Summary Sidebar */}
@@ -328,11 +333,13 @@ export const SeatSelectionPage: FC = () => {
       <MobileStickyBar onContinue={handleContinue} isLocking={isLocking} />
 
       {/* CineParty Group Modal */}
-      <CinePartyModal
-        isOpen={isCinePartyOpen}
-        onClose={() => setIsCinePartyOpen(false)}
-        showtimeId={currentShowtimeId}
-      />
+      {isFeatureEnabled('cineParty') && (
+        <CinePartyModal
+          isOpen={isCinePartyOpen}
+          onClose={() => setIsCinePartyOpen(false)}
+          showtimeId={currentShowtimeId}
+        />
+      )}
     </S.PageContainer>
   );
 };

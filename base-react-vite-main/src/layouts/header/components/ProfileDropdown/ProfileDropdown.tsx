@@ -12,6 +12,7 @@ import {
 import { BiCameraMovie } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import tokenManager from '@shared/utils/tokenManager';
+import { isFeatureEnabled } from '@/config/features.config';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import * as S from './ProfileDropdown.styles';
 
@@ -150,7 +151,9 @@ export function ProfileDropdownMenu({ onLogout }: ProfileDropdownMenuProps) {
 
           <S.ProfileDivider />
 
-          {PROFILE_MENU.map((item) => (
+          {PROFILE_MENU.filter((item) =>
+            item.id === 'passport' ? isFeatureEnabled('passport') : true,
+          ).map((item) => (
             <S.ProfileMenuItem
               key={item.id}
               onClick={handleMenuItemClick(item.path)}

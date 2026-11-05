@@ -4,6 +4,7 @@ import Header from './header/Header';
 import { Footer } from './footer/Footer';
 import Sidebar from './sidebar/Sidebar';
 import { CineBotWidget } from '@/features/ai-concierge/components/CineBotWidget';
+import { isFeatureEnabled } from '@/config/features.config';
 import * as S from './MainLayout.styles';
 
 export default function MainLayout() {
@@ -38,7 +39,7 @@ export default function MainLayout() {
       <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
 
       {/* 5. CineBot AI Concierge Floating Widget */}
-      <CineBotWidget />
+      {isFeatureEnabled('cineBotAi') && <CineBotWidget />}
     </S.LayoutWrapper>
   );
 }

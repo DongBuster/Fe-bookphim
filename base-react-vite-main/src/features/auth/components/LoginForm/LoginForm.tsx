@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import tokenManager from '@shared/utils/tokenManager';
+import { isFeatureEnabled } from '@/config/features.config';
 import { loginApi, registerApi } from '@features/auth/api/auth.api';
 import * as S from './LoginForm.styles';
 
@@ -446,7 +447,7 @@ export const LoginForm: FC = () => {
         </form>
 
         {/* Hoặc tiếp tục với */}
-        {!isRegisterMode && (
+        {!isRegisterMode && isFeatureEnabled('socialLogin') && (
           <>
             <S.OrDivider>
               <div className="line" />

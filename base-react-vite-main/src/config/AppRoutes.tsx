@@ -8,6 +8,7 @@ import GuestGuard from '@guards/GuestGuard';
 import MainLayout from '@layouts/MainLayout';
 import BookingLayout from '@layouts/BookingLayout';
 import { HOME_PATH } from '@shared/constants/path';
+import { isFeatureEnabled } from './features.config';
 
 const loadMovieDetailsPage = async () => {
   const { default: MovieDetailsPage } = await import(
@@ -172,6 +173,9 @@ export const router = createBrowserRouter([
           {
             path: 'profile/passport',
             async lazy() {
+              if (!isFeatureEnabled('passport')) {
+                return { Component: PageNotFound };
+              }
               const { default: PassportPage } = await import(
                 '@features/passport/PassportPage'
               );
@@ -181,6 +185,9 @@ export const router = createBrowserRouter([
           {
             path: 'ho-chieu',
             async lazy() {
+              if (!isFeatureEnabled('passport')) {
+                return { Component: PageNotFound };
+              }
               const { default: PassportPage } = await import(
                 '@features/passport/PassportPage'
               );

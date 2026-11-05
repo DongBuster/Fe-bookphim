@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, MapPin, ExternalLink } from 'lucide-react';
+import { isFeatureEnabled } from '@/config/features.config';
 import {
   DAY_OPTIONS,
   FORMAT_FILTERS,
@@ -222,7 +223,7 @@ export const ShowtimePicker = forwardRef<HTMLDivElement, ShowtimePickerProps>(
                             >
                               <span className="pill-time">{slot.time}</span>
                               <span className="pill-sub">
-                                {slot.isMystery ? '🔮 Bí ẩn' : slot.statusText} • {slot.priceText}
+                                {slot.isMystery && isFeatureEnabled('mysteryNight') ? '🔮 Bí ẩn' : slot.statusText} • {slot.priceText}
                               </span>
                             </S.ShowtimePill>
                           );
