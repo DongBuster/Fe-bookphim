@@ -12,9 +12,10 @@ export const ChangePasswordCard: FC<ChangePasswordCardProps> = ({
   onSuccess,
 }) => {
   const { t } = useTranslation();
-  const [currentPass, setCurrentPass] = useState('PasswordVIP2024!');
-  const [newPass, setNewPass] = useState('CinemaNoir_Elite99#');
-  const [confirmPass, setConfirmPass] = useState('CinemaNoir_Elite99#');
+  const [currentPass, setCurrentPass] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [isShowCurrentPassword, setIsShowCurrentPassword] = useState(false);
   const [isShowNewPassword, setIsShowNewPassword] = useState(false);
   const [isReloginRequired, setIsReloginRequired] = useState(true);
@@ -27,6 +28,7 @@ export const ChangePasswordCard: FC<ChangePasswordCardProps> = ({
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setCurrentPass(e.target.value);
+    if (errorMessage) setErrorMessage('');
   };
 
   const handleToggleCurrentPasswordVisibility = () => {
@@ -35,6 +37,7 @@ export const ChangePasswordCard: FC<ChangePasswordCardProps> = ({
 
   const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewPass(e.target.value);
+    if (errorMessage) setErrorMessage('');
   };
 
   const handleToggleNewPasswordVisibility = () => {
@@ -45,6 +48,7 @@ export const ChangePasswordCard: FC<ChangePasswordCardProps> = ({
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setConfirmPass(e.target.value);
+    if (errorMessage) setErrorMessage('');
   };
 
   const handleReloginRequiredChange = (
@@ -55,11 +59,26 @@ export const ChangePasswordCard: FC<ChangePasswordCardProps> = ({
 
   const handlePasswordSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (newPass !== confirmPass) {
+    if (!currentPass) {
+      setErrorMessage(t('profile:err_current_pass_empty', 'Vui lòng nhập mật khẩu hiện tại.'));
       return;
     }
+    if (newPass.length < 6) {
+      setErrorMessage(t('profile:err_pass_too_short', 'Mật khẩu mới phải có ít nhất 6 ký tự.'));
+      return;
+    }
+    if (newPass !== confirmPass) {
+      setErrorMessage(t('profile:err_pass_mismatch', 'Mật khẩu xác nhận không trùng khớp.'));
+      return;
+    }
+    setErrorMessage('');
     onSuccess(t('profile:toast_pass_updated'));
+    setCurrentPass('');
+    setNewPass('');
+    setConfirmPass('');
   };
+
+  const isPasswordMatch = Boolean(confirmPass && confirmPass === newPass);
 
   return (
     <S.Card>
@@ -93,6 +112,7 @@ export const ChangePasswordCard: FC<ChangePasswordCardProps> = ({
               type={isShowCurrentPassword ? 'text' : 'password'}
               value={currentPass}
               onChange={handleCurrentPasswordChange}
+              placeholder={t('profile:current_pass_placeholder', 'Nhập mật khẩu hiện tại')}
               required
             />
             <span
@@ -112,6 +132,7 @@ export const ChangePasswordCard: FC<ChangePasswordCardProps> = ({
               type={isShowNewPassword ? 'text' : 'password'}
               value={newPass}
               onChange={handleNewPasswordChange}
+              placeholder={t('profile:new_pass_placeholder', 'Nhập mật khẩu mới')}
               required
             />
             <span
@@ -144,11 +165,27 @@ export const ChangePasswordCard: FC<ChangePasswordCardProps> = ({
               type="password"
               value={confirmPass}
               onChange={handleConfirmPasswordChange}
+              placeholder={t('profile:confirm_pass_placeholder', 'Nhập lại mật khẩu mới')}
               required
             />
-            <CheckCircle2 size={15} className="check-ok" />
+            {isPasswordMatch && <CheckCircle2 size={15} className="check-ok" />}
           </div>
         </div>
+
+        {errorMessage && (
+          <div
+            style={{
+              color: '#ff535a',
+              fontSize: '12px',
+              padding: '8px 12px',
+              background: 'rgba(255, 83, 90, 0.1)',
+              borderRadius: 6,
+              border: '1px solid rgba(255, 83, 90, 0.2)',
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
 
         <label className="remember-check">
           <input

@@ -1,7 +1,8 @@
 import { useState, useMemo, type FC } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Star, Ticket, Loader2 } from "lucide-react";
+import { Star, Ticket } from "lucide-react";
+import { MovieGridSkeleton } from "@shared/components/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { getMoviesApi } from "@features/movie-discovery/api/movie.api";
 import type { MovieDto } from "@shared/types/api.types";
@@ -151,21 +152,7 @@ export const NowShowing: FC = () => {
         </S.Header>
 
         {/* Loading State */}
-        {isLoading && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '60px 0',
-              gap: 12,
-              color: '#ae8786',
-            }}
-          >
-            <Loader2 className="animate-spin" size={24} color="#ff535a" />
-            <span>{t('home:now_showing.loading_movies')}</span>
-          </div>
-        )}
+        {isLoading && <MovieGridSkeleton count={8} />}
 
         {/* Empty State */}
         {!isLoading && filteredMovies.length === 0 && (

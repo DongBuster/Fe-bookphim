@@ -117,6 +117,8 @@ export const MovieDetailsPage: FC = () => {
             statusText: t('movie:on_sale'),
             priceText: `${Math.round(s.basePrice / 1000)}k`,
             price: s.basePrice,
+            isMystery: s.isMysteryShowtime,
+            mysteryDiscount: s.mysteryDiscountRate,
           })),
         },
       ],

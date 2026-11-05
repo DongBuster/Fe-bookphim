@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { message } from 'antd';
-import { ChevronLeft, Clock } from 'lucide-react';
+import { toast } from '@config/notification';
+import { ChevronLeft, Clock, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBooking } from '../context/useBooking';
 import type { SeatItem } from '../context/booking.types';
@@ -19,6 +20,8 @@ import { SeatGrid } from './components/SeatGrid/SeatGrid';
 import { SeatFeatures } from './components/SeatFeatures/SeatFeatures';
 import { SeatSummarySidebar } from './components/SeatSummarySidebar/SeatSummarySidebar';
 import { MobileStickyBar } from './components/MobileStickyBar/MobileStickyBar';
+import { CinePartyModal } from '@/features/cineparty/components/CinePartyModal';
+import { CineMateWidget } from '@/features/cinemate/components/CineMateWidget';
 import * as S from './SeatSelectionPage.styles';
 
 const DEFAULT_ACTIVE_SHOWTIME_ID = '5458e3dd-b719-4a76-a9df-904be8fcf493';
@@ -35,6 +38,7 @@ export const SeatSelectionPage: FC = () => {
   } = useBooking();
 
   const [isLocking, setIsLocking] = useState(false);
+  const [isCinePartyOpen, setIsCinePartyOpen] = useState(false);
 
   // 10-minute live countdown timer
   const { formattedTime, isExpired, setTimeLeft } = useBookingTimer(600);
@@ -54,19 +58,19 @@ export const SeatSelectionPage: FC = () => {
     refetchInterval: 15000, // Sync seats every 15s to capture concurrent bookings
   });
 
+  const currentRoom = state.session.room;
+  const currentMovieTitle = state.movie.title;
+
   // Sync auditorium room and movie title if not already loaded in session
   useEffect(() => {
     if (seatMap) {
-      const updatesToSession: Partial<typeof state.session> = {};
-      const updatesToMovie: Partial<typeof state.movie> = {};
+      const updatesToSession: Record<string, string> = {};
+      const updatesToMovie: Record<string, string> = {};
 
-      if (!state.session.room && seatMap.auditoriumName) {
+      if (!currentRoom && seatMap.auditoriumName) {
         updatesToSession.room = seatMap.auditoriumName;
       }
-      if (
-        (!state.movie.title || state.movie.title === 'Dune: Hành Tinh Cát - Phần Hai') &&
-        seatMap.movieTitle
-      ) {
+      if (!currentMovieTitle && seatMap.movieTitle) {
         updatesToMovie.title = seatMap.movieTitle;
       }
 
@@ -77,7 +81,7 @@ export const SeatSelectionPage: FC = () => {
         setMovieAndSession(updatesToMovie, updatesToSession);
       }
     }
-  }, [seatMap, state.session.room, state.movie.title, setMovieAndSession]);
+  }, [seatMap, currentRoom, currentMovieTitle, setMovieAndSession]);
 
   // Handle countdown expiration
   useEffect(() => {
@@ -185,18 +189,25 @@ export const SeatSelectionPage: FC = () => {
         );
         navigate('/booking/snacks-services');
       } else {
-        message.error(res?.message || t('booking:cannot_lock_seats'));
+        toast.error(res?.message || t('booking:cannot_lock_seats'));
       }
     } catch (err: unknown) {
-      const errorObj = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      const errorMsg =
-        errorObj?.response?.data?.message ||
-        errorObj?.message ||
-        t('booking:seat_already_taken');
-      message.error(errorMsg);
+      console.error('Lỗi chọn ghế:', err);
+      const isAlreadyHandled = Boolean(
+        (err as { isHandled?: boolean })?.isHandled ||
+        (err as { isBusinessError?: boolean })?.isBusinessError
+      );
+      if (!isAlreadyHandled) {
+        const errorObj = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        const errorMsg =
+          errorObj?.response?.data?.message ||
+          errorObj?.message ||
+          t('booking:seat_already_taken');
+        toast.error(errorMsg);
+      }
       refetchSeatMap();
     } finally {
       setIsLocking(false);
@@ -271,6 +282,38 @@ export const SeatSelectionPage: FC = () => {
 
             {/* Feature Guarantees */}
             <SeatFeatures />
+
+            {/* CineParty Group Booking CTA */}
+            <button
+              type="button"
+              onClick={() => setIsCinePartyOpen(true)}
+              style={{
+                width: '100%',
+                padding: '12px 18px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(255, 185, 85, 0.15) 0%, rgba(255, 83, 90, 0.15) 100%)',
+                border: '1px solid rgba(255, 185, 85, 0.4)',
+                color: '#ffb955',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '14px',
+                transition: 'all 0.2s',
+              }}
+            >
+              <Users size={16} />
+              <span>Đặt vé nhóm & Chia tiền tự động (CineParty)</span>
+            </button>
+
+            {/* CineMate Solo Matchmaker */}
+            <CineMateWidget
+              showtimeId={currentShowtimeId}
+              selectedSeatLabel={state.selectedSeats[0]?.id}
+            />
           </S.SeatSelectionArea>
 
           {/* Right Column: Booking Summary Sidebar */}
@@ -283,6 +326,13 @@ export const SeatSelectionPage: FC = () => {
 
       {/* Mobile Sticky Checkout Bar */}
       <MobileStickyBar onContinue={handleContinue} isLocking={isLocking} />
+
+      {/* CineParty Group Modal */}
+      <CinePartyModal
+        isOpen={isCinePartyOpen}
+        onClose={() => setIsCinePartyOpen(false)}
+        showtimeId={currentShowtimeId}
+      />
     </S.PageContainer>
   );
 };

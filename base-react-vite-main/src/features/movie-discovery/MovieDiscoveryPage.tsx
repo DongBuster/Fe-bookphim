@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { MovieGridSkeleton } from '@shared/components/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { getMoviesApi } from './api/movie.api';
@@ -184,25 +184,7 @@ export const MovieDiscoveryPage: FC = () => {
 
         {/* SECTION 3: Movie Showcase Grid (Cinematic Cards) */}
         {isLoading ? (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '80px 0',
-              gap: 16,
-            }}
-          >
-            <Loader2
-              size={36}
-              color="#ff535a"
-              style={{ animation: 'spin 1s linear infinite' }}
-            />
-            <span style={{ color: '#8c8994', fontSize: 14 }}>
-              {t('discovery:loading_movies')}
-            </span>
-          </div>
+          <MovieGridSkeleton count={8} />
         ) : (
           <MovieShowcaseGrid
             movies={movies}

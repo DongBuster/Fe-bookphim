@@ -26,30 +26,40 @@ const loadVipElitePage = async () => {
 const MOVIE_DETAILS_PATHS = [
   'movie-details',
   'movie-details/:id',
-  'lich-chieu',
-  'lich-chieu/:id',
   'phim/:id',
-  'dat-ve',
   'dat-ve/:id',
-  'mua-ve',
   'mua-ve/:id',
-  'rap-chieu',
 ];
 
 const VIP_ELITE_PATHS = ['profile/vip-elite', 'ho-so-vip', 'profile'];
 
 export const router = createBrowserRouter([
   {
-    element: <AuthGuard />,
+    path: '/',
+    element: <MainLayout />,
     children: [
-      {
-        path: '/',
-        element: <MainLayout />,
-        children: [
       { index: true, element: <Home /> },
       { path: HOME_PATH, element: <Home /> },
       {
         path: 'kham-pha',
+        async lazy() {
+          const { default: MovieDiscoveryPage } = await import(
+            '@features/movie-discovery/MovieDiscoveryPage'
+          );
+          return { Component: MovieDiscoveryPage };
+        },
+      },
+      {
+        path: 'lich-chieu',
+        async lazy() {
+          const { default: MovieDiscoveryPage } = await import(
+            '@features/movie-discovery/MovieDiscoveryPage'
+          );
+          return { Component: MovieDiscoveryPage };
+        },
+      },
+      {
+        path: 'rap-chieu',
         async lazy() {
           const { default: MovieDiscoveryPage } = await import(
             '@features/movie-discovery/MovieDiscoveryPage'
@@ -97,67 +107,89 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      // Protected Routes: Chỉ cho phép người dùng đã đăng nhập xem vé và hồ sơ cá nhân
       {
-        path: 've-cua-toi',
-        async lazy() {
-          const { default: MyTicketsPage } = await import(
-            '@features/booking/my-tickets/MyTicketsPage'
-          );
-          return { Component: MyTicketsPage };
-        },
-      },
-      ...VIP_ELITE_PATHS.map((path) => ({
-        path,
-        lazy: loadVipElitePage,
-      })),
-      {
-        path: 'profile/personal-info',
-        async lazy() {
-          const { default: PersonalInfoPage } = await import(
-            '@features/profile/personal-info/PersonalInfoPage'
-          );
-          return { Component: PersonalInfoPage };
-        },
-      },
-      {
-        path: 'profile/security',
-        async lazy() {
-          const { default: SecurityPage } = await import(
-            '@features/profile/security/SecurityPage'
-          );
-          return { Component: SecurityPage };
-        },
-      },
-      {
-        path: 'profile/payment-methods',
-        async lazy() {
-          const { default: PaymentMethodsPage } = await import(
-            '@features/profile/payment-methods/PaymentMethodsPage'
-          );
-          return { Component: PaymentMethodsPage };
-        },
-      },
-      {
-        path: 'profile/cinematic-taste',
-        async lazy() {
-          const { default: CinematicTastePage } = await import(
-            '@features/profile/cinematic-taste/CinematicTastePage'
-          );
-          return { Component: CinematicTastePage };
-        },
-      },
-      {
-        path: 'profile/notification-settings',
-        async lazy() {
-          const { default: NotificationSettingsPage } = await import(
-            '@features/profile/notification-settings/NotificationSettingsPage'
-          );
-          return { Component: NotificationSettingsPage };
-        },
-      },
-      { path: '*', element: <PageNotFound /> },
+        element: <AuthGuard />,
+        children: [
+          {
+            path: 've-cua-toi',
+            async lazy() {
+              const { default: MyTicketsPage } = await import(
+                '@features/booking/my-tickets/MyTicketsPage'
+              );
+              return { Component: MyTicketsPage };
+            },
+          },
+          ...VIP_ELITE_PATHS.map((path) => ({
+            path,
+            lazy: loadVipElitePage,
+          })),
+          {
+            path: 'profile/personal-info',
+            async lazy() {
+              const { default: PersonalInfoPage } = await import(
+                '@features/profile/personal-info/PersonalInfoPage'
+              );
+              return { Component: PersonalInfoPage };
+            },
+          },
+          {
+            path: 'profile/security',
+            async lazy() {
+              const { default: SecurityPage } = await import(
+                '@features/profile/security/SecurityPage'
+              );
+              return { Component: SecurityPage };
+            },
+          },
+          {
+            path: 'profile/payment-methods',
+            async lazy() {
+              const { default: PaymentMethodsPage } = await import(
+                '@features/profile/payment-methods/PaymentMethodsPage'
+              );
+              return { Component: PaymentMethodsPage };
+            },
+          },
+          {
+            path: 'profile/cinematic-taste',
+            async lazy() {
+              const { default: CinematicTastePage } = await import(
+                '@features/profile/cinematic-taste/CinematicTastePage'
+              );
+              return { Component: CinematicTastePage };
+            },
+          },
+          {
+            path: 'profile/notification-settings',
+            async lazy() {
+              const { default: NotificationSettingsPage } = await import(
+                '@features/profile/notification-settings/NotificationSettingsPage'
+              );
+              return { Component: NotificationSettingsPage };
+            },
+          },
+          {
+            path: 'profile/passport',
+            async lazy() {
+              const { default: PassportPage } = await import(
+                '@features/passport/PassportPage'
+              );
+              return { Component: PassportPage };
+            },
+          },
+          {
+            path: 'ho-chieu',
+            async lazy() {
+              const { default: PassportPage } = await import(
+                '@features/passport/PassportPage'
+              );
+              return { Component: PassportPage };
+            },
+          },
         ],
       },
+      { path: '*', element: <PageNotFound /> },
     ],
   },
   {

@@ -1,17 +1,12 @@
 import type { AxiosError } from 'axios';
-import { notification } from 'antd';
+import notify from './notification';
 import { BACKEND_ERROR_CODES } from '@shared/constants/backend-error-code';
 import type { IResponse } from '@shared/types/response';
-
-const notify = {
-  error: (msg?: string) =>
-    notification.error({ message: 'Lỗi', description: msg }),
-  warning: (msg?: string) =>
-    notification.warning({ message: 'Cảnh báo', description: msg }),
-};
+import { sanitizeErrorMessage } from '@/shared/utils/error-sanitizer';
 
 export interface BusinessError extends Error {
   isBusinessError: true;
+  isHandled?: boolean;
   code: number;
   serverData: IResponse<unknown>;
 }
@@ -35,16 +30,18 @@ export function isBusinessResponseFailed(
 }
 
 export function getBackendErrorMessage(data: Partial<IResponse<unknown>>) {
-  return (
-    data.message || data.error || 'Thao tác không thành công. Vui lòng thử lại.'
-  );
+  const raw = data.message || data.error;
+  return sanitizeErrorMessage(raw);
 }
 
-export function createBusinessError(data: IResponse<unknown>): BusinessError {
-  const businessError = new Error(
-    getBackendErrorMessage(data),
-  ) as BusinessError;
+export function createBusinessError(
+  data: IResponse<unknown>,
+  isHandled = false,
+): BusinessError {
+  const message = getBackendErrorMessage(data);
+  const businessError = new Error(message) as BusinessError;
   businessError.isBusinessError = true;
+  businessError.isHandled = isHandled;
   businessError.code = data.code ?? BACKEND_ERROR_CODES.UNKNOWN;
   businessError.serverData = data;
 
@@ -55,11 +52,12 @@ export function rejectBusinessError(
   data: IResponse<unknown>,
   shouldNotify = true,
 ) {
+  const message = getBackendErrorMessage(data);
   if (shouldNotify) {
-    notify.error(getBackendErrorMessage(data));
+    notify.error(message);
   }
 
-  return Promise.reject(createBusinessError(data));
+  return Promise.reject(createBusinessError(data, shouldNotify));
 }
 
 export async function tryParseBlobErrorResponse(blob: Blob) {
@@ -77,8 +75,10 @@ export async function tryParseBlobErrorResponse(blob: Blob) {
 }
 
 export function handleCommonHttpError(error: AxiosError<IResponse<unknown>>) {
+  (error as { isHandled?: boolean }).isHandled = true;
+
   if (!error.response) {
-    notify.error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng.');
+    notify.error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.');
     return Promise.reject(error);
   }
 
@@ -86,6 +86,11 @@ export function handleCommonHttpError(error: AxiosError<IResponse<unknown>>) {
 
   if (isBusinessResponseFailed(data)) {
     return rejectBusinessError(data);
+  }
+
+  if (status === 401) {
+    notify.warning('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    return Promise.reject(error);
   }
 
   if (status === 403) {
@@ -99,10 +104,11 @@ export function handleCommonHttpError(error: AxiosError<IResponse<unknown>>) {
   }
 
   if (status >= 500) {
-    notify.error('Máy chủ gặp sự cố. Vui lòng thử lại sau ít phút.');
+    notify.error('Hệ thống đang bận hoặc gặp sự cố. Vui lòng thử lại sau ít phút.');
     return Promise.reject(error);
   }
 
-  notify.error(getBackendErrorMessage(data ?? {}));
+  const fallbackMsg = getBackendErrorMessage(data ?? {});
+  notify.error(fallbackMsg);
   return Promise.reject(error);
 }

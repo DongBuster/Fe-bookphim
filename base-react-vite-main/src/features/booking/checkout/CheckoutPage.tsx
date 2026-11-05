@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Lock } from 'lucide-react';
 import { message } from 'antd';
+import { toast } from '@config/notification';
 import { useTranslation } from 'react-i18next';
 import { useBooking } from '../context/useBooking';
 import { useBookingTimer } from '../hooks/useBookingTimer';
@@ -206,7 +207,7 @@ export const CheckoutPage: FC = () => {
           activeLockToken = lockRes.lockToken;
           setLockToken(lockRes.lockToken);
         } else {
-          message.error(lockRes?.message || t('booking:cannot_lock_seats'));
+          toast.error(lockRes?.message || t('booking:cannot_lock_seats'));
           setIsProcessing(false);
           return;
         }
@@ -263,15 +264,21 @@ export const CheckoutPage: FC = () => {
       }
     } catch (err: unknown) {
       console.error('Lỗi thanh toán:', err);
-      const errorObj = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      const errorMsg =
-        errorObj?.response?.data?.message ||
-        errorObj?.message ||
-        t('booking:payment_failed_toast');
-      message.error(errorMsg);
+      const isAlreadyHandled = Boolean(
+        (err as { isHandled?: boolean })?.isHandled ||
+        (err as { isBusinessError?: boolean })?.isBusinessError
+      );
+      if (!isAlreadyHandled) {
+        const errorObj = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        const errorMsg =
+          errorObj?.response?.data?.message ||
+          errorObj?.message ||
+          t('booking:payment_failed_toast');
+        toast.error(errorMsg);
+      }
     } finally {
       setIsProcessing(false);
     }

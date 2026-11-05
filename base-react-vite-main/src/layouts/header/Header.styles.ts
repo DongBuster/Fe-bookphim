@@ -9,7 +9,7 @@ export const OuterHeader = styled.header`
   width: 100%;
   height: var(--header-public-height, 80px);
   z-index: 100;
-  background: rgba(14, 14, 15, 0.8);
+  background: rgba(14, 14, 15, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0px 16px 40px -8px rgba(0, 0, 0, 0.7);
@@ -45,8 +45,32 @@ export const NavLeftGroup = styled.div`
   gap: 16px;
   height: 42px;
   min-width: 0;
+  flex-shrink: 0;
 `;
 
+export const SearchCenterGroup = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  max-width: 440px;
+  min-width: 200px;
+  margin: 0 24px;
+
+  @media ${media.xl} {
+    max-width: 360px;
+    margin: 0 16px;
+  }
+
+  @media ${media.lg} {
+    max-width: 260px;
+    margin: 0 10px;
+  }
+
+  @media ${media.md} {
+    display: none;
+  }
+`;
 
 export const EdgeMenuTrigger = styled.button<{ $isOpen?: boolean }>`
   display: none; /* Ẩn trên desktop/màn hình lớn */
@@ -96,6 +120,7 @@ export const ActionsGroup = styled.div`
   align-items: center;
   gap: 12px;
   height: 37px;
+  flex-shrink: 0;
 
   @media ${media.xl} {
     gap: 8px;
@@ -109,43 +134,3 @@ export const ActionsGroup = styled.div`
     gap: 6px;
   }
 `;
-
-export const TicketPassBtn = styled.button`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 6px 12px;
-  gap: 6px;
-  height: 28px;
-  background: var(--primary, #ff535a);
-  box-shadow: 0px 4px 20px rgba(255, 83, 90, 0.35);
-  border-radius: 9999px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  @media ${media.lg} {
-    display: none;
-  }
-
-  span {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 16px;
-    letter-spacing: 0.66px;
-    color: #5b000d;
-    white-space: nowrap;
-  }
-
-  .ticket-icon {
-    color: #5b000d;
-    font-size: 12px;
-  }
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0px 6px 24px rgba(255, 83, 90, 0.45);
-  }
-`;
-

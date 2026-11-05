@@ -127,13 +127,48 @@ export interface BookingShowtimeOption {
   defaultLabel: string;
 }
 
-export const BOOKING_DATES: BookingDateOption[] = [
-  { key: 'today', defaultLabel: 'Hôm nay, 24 Tháng 10' },
-  { key: 'tomorrow', defaultLabel: 'Ngày mai, 25 Tháng 10' },
-  { key: 'sat', defaultLabel: 'Thứ Bảy, 26 Tháng 10' },
-  { key: 'sun', defaultLabel: 'Chủ Nhật, 27 Tháng 10' },
-  { key: 'mon', defaultLabel: 'Thứ Hai, 28 Tháng 10' },
+const VI_DAY_NAMES = [
+  'Chủ Nhật',
+  'Thứ Hai',
+  'Thứ Ba',
+  'Thứ Tư',
+  'Thứ Năm',
+  'Thứ Sáu',
+  'Thứ Bảy',
 ];
+
+export const generateBookingDates = (): BookingDateOption[] => {
+  const dates: BookingDateOption[] = [];
+  const now = new Date();
+
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
+
+    const dayOfMonth = d.getDate();
+    const month = d.getMonth() + 1;
+    const dayOfWeek = VI_DAY_NAMES[d.getDay()];
+
+    let prefix = dayOfWeek;
+    let key = `day_${i}`;
+    if (i === 0) {
+      prefix = 'Hôm nay';
+      key = 'today';
+    } else if (i === 1) {
+      prefix = 'Ngày mai';
+      key = 'tomorrow';
+    }
+
+    dates.push({
+      key,
+      defaultLabel: `${prefix}, ${dayOfMonth} Tháng ${month}`,
+    });
+  }
+
+  return dates;
+};
+
+export const BOOKING_DATES: BookingDateOption[] = generateBookingDates();
 
 export const BOOKING_SHOWTIMES: BookingShowtimeOption[] = [
   { key: 'time_1', defaultLabel: '10:15 • 2D Phụ đề' },

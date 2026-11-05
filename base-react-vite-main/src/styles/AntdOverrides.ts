@@ -47,23 +47,23 @@ export const AntdOverrides = createGlobalStyle`
 }
 /* ===== SECONDARY ===== */
 .ant-btn-secondary {
-  background-color: var(--primary-text);
-  color: var(--primary);
-  border-color: var(--primary);
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary, #ffffff);
+  border-color: var(--primary-border, rgba(255, 255, 255, 0.12));
 
   &:hover,
   &:focus {
-    background-color: var(--primary-bg-sub);
-    color: var(--primary-text-highlight);
-    border-color: var(--primary-sub);
+    background-color: rgba(255, 255, 255, 0.14);
+    color: var(--primary, #ff535a);
+    border-color: var(--primary-sub, #e01e35);
   }
 }
 
 /* ===== DEFAULT ===== */
 .ant-btn-default {
-  background-color: var(--primary-text);
-  color: var(--primary);
-  border-color: var(--primary-border);
+  background-color: var(--bg-card, #1c1b1c);
+  color: var(--text-primary, #ffffff);
+  border-color: var(--primary-border, rgba(255, 255, 255, 0.12));
 
   .anticon {
     transition: color 0.25s linear;
@@ -71,12 +71,12 @@ export const AntdOverrides = createGlobalStyle`
 
   &:hover,
   &:focus {
-    background-color: var(--primary-bg-sub);
-    color: var(--primary-text-highlight);
-    border-color: var(--primary-sub);
+    background-color: var(--bg-elevated, #201f20);
+    color: var(--primary, #ff535a);
+    border-color: var(--primary, #ff535a);
 
     .anticon {
-      color: var(--primary-text-highlight) !important;
+      color: var(--primary, #ff535a) !important;
     }
   }
 }
@@ -457,9 +457,58 @@ input.ant-input,
 }
 
 /* ===== _notification.scss ===== */
-.ant-notification-notice-message {
-  font-weight: bold;
-  font-size: 2rem;
+.ant-notification .ant-notification-notice {
+  background: var(--bg-card, #1c1b1c) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75) !important;
+
+  .ant-notification-notice-message {
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+  }
+
+  .ant-notification-notice-description {
+    color: #ae8786 !important;
+    font-size: 13.5px !important;
+    line-height: 1.5 !important;
+  }
+
+  .ant-notification-notice-close {
+    color: #8c90a4 !important;
+    &:hover {
+      color: #ffffff !important;
+    }
+  }
+
+  &.ant-notification-notice-error {
+    border-left: 4px solid var(--primary, #ff535a) !important;
+  }
+
+  &.ant-notification-notice-success {
+    border-left: 4px solid var(--success, #34c759) !important;
+  }
+
+  &.ant-notification-notice-warning {
+    border-left: 4px solid var(--warning, #ffb955) !important;
+  }
+
+  &.ant-notification-notice-info {
+    border-left: 4px solid var(--info, #178fe2) !important;
+  }
+}
+
+/* ===== _message.scss ===== */
+.ant-message .ant-message-notice .ant-message-notice-content {
+  background: #1c1b1c !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  padding: 8px 18px !important;
 }
 
 /* ===== _pagination.scss ===== */
@@ -509,7 +558,7 @@ input.ant-input,
   margin: 0 !important;
   padding: 1.2rem 0;
   align-items: center;
-  background-color: #ffffff;
+  background-color: var(--bg-elevated, #201f20);
 }
 
 .ant-pagination-options .ant-select-single {
@@ -610,7 +659,7 @@ input.ant-input,
   &.--disabled {
     pointer-events: none;
     tbody tr {
-      background-color: #f2f2f2;
+      background-color: var(--bg-disabled, #2a2a2b);
     }
   }
   &.--border-last-row .ant-table-body tr:last-child td {

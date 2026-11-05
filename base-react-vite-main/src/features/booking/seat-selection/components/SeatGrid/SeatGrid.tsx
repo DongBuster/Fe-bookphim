@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { MoveHorizontal } from 'lucide-react';
 import { useBooking } from '../../../context/useBooking';
 import type { SeatDto } from '@shared/types/api.types';
+import { SeatMapSkeleton } from '@shared/components/skeleton';
 import * as S from './SeatGrid.styles';
 
 interface SeatGridProps {
@@ -69,15 +70,7 @@ export const SeatGrid: FC<SeatGridProps> = ({
   };
 
   if (isLoading) {
-    return (
-      <S.SeatMapGrid>
-        <S.SeatMapInner style={{ padding: '60px 0', textAlign: 'center' }}>
-          <div style={{ color: '#ffb955', fontSize: '13px', fontWeight: 600 }}>
-            {t('booking:loading_seatmap')}
-          </div>
-        </S.SeatMapInner>
-      </S.SeatMapGrid>
-    );
+    return <SeatMapSkeleton />;
   }
 
   return (
@@ -147,6 +140,16 @@ export const SeatGrid: FC<SeatGridProps> = ({
                             disabled={isSold}
                             onClick={() => !isSold && onSeatClick(seat)}
                             title={getTooltip()}
+                            role="button"
+                            tabIndex={isSold ? -1 : 0}
+                            aria-label={`${seatLabel}, ${seat.seatType || 'Ghế'}, ${isSold ? 'Đã bán' : isSelected ? 'Đang chọn' : 'Còn trống'}`}
+                            aria-pressed={isSelected}
+                            onKeyDown={(e) => {
+                              if (!isSold && (e.key === 'Enter' || e.key === ' ')) {
+                                e.preventDefault();
+                                onSeatClick(seat);
+                              }
+                            }}
                           >
                             {getDisplayContent()}
                           </S.SeatBox>

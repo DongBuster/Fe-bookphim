@@ -11,6 +11,8 @@ export interface ShowtimeSlot {
   isAlmostFull?: boolean;
   priceText: string;
   price: number;
+  isMystery?: boolean;
+  mysteryDiscount?: number;
 }
 
 export interface ScreenFormatGroup {
@@ -2012,44 +2014,60 @@ export const getMovieDetails = (
   return MOVIE_DETAILS_MAP[key] || DUNE_MOVIE_DATA;
 };
 
-export const DAY_OPTIONS: DayOption[] = [
-  {
-    dayLabel: 'HÔM NAY',
-    dateStr: '24/10',
-    dayOfWeek: 'Thứ Năm',
-    fullDate: 'Hôm nay, 24/10/2024',
-  },
-  {
-    dayLabel: 'NGÀY MAI',
-    dateStr: '25/10',
-    dayOfWeek: 'Thứ Sáu',
-    fullDate: 'Thứ Sáu, 25/10/2024',
-  },
-  {
-    dayLabel: 'CUỐI TUẦN',
-    dateStr: '26/10',
-    dayOfWeek: 'Thứ Bảy',
-    fullDate: 'Thứ Bảy, 26/10/2024',
-  },
-  {
-    dayLabel: 'CUỐI TUẦN',
-    dateStr: '27/10',
-    dayOfWeek: 'Chủ Nhật',
-    fullDate: 'Chủ Nhật, 27/10/2024',
-  },
-  {
-    dayLabel: 'TUẦN MỚI',
-    dateStr: '28/10',
-    dayOfWeek: 'Thứ Hai',
-    fullDate: 'Thứ Hai, 28/10/2024',
-  },
-  {
-    dayLabel: 'ƯU ĐÃI',
-    dateStr: '29/10',
-    dayOfWeek: 'Thứ Ba',
-    fullDate: 'Thứ Ba, 29/10/2024',
-  },
+const VIETNAMESE_DAYS = [
+  'Chủ Nhật',
+  'Thứ Hai',
+  'Thứ Ba',
+  'Thứ Tư',
+  'Thứ Năm',
+  'Thứ Sáu',
+  'Thứ Bảy',
 ];
+
+export const generateDynamicDayOptions = (): DayOption[] => {
+  const options: DayOption[] = [];
+  const now = new Date();
+
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
+
+    const dayOfMonth = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const dayOfWeek = VIETNAMESE_DAYS[d.getDay()];
+
+    let dayLabel = dayOfWeek.toUpperCase();
+    if (i === 0) {
+      dayLabel = 'HÔM NAY';
+    } else if (i === 1) {
+      dayLabel = 'NGÀY MAI';
+    } else if (d.getDay() === 0 || d.getDay() === 6) {
+      dayLabel = 'CUỐI TUẦN';
+    } else if (d.getDay() === 1) {
+      dayLabel = 'TUẦN MỚI';
+    } else if (d.getDay() === 2) {
+      dayLabel = 'ƯU ĐÃI';
+    }
+
+    const dateStr = `${dayOfMonth}/${month}`;
+    const fullDate =
+      i === 0
+        ? `Hôm nay, ${dateStr}/${year}`
+        : `${dayOfWeek}, ${dateStr}/${year}`;
+
+    options.push({
+      dayLabel,
+      dateStr,
+      dayOfWeek,
+      fullDate,
+    });
+  }
+
+  return options;
+};
+
+export const DAY_OPTIONS: DayOption[] = generateDynamicDayOptions();
 
 export const FORMAT_FILTERS = [
   { id: 'all', label: 'Tất cả định dạng', count: 18 },

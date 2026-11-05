@@ -222,7 +222,7 @@ export const ShowtimePicker = forwardRef<HTMLDivElement, ShowtimePickerProps>(
                             >
                               <span className="pill-time">{slot.time}</span>
                               <span className="pill-sub">
-                                {slot.statusText} • {slot.priceText}
+                                {slot.isMystery ? '🔮 Bí ẩn' : slot.statusText} • {slot.priceText}
                               </span>
                             </S.ShowtimePill>
                           );

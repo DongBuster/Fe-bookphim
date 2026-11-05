@@ -2,7 +2,6 @@ import type { FC } from 'react';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu as MenuIcon } from 'lucide-react';
-import { BiCameraMovie } from 'react-icons/bi';
 import { useTranslation } from 'react-i18next';
 import tokenManager from '@shared/utils/tokenManager';
 import { LocationPicker } from './components/LocationPicker';
@@ -43,10 +42,6 @@ const Header: FC<HeaderProps> = ({
     }, 150);
   };
 
-  const handleNavigateMyTickets = () => {
-    navigate('/ve-cua-toi');
-  };
-
   const handleCloseOthers = () => {};
 
   const handleLogout = () => {
@@ -63,26 +58,22 @@ const Header: FC<HeaderProps> = ({
           <HeaderNav onScrollOrNavigate={handleScrollOrNavigate} />
         </S.NavLeftGroup>
 
+        {/* Center: Prominent Search Bar */}
+        <S.SearchCenterGroup>
+          <HeaderSearch />
+        </S.SearchCenterGroup>
+
         {/* Right Side: Actions */}
         <S.ActionsGroup>
           {/* Language Switcher */}
           <LangSwitcher />
 
-          {/* Search Box */}
-          <HeaderSearch />
-
           {/* Location Picker */}
           <LocationPicker />
 
-          {/* My Tickets */}
-          <S.TicketPassBtn onClick={handleNavigateMyTickets}>
-            <BiCameraMovie className="ticket-icon" />
-            <span>{t('header:my_tickets')}</span>
-          </S.TicketPassBtn>
-
           {/* Notification Dropdown */}
           <NotificationDropdownMenu
-            onCloseOthers={handleCloseOthers} // each dropdown manages its own state
+            onCloseOthers={handleCloseOthers}
             onScrollOrNavigate={handleScrollOrNavigate}
           />
 

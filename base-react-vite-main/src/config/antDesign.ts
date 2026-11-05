@@ -1,4 +1,4 @@
-import type { ConfigProviderProps, ThemeConfig } from 'antd';
+import { theme as antdTheme, type ConfigProviderProps, type ThemeConfig } from 'antd';
 import viVN from 'antd/locale/vi_VN';
 
 export const palette = {
@@ -20,6 +20,7 @@ export const palette = {
 } as const;
 
 export const theme: ThemeConfig = {
+  algorithm: antdTheme.darkAlgorithm,
   token: {
     colorPrimary: palette.primary,
     colorLink: palette.primary,
@@ -69,6 +70,15 @@ export const theme: ThemeConfig = {
     },
     Modal: {
       borderRadiusLG: 16,
+    },
+    Notification: {
+      colorBgElevated: palette.surface,
+      colorText: palette.textPrimary,
+      colorTextHeading: palette.textPrimary,
+    },
+    Message: {
+      contentBg: palette.surface,
+      colorText: palette.textPrimary,
     },
     Select: {
       optionSelectedBg: palette.goldSoft,

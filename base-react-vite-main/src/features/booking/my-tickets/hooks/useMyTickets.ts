@@ -1,3 +1,4 @@
+import { sanitizeErrorMessage } from '@/shared/utils/error-sanitizer';
 import { useState, useEffect } from 'react';
 import { DEFAULT_ACTIVE_TICKET } from '../data/active-ticket.data';
 import type { ActiveTicketData } from '../data/active-ticket.data';
@@ -143,7 +144,7 @@ export function useMyTickets() {
         errorObj?.response?.data?.message ||
         errorObj?.message ||
         'Không thể check-in vé lúc này.';
-      triggerToast(errorMsg);
+      triggerToast(sanitizeErrorMessage(errorMsg));
     }
   };
 
@@ -175,7 +176,7 @@ export function useMyTickets() {
         errorObj?.response?.data?.message ||
         errorObj?.message ||
         'Không thể hoàn vé (yêu cầu trước giờ chiếu tối thiểu 60 phút)!';
-      triggerToast(errorMsg);
+      triggerToast(sanitizeErrorMessage(errorMsg));
     }
   };
 

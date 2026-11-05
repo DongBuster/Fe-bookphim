@@ -204,6 +204,9 @@ export interface ShowtimeItemDto {
   subtitleLanguage: string;
   basePrice: number;
   auditoriumName: string;
+  isMysteryShowtime?: boolean;
+  mysteryHint?: string;
+  mysteryDiscountRate?: number;
 }
 
 export interface TheaterShowtimesGroupDto {
@@ -246,6 +249,9 @@ export interface SeatMapDto {
   showtimeId: string;
   movieTitle?: string;
   auditoriumName: string;
+  isMysteryShowtime?: boolean;
+  mysteryHint?: string;
+  mysteryDiscountRate?: number;
   screenType?: ScreenType | string;
   startTime?: string;
   basePrice?: number;
@@ -343,6 +349,9 @@ export interface TicketDto {
   movieTitle: string;
   theaterName: string;
   auditoriumName: string;
+  isMysteryShowtime?: boolean;
+  mysteryHint?: string;
+  mysteryDiscountRate?: number;
   seatLabel: string;
   format: string;
   startTime: string;
@@ -360,4 +369,184 @@ export interface TurnstileCheckInRequest {
   passCode: string;
   deviceId: string;
   gateNumber: string;
+}
+
+
+// ==================== 7.1 PASSPORT & GAMIFICATION TYPES ====================
+export interface HologramStampDto {
+  stampId: string;
+  movieTitle: string;
+  moviePosterUrl?: string;
+  theaterName: string;
+  format: string;
+  acquiredAt: string;
+  hologramEffect: 'GOLD_SHINE' | 'IRIDESCENT' | 'LASER_FIRE' | 'PLATINUM' | string;
+}
+
+export interface BadgeDto {
+  badgeId: string;
+  code: string;
+  name: string;
+  description: string;
+  iconUrl: string;
+  category: 'WATCH_COUNT' | 'THEATER_VISIT' | 'GENRE_EXPLORER' | 'SPECIAL_EVENT' | string;
+  isUnlocked: boolean;
+  unlockedAt?: string | null;
+  rewardPoints: number;
+  isRewardClaimed: boolean;
+}
+
+export interface PassportDto {
+  userId: string;
+  fullName: string;
+  avatarUrl?: string;
+  membershipTier: MembershipTier | string;
+  cinephileTitle:
+    | 'Tân Binh'
+    | 'Khán Giả Quen Mặt'
+    | 'Tín Đồ Màn Bạc'
+    | 'Đại Sứ Điện Ảnh VIP'
+    | string;
+  totalPoints: number;
+  moviesWatchedCount: number;
+  theatersVisitedCount: number;
+  stamps: HologramStampDto[];
+  badges: BadgeDto[];
+}
+
+export interface ClaimRewardRequest {
+  badgeId: string;
+}
+
+export interface ClaimRewardResponseData {
+  success: boolean;
+  badgeId: string;
+  rewardPoints: number;
+  newTotalPoints: number;
+}
+
+// ==================== 7.2 CINEBOT AI CONCIERGE TYPES ====================
+export interface ConciergeChatMessage {
+  role: 'user' | 'model' | 'assistant';
+  content: string;
+}
+
+export interface ConciergeChatRequest {
+  message: string;
+  conversationHistory?: ConciergeChatMessage[];
+}
+
+export interface RecommendedMovieDto {
+  id: string;
+  title: string;
+  slug: string;
+  posterUrl: string;
+  imdbRating?: number;
+  genre: string;
+  matchReason?: string;
+}
+
+export interface BookingDraftDto {
+  movieId?: string;
+  movieTitle?: string;
+  theaterId?: string;
+  theaterName?: string;
+  showtimeId?: string;
+  time?: string;
+  format?: string;
+  seatIds?: string[];
+  totalEstimate?: number;
+}
+
+export interface ConciergeChatResponseData {
+  reply: string;
+  recommendedMovies?: RecommendedMovieDto[];
+  bookingDraft?: BookingDraftDto;
+  suggestedReplies?: string[];
+}
+
+export interface QuickRecommendResponseData {
+  trendingMovies: MovieDto[];
+  recommendationTopic: string;
+}
+
+// ==================== 7.3 CINEPARTY GROUP BOOKING TYPES ====================
+export const GroupRoomStatus = {
+  OPEN: 'OPEN',
+  LOCKED: 'LOCKED',
+  SETTLING: 'SETTLING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+} as const;
+export type GroupRoomStatus =
+  (typeof GroupRoomStatus)[keyof typeof GroupRoomStatus];
+
+export interface GroupMemberDto {
+  userId: string;
+  fullName: string;
+  avatarUrl?: string;
+  isHost: boolean;
+  joinedAt: string;
+  selectedSeatIds: string[];
+  selectedSeatLabels: string[];
+  shareAmount: number;
+  isPaid: boolean;
+  paidAt?: string | null;
+}
+
+export interface GroupRoomDto {
+  roomId: string;
+  roomCode: string;
+  hostUserId: string;
+  showtimeId: string;
+  movieTitle: string;
+  theaterName: string;
+  showtimeTime: string;
+  status: GroupRoomStatus | string;
+  expiresAt: string;
+  members: GroupMemberDto[];
+  totalSeatsCount: number;
+  totalAmount: number;
+}
+
+export interface CreateGroupRoomRequest {
+  showtimeId: string;
+}
+
+export interface JoinGroupRoomRequest {
+  roomCode: string;
+}
+
+export interface SelectGroupSeatsRequest {
+  roomCode: string;
+  seatIds: string[];
+}
+
+export interface PayGroupShareRequest {
+  roomCode: string;
+  paymentMethod: PaymentMethodType | string;
+}
+
+// ==================== 7.4 CINEMATE & MYSTERY NIGHT TYPES ====================
+export interface CineMateOptInRequest {
+  showtimeId: string;
+  seatLabel: string;
+  favoriteGenres?: string[];
+}
+
+export interface CineMateMatchDto {
+  userId: string;
+  fullName: string;
+  nickname?: string;
+  avatarUrl?: string;
+  seatLabel: string;
+  tasteMatchRate: number;
+  sharedGenres: string[];
+  sharedDirectors: string[];
+}
+
+export interface CineMateSendHiRequest {
+  targetUserId: string;
+  showtimeId: string;
+  greetingMessage?: string;
 }

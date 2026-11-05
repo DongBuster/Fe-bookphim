@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,6 +24,7 @@ import { useSpotlightCarousel } from './hooks/useSpotlightCarousel';
 import { SlideItem } from './components/SlideItem/SlideItem';
 
 export const HeroSpotlight: FC = () => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   // ── Carousel ──────────────────────────────────────────────────────────────
@@ -148,6 +150,15 @@ export const HeroSpotlight: FC = () => {
 
   const handleStopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
+  };
+
+  const handleQuickBookSubmit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const matchedMovie =
+      SPOTLIGHT_MOVIES.find((m) => m.mainTitle === selectedMovie) ||
+      SPOTLIGHT_MOVIES[0];
+    const targetId = matchedMovie?.detailMovieId || 'nhim-sonic-3';
+    navigate(`/phim/${targetId}`);
   };
 
   return (
@@ -295,7 +306,7 @@ export const HeroSpotlight: FC = () => {
                 {t(
                   `home:hero.dates.${selectedDateKey}`,
                   BOOKING_DATES.find((d) => d.key === selectedDateKey)
-                    ?.defaultLabel || 'Hôm nay, 24 Tháng 10',
+                    ?.defaultLabel || BOOKING_DATES[0]?.defaultLabel || 'Hôm nay',
                 )}
               </S.StepValue>
               <S.DropdownChevron $isOpen={activeDropdown === 'date'}>
@@ -372,6 +383,14 @@ export const HeroSpotlight: FC = () => {
             </S.BookingDropdown>
           )}
         </S.StepItem>
+        <S.QuickBookSubmitButton
+          type="button"
+          onClick={handleQuickBookSubmit}
+          aria-label={t('home:hero.quick_book_btn', 'Đặt vé ngay')}
+        >
+          <Ticket size={16} />
+          <span>{t('home:hero.quick_book_btn', 'ĐẶT VÉ NGAY')}</span>
+        </S.QuickBookSubmitButton>
       </S.QuickBookingBar>
     </S.SectionContainer>
   );

@@ -61,6 +61,13 @@ const PROFILE_MENU = [
     path: '/profile/cinematic-taste',
   },
   {
+    id: 'passport',
+    icon: 'award',
+    labelKey: 'header:menu_passport',
+    defaultLabel: 'Hộ chiếu & Huy hiệu điện ảnh',
+    path: '/profile/passport',
+  },
+  {
     id: 'tickets',
     icon: 'camera',
     labelKey: 'header:menu_tickets',

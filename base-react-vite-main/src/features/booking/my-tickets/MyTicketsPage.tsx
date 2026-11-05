@@ -50,7 +50,7 @@ export default function MyTicketsPage() {
               $isActive={activeTab === 'upcoming'}
               onClick={handleSelectTab('upcoming')}
             >
-              {t('booking:tickets_upcoming')} ( 1 )
+              {t('booking:tickets_upcoming')} ( {activeTicket ? 1 : 0} )
             </S.TabPill>
             <S.TabPill
               $isActive={activeTab === 'history'}
@@ -62,7 +62,7 @@ export default function MyTicketsPage() {
               $isActive={activeTab === 'vouchers'}
               onClick={handleSelectTab('vouchers')}
             >
-              {t('booking:tickets_vouchers')} ( 3 )
+              {t('booking:tickets_vouchers')} ( {VOUCHERS.length} )
             </S.TabPill>
           </div>
         </S.PageHeader>

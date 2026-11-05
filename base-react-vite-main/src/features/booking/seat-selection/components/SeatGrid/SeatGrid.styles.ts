@@ -89,6 +89,14 @@ export const SeatBox = styled.button<{
   justify-content: center;
   cursor: ${({ $isSold }) => ($isSold ? 'not-allowed' : 'pointer')};
   transition: all 0.15s ease;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    z-index: 1;
+  }
   user-select: none;
 
   ${({ $isSold }) =>
@@ -96,7 +104,7 @@ export const SeatBox = styled.button<{
       ? `
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.45);
   `
       : ''}
 
@@ -184,13 +192,21 @@ export const SweetboxCouple = styled.button<{
   font-weight: 700;
   cursor: ${({ $isSold }) => ($isSold ? 'not-allowed' : 'pointer')};
   transition: all 0.15s ease;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    z-index: 1;
+  }
 
   ${({ $isSold }) =>
     $isSold
       ? `
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.45);
   `
       : ''}
 

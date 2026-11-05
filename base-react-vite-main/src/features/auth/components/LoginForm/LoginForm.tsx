@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { message } from 'antd';
 import {
   ArrowRight,
   Eye,
@@ -37,11 +38,14 @@ export const LoginForm: FC = () => {
   // Form states
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [identifier, setIdentifier] = useState('testuser@phimbook.vn');
-  const [credential, setCredential] = useState('Password123@');
+  const [identifier, setIdentifier] = useState('');
+  const [credential, setCredential] = useState('');
   const [isRememberMe, setIsRememberMe] = useState(true);
 
-  const handleSelectPhoneTab = () => setActiveTab('phone');
+  const handleSelectPhoneTab = () => {
+    setActiveTab('phone');
+    message.info('Phương thức đăng nhập qua Số điện thoại (OTP) đang được thử nghiệm.');
+  };
   const handleSelectEmailTab = () => setActiveTab('email');
 
   const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,15 +79,25 @@ export const LoginForm: FC = () => {
     setCredential('Password123@');
   };
 
-  const handleForgotPassword = () => {};
+  const handleForgotPassword = () => {
+    message.info('Tính năng Quên mật khẩu đang được kết nối với cổng SMS/Email OTP.');
+  };
 
-  const handleGoogleLogin = () => {};
+  const handleGoogleLogin = () => {
+    message.info('Đăng nhập Google OAuth2 đang trong quá trình tích hợp môi trường.');
+  };
 
-  const handleFacebookLogin = () => {};
+  const handleFacebookLogin = () => {
+    message.info('Đăng nhập Facebook OAuth2 đang trong quá trình tích hợp môi trường.');
+  };
 
-  const handleZaloLogin = () => {};
+  const handleZaloLogin = () => {
+    message.info('Đăng nhập Zalo ZNS/OAuth đang trong quá trình tích hợp môi trường.');
+  };
 
-  const handleQrLogin = () => {};
+  const handleQrLogin = () => {
+    message.info('Tính năng Quét mã QR đăng nhập qua App PhimBook sẽ sớm ra mắt.');
+  };
 
   const handleToggleMode = () => {
     setIsRegisterMode((prev) => !prev);
@@ -104,6 +118,7 @@ export const LoginForm: FC = () => {
 
     if (isRegisterMode) {
       if (!fullName.trim() || !phone.trim() || !email || !password) {
+        message.warning('Vui lòng điền đầy đủ tất cả các trường đăng ký.');
         return;
       }
 
@@ -139,6 +154,7 @@ export const LoginForm: FC = () => {
     }
 
     if (!email || !password) {
+      message.warning('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
       return;
     }
 
@@ -170,7 +186,13 @@ export const LoginForm: FC = () => {
       }
     } catch (error: unknown) {
       console.error('Đăng nhập thất bại:', error);
-      // Lỗi nghiệp vụ từ backend đã được axios-error-helper tự động hiển thị notification
+      const isAlreadyHandled = Boolean(
+        (error as { isHandled?: boolean })?.isHandled ||
+        (error as { isBusinessError?: boolean })?.isBusinessError
+      );
+      if (!isAlreadyHandled) {
+        message.error('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin tài khoản.');
+      }
     } finally {
       setIsLoading(false);
     }

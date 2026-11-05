@@ -3,6 +3,7 @@ import { Outlet, ScrollRestoration } from 'react-router-dom';
 import Header from './header/Header';
 import { Footer } from './footer/Footer';
 import Sidebar from './sidebar/Sidebar';
+import { CineBotWidget } from '@/features/ai-concierge/components/CineBotWidget';
 import * as S from './MainLayout.styles';
 
 export default function MainLayout() {
@@ -35,6 +36,9 @@ export default function MainLayout() {
 
       {/* 4. Full Vertical Sidebar ở mép màn hình */}
       <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
+
+      {/* 5. CineBot AI Concierge Floating Widget */}
+      <CineBotWidget />
     </S.LayoutWrapper>
   );
 }

@@ -48,6 +48,23 @@ export const getOrderByCodeApi = async (
 };
 
 /**
+ * Lấy chi tiết đơn hàng theo orderId
+ * Endpoint: GET /api/v1/orders/{id}
+ */
+export const getOrderByIdApi = async (
+  id: string,
+): Promise<OrderDto> => {
+  const res = (await axiosClient.get(`/orders/${encodeURIComponent(id)}`)) as unknown as
+    | BaseResponse<OrderDto>
+    | OrderDto;
+
+  if (res && typeof res === 'object' && 'data' in res && res.data) {
+    return res.data;
+  }
+  return res as OrderDto;
+};
+
+/**
  * Lấy URL ảnh mã QR vé điện tử từ backend Railway
  * Endpoint: GET /api/v1/tickets/qr/{passCode}
  */

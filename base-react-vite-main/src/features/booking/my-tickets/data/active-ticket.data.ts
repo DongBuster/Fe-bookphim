@@ -27,7 +27,7 @@ export const DEFAULT_ACTIVE_TICKET: ActiveTicketData = {
   cinemaName: 'CGV Vincom Center Landmark 81',
   cinemaRoom: 'Cinema 06 (IMAX Laser)',
   showtime: '19:45 ~ 22:30',
-  date: 'Hôm nay, 28/03/2024',
+  date: `Hôm nay, ${String(new Date().getDate()).padStart(2, '0')}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()}`,
   format: 'IMAX Laser 2D',
   seats: 'H8, H9',
   seatsType: 'VIP Prime Center',

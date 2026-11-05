@@ -16,6 +16,7 @@ import {
   Check,
   Loader2,
 } from 'lucide-react';
+import { UserProfileSkeleton } from '@shared/components/skeleton';
 import * as S from './UserProfileForm.styles';
 
 const CITIES = ['TP. Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Bình Dương'];
@@ -159,6 +160,10 @@ export const UserProfileForm: FC<UserProfileFormProps> = ({
       setIsSaving(false);
     }
   };
+
+  if (isFetchingProfile && !profileData) {
+    return <UserProfileSkeleton />;
+  }
 
   return (
     <S.Card as="form" onSubmit={handleSubmit}>

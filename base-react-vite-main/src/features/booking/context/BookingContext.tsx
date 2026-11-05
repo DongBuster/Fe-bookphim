@@ -2,44 +2,56 @@ import React, { useState, useEffect } from 'react';
 import { BookingContext } from './useBooking';
 import type { BookingState, SeatItem, SnackItem, VoucherItem } from './booking.types';
 
+const getInitialRecipient = () => {
+  try {
+    const userInfoStr = localStorage.getItem('user_info');
+    if (userInfoStr) {
+      const user = JSON.parse(userInfoStr);
+      return {
+        name: user.fullName || localStorage.getItem('user_name') || '',
+        phone: user.phone || '',
+        email: user.email || '',
+        isSendZalo: true,
+      };
+    }
+  } catch {
+    // fallback
+  }
+  return {
+    name: localStorage.getItem('user_name') || '',
+    phone: '',
+    email: '',
+    isSendZalo: true,
+  };
+};
+
 const defaultState: BookingState = {
   movie: {
-    id: 'dune-2',
-    title: 'Dune: Hành Tinh Cát - Phần Hai',
-    originalTitle: 'Dune: Part Two (2024)',
-    posterUrl:
-      'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600&auto=format&fit=crop',
-    backdropUrl:
-      'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1600&auto=format&fit=crop',
-    rating: 8.9,
-    ageRating: 'T16',
-    duration: '166 phút',
-    format: 'IMAX Laser 2D',
+    id: '',
+    title: '',
+    originalTitle: '',
+    posterUrl: '',
+    backdropUrl: '',
+    rating: 8.8,
+    ageRating: 'P',
+    duration: '',
+    format: '2D Tiêu Chuẩn',
   },
   session: {
-    cinemaId: 'cgv-landmark-81',
-    cinemaName: 'PhimBook IMAX Landmark 81',
-    cinemaAddress: 'Tầng B1, TTTM Vincom Landmark 81, TP.HCM',
-    room: 'Phòng IMAX 01',
-    date: 'Thứ Năm, 24/10/2024',
-    time: '20:15',
-    format: 'IMAX Laser 2D',
-    soundSystem: 'DOLBY ATMOS • 64 LOA',
+    cinemaId: '',
+    cinemaName: '',
+    cinemaAddress: '',
+    room: '',
+    date: '',
+    time: '',
+    format: '',
+    soundSystem: 'DOLBY ATMOS',
   },
   selectedSeats: [],
   selectedSnacks: [],
   pickupMethod: 'at-seat',
-  appliedVoucher: {
-    code: 'GIAM30K',
-    discount: 30000,
-    title: 'Giảm 30K combo phim bom tấn',
-  },
-  recipient: {
-    name: 'Nguyễn Thanh Tùng',
-    phone: '0988 123 456',
-    email: 'tung.nguyen@gmail.com',
-    isSendZalo: true,
-  },
+  appliedVoucher: null,
+  recipient: getInitialRecipient(),
   paymentMethod: 'momo',
 };
 
@@ -49,7 +61,16 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({
   const [state, setState] = useState<BookingState>(() => {
     try {
       const saved = localStorage.getItem('phimbook_booking_state');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (
+          parsed.recipient?.name === 'Nguyễn Thanh Tùng' ||
+          parsed.session?.date === 'Thứ Năm, 24/10/2024'
+        ) {
+          return defaultState;
+        }
+        return parsed;
+      }
     } catch {
       // fallback
     }
