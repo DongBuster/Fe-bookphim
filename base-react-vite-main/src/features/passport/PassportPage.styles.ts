@@ -16,10 +16,20 @@ const shimmerHolo = keyframes`
 export const Container = styled.div`
   max-width: 1100px;
   margin: 0 auto;
-  padding: 32px 20px 80px;
+  padding-top: var(--page-top-offset, calc(var(--header-public-height, 80px) + 24px));
+  padding-bottom: 80px;
+  padding-left: 20px;
+  padding-right: 20px;
   display: flex;
   flex-direction: column;
   gap: 32px;
+
+  @media ${media.sm} {
+    padding-top: calc(var(--header-public-height, 68px) + 16px);
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 60px;
+  }
 `;
 
 export const PassportHeaderCard = styled.div`
