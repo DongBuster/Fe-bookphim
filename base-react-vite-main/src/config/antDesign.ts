@@ -30,6 +30,8 @@ export const theme: ThemeConfig = {
     colorError: palette.error,
     colorText: palette.textPrimary,
     colorTextBase: palette.textPrimary,
+    colorTextHeading: '#FFFFFF',
+    colorTextDescription: '#F1F5F9',
     colorTextSecondary: palette.textSecondary,
     colorBgBase: palette.bgPrimary,
     colorBgContainer: palette.surface,
@@ -76,6 +78,7 @@ export const theme: ThemeConfig = {
       colorText: '#ffffff',
       colorTextHeading: '#ffffff',
       colorTextDescription: '#f1f5f9',
+      progressBg: 'linear-gradient(90deg, #ff535a, #e01e35)',
     },
     Message: {
       contentBg: palette.surface,

@@ -1,3 +1,8 @@
+// Disable styled-components speedy mode in production for React 19 hydration stability
+if (typeof window !== 'undefined') {
+  (window as any).SC_DISABLE_SPEEDY = true;
+}
+
 // Styles
 import 'antd/dist/reset.css';
 

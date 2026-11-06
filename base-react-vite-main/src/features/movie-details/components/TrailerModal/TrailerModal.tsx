@@ -1,6 +1,6 @@
 import { useMemo, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Film } from 'lucide-react';
+import { X, Film, ExternalLink } from 'lucide-react';
 import * as S from './TrailerModal.styles';
 
 interface TrailerModalProps {
@@ -10,43 +10,48 @@ interface TrailerModalProps {
   title?: string;
 }
 
+export interface ParsedTrailerUrls {
+  embedUrl: string | null;
+  watchUrl: string | null;
+}
+
 /**
- * Normalizes any YouTube URL variant into an embeddable URL:
+ * Normalizes any YouTube URL variant into privacy-enhanced embed & watch URLs:
  * - https://www.youtube.com/watch?v=VIDEO_ID
  * - https://youtu.be/VIDEO_ID
  * - https://www.youtube.com/embed/VIDEO_ID
  * - https://www.youtube.com/shorts/VIDEO_ID
- * Uses privacy-enhanced domain: https://www.youtube-nocookie.com/embed/VIDEO_ID?autoplay=1&rel=0
+ * Always returns https://www.youtube-nocookie.com/embed/VIDEO_ID?autoplay=1&rel=0
  */
-export function formatYouTubeEmbedUrl(url?: string, autoplay = true): string | null {
-  if (!url || typeof url !== 'string' || !url.trim()) return null;
+export function formatYouTubeEmbedUrl(url?: string, autoplay = true): ParsedTrailerUrls {
+  if (!url || typeof url !== 'string' || !url.trim()) {
+    return { embedUrl: null, watchUrl: null };
+  }
 
   const trimmed = url.trim();
 
-  // If already an embed URL, ensure proper query params
-  if (trimmed.includes('youtube.com/embed/') || trimmed.includes('youtube-nocookie.com/embed/')) {
-    if (autoplay && !trimmed.includes('autoplay=')) {
-      return trimmed.includes('?') ? `${trimmed}&autoplay=1&rel=0` : `${trimmed}?autoplay=1&rel=0`;
-    }
-    return trimmed;
-  }
-
-  // Extract 11-char YouTube ID from any standard formats
+  // Extract 11-char YouTube video ID across all known patterns
   const match = trimmed.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/
+    /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/
   );
 
   if (match && match[1]) {
     const videoId = match[1];
-    return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0`;
+    return {
+      embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0`,
+      watchUrl: `https://www.youtube.com/watch?v=${videoId}`,
+    };
   }
 
-  // If it's a direct video link or another valid HTTPS embed link, return as is
+  // Fallback for valid external video URLs
   if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
-    return trimmed;
+    return {
+      embedUrl: trimmed,
+      watchUrl: trimmed,
+    };
   }
 
-  return null;
+  return { embedUrl: null, watchUrl: null };
 }
 
 export const TrailerModal: FC<TrailerModalProps> = ({
@@ -57,7 +62,10 @@ export const TrailerModal: FC<TrailerModalProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const embedUrl = useMemo(() => formatYouTubeEmbedUrl(trailerUrl, true), [trailerUrl]);
+  const { embedUrl, watchUrl } = useMemo(
+    () => formatYouTubeEmbedUrl(trailerUrl, true),
+    [trailerUrl]
+  );
 
   if (!isOpen) return null;
 
@@ -68,31 +76,53 @@ export const TrailerModal: FC<TrailerModalProps> = ({
   return (
     <S.TrailerModal onClick={onClose}>
       <div className="modal-content" onClick={handleContentClick}>
-        <button
-          type="button"
-          className="close-btn"
-          onClick={onClose}
-          aria-label={t('movie:close_trailer', 'Đóng trailer')}
-        >
-          <X size={18} />
-        </button>
-
-        {embedUrl ? (
-          <iframe
-            src={embedUrl}
-            title={`${title || 'Phim'} Trailer`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        ) : (
-          <div className="trailer-fallback">
-            <Film size={48} className="fallback-icon" />
-            <h4 className="fallback-title">{t('movie:trailer_unavailable_title', 'Trailer chưa sẵn sàng')}</h4>
-            <p className="fallback-desc">
-              {t('movie:trailer_unavailable_desc', 'Video trailer của phim này đang được cập nhật. Vui lòng quay lại sau!')}
-            </p>
+        <div className="modal-header-bar">
+          <span className="trailer-title" title={title}>
+            {title ? `${title} • Trailer` : t('movie:trailer', 'Trailer')}
+          </span>
+          <div className="header-actions">
+            {watchUrl && (
+              <a
+                href={watchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="external-link-btn"
+                title={t('movie:watch_on_youtube', 'Mở trên YouTube')}
+              >
+                <ExternalLink size={14} />
+                <span>YouTube</span>
+              </a>
+            )}
+            <button
+              type="button"
+              className="close-btn"
+              onClick={onClose}
+              aria-label={t('movie:close_trailer', 'Đóng trailer')}
+            >
+              <X size={18} />
+            </button>
           </div>
-        )}
+        </div>
+
+        <div className="player-container">
+          {embedUrl ? (
+            <iframe
+              src={embedUrl}
+              title={`${title || 'Phim'} Trailer`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          ) : (
+            <div className="trailer-fallback">
+              <Film size={48} className="fallback-icon" />
+              <h4 className="fallback-title">{t('movie:trailer_unavailable_title', 'Trailer chưa sẵn sàng')}</h4>
+              <p className="fallback-desc">
+                {t('movie:trailer_unavailable_desc', 'Video trailer của phim này đang được cập nhật. Vui lòng quay lại sau!')}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </S.TrailerModal>
   );

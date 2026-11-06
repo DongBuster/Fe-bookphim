@@ -152,6 +152,15 @@ export const ShowtimePicker = forwardRef<HTMLDivElement, ShowtimePickerProps>(
         </S.StepsContainer>
 
         {/* Danh sách các cụm rạp và suất chiếu */}
+        {isFeatureEnabled('mysteryNight') && (
+          <S.MysteryBanner>
+            <div className="mystery-badge">🔮 Mystery Night</div>
+            <div className="mystery-text">
+              <strong>Suất chiếu bí ẩn:</strong> Giảm giá vé đến 40%! Tên phim được giữ bí mật đến khi vào phòng chiếu.
+            </div>
+          </S.MysteryBanner>
+        )}
+
         <S.CinemaScheduleList>
           {cinemas
             .map((cinema) => {
@@ -219,6 +228,7 @@ export const ShowtimePicker = forwardRef<HTMLDivElement, ShowtimePickerProps>(
                               key={slot.id}
                               $isSelected={isSlotSelected}
                               $isAlmostFull={slot.isAlmostFull}
+                              $isMystery={Boolean(slot.isMystery && isFeatureEnabled('mysteryNight'))}
                               onClick={handleSelectSlot(cinema, fmtGroup, slot)}
                             >
                               <span className="pill-time">{slot.time}</span>

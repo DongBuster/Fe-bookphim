@@ -390,7 +390,49 @@ export const CinemaCard = styled.div`
   }
 `;
 
+export const MysteryBanner = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.14) 0%, rgba(99, 102, 241, 0.08) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.12);
+
+  .mystery-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #9333ea;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
+  }
+
+  .mystery-text {
+    color: #e9d5ff;
+    font-size: 13px;
+    line-height: 1.45;
+
+    strong {
+      color: #ffffff;
+    }
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+`;
+
 export const ShowtimePill = styled.button<{
+  $isMystery?: boolean;
   $isSelected: boolean;
   $isAlmostFull?: boolean;
 }>`

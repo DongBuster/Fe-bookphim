@@ -587,6 +587,51 @@ input.ant-input,
   color: #f1f5f9 !important;
 }
 
+/* Fallback un-nested progress bar rules for semantic colors */
+.ant-notification-notice-error .ant-notification-notice-progress::-webkit-progress-value,
+.ant-notification-notice.ant-notification-notice-error .ant-notification-notice-progress::-webkit-progress-value {
+  background: #ff535a !important;
+  background-color: #ff535a !important;
+}
+.ant-notification-notice-error .ant-notification-notice-progress::-moz-progress-bar,
+.ant-notification-notice.ant-notification-notice-error .ant-notification-notice-progress::-moz-progress-bar {
+  background: #ff535a !important;
+  background-color: #ff535a !important;
+}
+
+.ant-notification-notice-warning .ant-notification-notice-progress::-webkit-progress-value,
+.ant-notification-notice.ant-notification-notice-warning .ant-notification-notice-progress::-webkit-progress-value {
+  background: #ffb955 !important;
+  background-color: #ffb955 !important;
+}
+.ant-notification-notice-warning .ant-notification-notice-progress::-moz-progress-bar,
+.ant-notification-notice.ant-notification-notice-warning .ant-notification-notice-progress::-moz-progress-bar {
+  background: #ffb955 !important;
+  background-color: #ffb955 !important;
+}
+
+.ant-notification-notice-success .ant-notification-notice-progress::-webkit-progress-value,
+.ant-notification-notice.ant-notification-notice-success .ant-notification-notice-progress::-webkit-progress-value {
+  background: #34c759 !important;
+  background-color: #34c759 !important;
+}
+.ant-notification-notice-success .ant-notification-notice-progress::-moz-progress-bar,
+.ant-notification-notice.ant-notification-notice-success .ant-notification-notice-progress::-moz-progress-bar {
+  background: #34c759 !important;
+  background-color: #34c759 !important;
+}
+
+.ant-notification-notice-info .ant-notification-notice-progress::-webkit-progress-value,
+.ant-notification-notice.ant-notification-notice-info .ant-notification-notice-progress::-webkit-progress-value {
+  background: #178fe2 !important;
+  background-color: #178fe2 !important;
+}
+.ant-notification-notice-info .ant-notification-notice-progress::-moz-progress-bar,
+.ant-notification-notice.ant-notification-notice-info .ant-notification-notice-progress::-moz-progress-bar {
+  background: #178fe2 !important;
+  background-color: #178fe2 !important;
+}
+
 /* ===== _message.scss ===== */
 .ant-message .ant-message-notice .ant-message-notice-content {
   background: #1c1b1c !important;
