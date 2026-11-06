@@ -45,46 +45,59 @@ export const handleRefreshToken = async (originalRequest: IOriginRequest) => {
   return new Promise(function (resolve, reject) {
     const refreshToken = tokenManager.getRefreshToken();
 
-    if (refreshToken) {
-      axios
-        .post(
-          `${import.meta.env.VITE_API_URL || '/api/v1'}/auth/refresh-token`,
-          { refreshToken },
-          {
-            headers: { 'Content-Type': 'application/json' },
-          },
-        )
-        .then(({ data }) => {
-          //Trường hợp refresh token hết hạn đẩy về trang đăng nhập
-          if (!data?.data) {
-            tokenManager.removeAccessToken();
-            tokenManager.removeRefreshToken();
-            window.location.href = LOGIN_PATH;
-            return;
-          }
+    if (!refreshToken) {
+      isRefreshing = false;
+      const err = new Error('No refresh token available');
+      processQueue(err, null);
+      tokenManager.removeAccessToken();
+      tokenManager.removeRefreshToken();
+      window.location.href = LOGIN_PATH;
+      reject(err);
+      return;
+    }
 
-          tokenManager.setAccessToken(data.data.accessToken);
-          tokenManager.setRefreshToken(data.data.refreshToken);
-
-          if (originalRequest.headers) {
-            originalRequest.headers['Authorization'] =
-              'Bearer ' + data.data.accessToken;
-          }
-
-          processQueue(null, data.data.accessToken);
-          resolve(axiosClient(originalRequest));
-        })
-        .then(() => {
+    axios
+      .post(
+        `${import.meta.env.VITE_API_URL || '/api/v1'}/auth/refresh-token`,
+        { refreshToken },
+        {
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+      .then(({ data }) => {
+        // Trường hợp refresh token hết hạn hoặc backend báo lỗi
+        if (!data?.data || data?.success === false) {
           isRefreshing = false;
-        })
-        .catch((err) => {
-          console.log('refresh token err: ', err);
+          const err = new Error(data?.message || 'Phiên đăng nhập đã hết hạn.');
           tokenManager.removeAccessToken();
           tokenManager.removeRefreshToken();
-          window.location.href = LOGIN_PATH;
           processQueue(err, null);
+          window.location.href = LOGIN_PATH;
           reject(err);
-        });
-    }
+          return;
+        }
+
+        tokenManager.setAccessToken(data.data.accessToken);
+        tokenManager.setRefreshToken(data.data.refreshToken);
+
+        if (originalRequest.headers) {
+          originalRequest.headers['Authorization'] =
+            'Bearer ' + data.data.accessToken;
+        }
+
+        processQueue(null, data.data.accessToken);
+        resolve(axiosClient(originalRequest));
+      })
+      .catch((err) => {
+        console.log('refresh token err: ', err);
+        tokenManager.removeAccessToken();
+        tokenManager.removeRefreshToken();
+        processQueue(err, null);
+        window.location.href = LOGIN_PATH;
+        reject(err);
+      })
+      .finally(() => {
+        isRefreshing = false;
+      });
   });
 };
