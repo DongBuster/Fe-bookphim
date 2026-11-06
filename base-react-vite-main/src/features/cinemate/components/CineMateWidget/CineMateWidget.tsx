@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useState } from 'react';
 import { Heart, Send, Check } from 'lucide-react';
-import { message } from 'antd';
+import { message } from '@config/notification';
 import {
   optInCineMateApi,
   getCineMateMatchesApi,

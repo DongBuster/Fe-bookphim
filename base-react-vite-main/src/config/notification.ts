@@ -1,10 +1,24 @@
 import type { NotificationArgsProps } from 'antd';
-import { notification, message as antdMessage } from 'antd';
+import { ConfigProvider, notification } from 'antd';
 import { sanitizeErrorMessage } from '@/shared/utils/error-sanitizer';
+import { theme } from './antDesign';
+
+// Ensure global theme is active for static notification calls
+ConfigProvider.config({
+  theme,
+});
 
 type NotificationPlacement = NotificationArgsProps['placement'];
 
 const defaultPlacement: NotificationPlacement = 'topRight';
+
+// Global config for Ant Design notifications
+notification.config({
+  placement: defaultPlacement,
+  duration: 3.5,
+  showProgress: true,
+  pauseOnHover: true,
+});
 
 // Deduplication tracker to prevent identical notifications from stacking within 1.5 seconds
 const recentNotifications = new Map<string, number>();
@@ -28,10 +42,26 @@ export const shouldDisplayNotification = (key: string): boolean => {
 };
 
 const NOTIFICATION_BASE_STYLE = {
-  backgroundColor: '#1C1B1C',
-  border: '1px solid rgba(255, 255, 255, 0.12)',
-  borderRadius: '10px',
-  boxShadow: '0 12px 32px rgba(0, 0, 0, 0.65)',
+  backgroundColor: '#18181B',
+  border: '1px solid rgba(255, 255, 255, 0.14)',
+  borderRadius: '12px',
+  boxShadow: '0 20px 45px rgba(0, 0, 0, 0.85)',
+};
+
+const SEMANTIC_STYLES = {
+  title: {
+    color: '#FFFFFF',
+    fontSize: '15px',
+    fontWeight: 700,
+    letterSpacing: '-0.2px',
+    marginBottom: '4px',
+  },
+  description: {
+    color: '#F1F5F9', // Crisp high-contrast light slate white
+    fontSize: '13.5px',
+    lineHeight: '1.55',
+    fontWeight: 400,
+  },
 };
 
 const notify = {
@@ -41,13 +71,23 @@ const notify = {
 
     notification.success({
       message: title,
+      title, // AntD 6 compatibility
       description,
       placement: defaultPlacement,
-      duration: 2.5,
+      duration: 3,
       showProgress: true,
+      pauseOnHover: true,
       style: {
         ...NOTIFICATION_BASE_STYLE,
-        border: '1px solid rgba(52, 199, 89, 0.35)',
+        borderLeft: '4px solid #34C759',
+      },
+      styles: {
+        root: {
+          backgroundColor: '#18181B',
+          borderRadius: '12px',
+        },
+        title: SEMANTIC_STYLES.title,
+        description: SEMANTIC_STYLES.description,
       },
     });
   },
@@ -59,13 +99,23 @@ const notify = {
 
     notification.error({
       message: title,
+      title, // AntD 6 compatibility
       description: cleanDesc,
       placement: defaultPlacement,
-      duration: 3.5,
+      duration: 4,
       showProgress: true,
+      pauseOnHover: true,
       style: {
         ...NOTIFICATION_BASE_STYLE,
-        border: '1px solid rgba(255, 83, 90, 0.4)',
+        borderLeft: '4px solid #FF535A',
+      },
+      styles: {
+        root: {
+          backgroundColor: '#18181B',
+          borderRadius: '12px',
+        },
+        title: SEMANTIC_STYLES.title,
+        description: SEMANTIC_STYLES.description,
       },
     });
   },
@@ -77,13 +127,23 @@ const notify = {
 
     notification.warning({
       message: title,
+      title, // AntD 6 compatibility
       description: cleanDesc,
       placement: defaultPlacement,
-      duration: 3,
+      duration: 3.5,
       showProgress: true,
+      pauseOnHover: true,
       style: {
         ...NOTIFICATION_BASE_STYLE,
-        border: '1px solid rgba(255, 185, 85, 0.35)',
+        borderLeft: '4px solid #FFB955',
+      },
+      styles: {
+        root: {
+          backgroundColor: '#18181B',
+          borderRadius: '12px',
+        },
+        title: SEMANTIC_STYLES.title,
+        description: SEMANTIC_STYLES.description,
       },
     });
   },
@@ -94,39 +154,38 @@ const notify = {
 
     notification.info({
       message: title,
+      title, // AntD 6 compatibility
       description,
       placement: defaultPlacement,
-      duration: 2.5,
+      duration: 3,
       showProgress: true,
+      pauseOnHover: true,
       style: {
         ...NOTIFICATION_BASE_STYLE,
-        border: '1px solid rgba(23, 143, 226, 0.35)',
+        borderLeft: '4px solid #178FE2',
+      },
+      styles: {
+        root: {
+          backgroundColor: '#18181B',
+          borderRadius: '12px',
+        },
+        title: SEMANTIC_STYLES.title,
+        description: SEMANTIC_STYLES.description,
       },
     });
   },
 };
 
 /**
- * Toast / Message helper with automatic deduplication & error sanitization
+ * Unified Toast & Message helpers using the unified Cinema Noir Notification Card
  */
 export const toast = {
-  success: (msg: string) => {
-    if (!shouldDisplayNotification(`toast_s_${msg}`)) return;
-    antdMessage.success(msg);
-  },
-  error: (rawMsg: string) => {
-    const cleanMsg = sanitizeErrorMessage(rawMsg);
-    if (!shouldDisplayNotification(`toast_e_${cleanMsg}`)) return;
-    antdMessage.error(cleanMsg);
-  },
-  warning: (msg: string) => {
-    if (!shouldDisplayNotification(`toast_w_${msg}`)) return;
-    antdMessage.warning(msg);
-  },
-  info: (msg: string) => {
-    if (!shouldDisplayNotification(`toast_i_${msg}`)) return;
-    antdMessage.info(msg);
-  },
+  success: (msg: string, title = 'Thành công') => notify.success(msg, title),
+  error: (rawMsg: string, title = 'Thông báo lỗi') => notify.error(rawMsg, title),
+  warning: (msg: string, title = 'Cảnh báo') => notify.warning(msg, title),
+  info: (msg: string, title = 'Thông báo') => notify.info(msg, title),
 };
+
+export const message = toast;
 
 export default notify;

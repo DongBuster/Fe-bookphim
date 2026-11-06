@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Award,
@@ -11,7 +12,7 @@ import {
   Coins,
   CheckCircle2,
 } from 'lucide-react';
-import { message } from 'antd';
+import { message } from '@config/notification';
 import {
   getMyPassportApi,
   getPassportBadgesApi,
@@ -21,6 +22,7 @@ import type { PassportDto, BadgeDto, HologramStampDto } from '@shared/types/api.
 import * as S from './PassportPage.styles';
 
 export const PassportPage: FC = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'stamps' | 'badges'>('stamps');
 
@@ -41,13 +43,18 @@ export const PassportPage: FC = () => {
     mutationFn: (badgeId: string) => claimBadgeRewardApi({ badgeId }),
     onSuccess: (data) => {
       message.success(
-        `Chúc mừng! Bạn đã nhận thành công +${data.rewardPoints} điểm thưởng vào tài khoản!`,
+        t('profile:badge_claimed_success', {
+          points: data.rewardPoints,
+          defaultValue: `Chúc mừng! Bạn đã nhận thành công +${data.rewardPoints} điểm thưởng vào tài khoản!`,
+        }),
       );
       queryClient.invalidateQueries({ queryKey: ['my-passport'] });
       queryClient.invalidateQueries({ queryKey: ['passport-badges'] });
     },
     onError: () => {
-      message.error('Không thể nhận thưởng lúc này. Vui lòng thử lại sau.');
+      message.error(
+        t('profile:badge_claim_error', 'Không thể nhận thưởng lúc này. Vui lòng thử lại sau.'),
+      );
     },
   });
 
@@ -165,7 +172,10 @@ export const PassportPage: FC = () => {
               </div>
               <h2>{effectivePassport.fullName}</h2>
               <span className="tier-label">
-                Hạng Thành Viên: {effectivePassport.membershipTier} ELITE
+                {t('profile:passport_member_tier', {
+                  tier: effectivePassport.membershipTier,
+                  defaultValue: `Hạng Thành Viên: ${effectivePassport.membershipTier} ELITE`,
+                })}
               </span>
             </div>
           </S.UserIdentity>
@@ -177,7 +187,7 @@ export const PassportPage: FC = () => {
                 <Coins size={16} style={{ display: 'inline', marginRight: 4 }} />
                 {effectivePassport.totalPoints.toLocaleString('vi-VN')}
               </span>
-              <span className="stat-label">Điểm Tích Lũy</span>
+              <span className="stat-label">{t('profile:accumulated_points_label', 'Điểm Tích Lũy')}</span>
             </S.StatBox>
 
             <S.StatBox>
@@ -185,7 +195,7 @@ export const PassportPage: FC = () => {
                 <Film size={16} style={{ display: 'inline', marginRight: 4 }} />
                 {effectivePassport.moviesWatchedCount}
               </span>
-              <span className="stat-label">Phim Đã Thưởng Thức</span>
+              <span className="stat-label">{t('profile:movies_watched_label', 'Phim Đã Thưởng Thức')}</span>
             </S.StatBox>
 
             <S.StatBox>
@@ -196,7 +206,7 @@ export const PassportPage: FC = () => {
                 />
                 {effectivePassport.theatersVisitedCount}
               </span>
-              <span className="stat-label">Cụm Rạp Check-in</span>
+              <span className="stat-label">{t('profile:theaters_visited_label', 'Cụm Rạp Check-in')}</span>
             </S.StatBox>
           </S.StatsGrid>
         </S.PassportCardInner>
@@ -210,7 +220,12 @@ export const PassportPage: FC = () => {
           onClick={() => setActiveTab('stamps')}
         >
           <Stamp size={16} />
-          <span>Con Dấu Điện Ảnh ({stamps.length})</span>
+          <span>
+            {t('profile:passport_tab_stamps', {
+              count: stamps.length,
+              defaultValue: `Con Dấu Điện Ảnh (${stamps.length})`,
+            })}
+          </span>
         </S.TabButton>
 
         <S.TabButton
@@ -219,7 +234,12 @@ export const PassportPage: FC = () => {
           onClick={() => setActiveTab('badges')}
         >
           <Trophy size={16} />
-          <span>Huy Hiệu & Đổi Thưởng ({effectiveBadges.length})</span>
+          <span>
+            {t('profile:passport_tab_badges', {
+              count: effectiveBadges.length,
+              defaultValue: `Huy Hiệu & Đổi Thưởng (${effectiveBadges.length})`,
+            })}
+          </span>
         </S.TabButton>
       </S.TabBar>
 
@@ -229,7 +249,12 @@ export const PassportPage: FC = () => {
           {stamps.length === 0 ? (
             <S.EmptyState>
               <Stamp size={48} color="#8c8994" />
-              <p>Bạn chưa có con dấu nào. Hãy check-in suất chiếu tiếp theo để đóng dấu hộ chiếu!</p>
+              <p>
+                {t(
+                  'profile:passport_empty_stamps',
+                  'Bạn chưa có con dấu nào. Hãy check-in suất chiếu tiếp theo để đóng dấu hộ chiếu!',
+                )}
+              </p>
             </S.EmptyState>
           ) : (
             <S.StampGrid>
@@ -272,7 +297,10 @@ export const PassportPage: FC = () => {
                       disabled={claimMutation.isPending}
                       onClick={() => claimMutation.mutate(badge.badgeId)}
                     >
-                      Nhận +{badge.rewardPoints} Điểm
+                      {t('profile:passport_claim_reward', {
+                        points: badge.rewardPoints,
+                        defaultValue: `Nhận +${badge.rewardPoints} Điểm`,
+                      })}
                     </button>
                   ) : badge.isRewardClaimed ? (
                     <span
@@ -287,7 +315,7 @@ export const PassportPage: FC = () => {
                       }}
                     >
                       <CheckCircle2 size={13} />
-                      Đã nhận +{badge.rewardPoints} điểm
+                      {t('profile:passport_claimed', 'Đã Nhận Thưởng')} (+{badge.rewardPoints})
                     </span>
                   ) : (
                     <span
@@ -297,7 +325,7 @@ export const PassportPage: FC = () => {
                         marginTop: 6,
                       }}
                     >
-                      🔒 Thưởng +{badge.rewardPoints} điểm khi mở khóa
+                      🔒 {t('profile:passport_locked', 'Chưa Mở Khóa')} (+{badge.rewardPoints})
                     </span>
                   )}
                 </div>

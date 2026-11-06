@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { message } from 'antd';
+import { message } from '@config/notification';
 import {
   ArrowRight,
   Eye,
@@ -45,7 +45,7 @@ export const LoginForm: FC = () => {
 
   const handleSelectPhoneTab = () => {
     setActiveTab('phone');
-    message.info('Phương thức đăng nhập qua Số điện thoại (OTP) đang được thử nghiệm.');
+    message.info(t('auth:toast_phone_otp_test', 'Phương thức đăng nhập qua Số điện thoại (OTP) đang được thử nghiệm.'));
   };
   const handleSelectEmailTab = () => setActiveTab('email');
 
@@ -81,23 +81,23 @@ export const LoginForm: FC = () => {
   };
 
   const handleForgotPassword = () => {
-    message.info('Tính năng Quên mật khẩu đang được kết nối với cổng SMS/Email OTP.');
+    message.info(t('auth:toast_forgot_pass', 'Tính năng Quên mật khẩu đang được kết nối với cổng SMS/Email OTP.'));
   };
 
   const handleGoogleLogin = () => {
-    message.info('Đăng nhập Google OAuth2 đang trong quá trình tích hợp môi trường.');
+    message.info(t('auth:toast_google_oauth', 'Đăng nhập Google OAuth2 đang trong quá trình tích hợp môi trường.'));
   };
 
   const handleFacebookLogin = () => {
-    message.info('Đăng nhập Facebook OAuth2 đang trong quá trình tích hợp môi trường.');
+    message.info(t('auth:toast_facebook_oauth', 'Đăng nhập Facebook OAuth2 đang trong quá trình tích hợp môi trường.'));
   };
 
   const handleZaloLogin = () => {
-    message.info('Đăng nhập Zalo ZNS/OAuth đang trong quá trình tích hợp môi trường.');
+    message.info(t('auth:toast_zalo_oauth', 'Đăng nhập Zalo ZNS/OAuth đang trong quá trình tích hợp môi trường.'));
   };
 
   const handleQrLogin = () => {
-    message.info('Tính năng Quét mã QR đăng nhập qua App PhimBook sẽ sớm ra mắt.');
+    message.info(t('auth:toast_qr_login', 'Tính năng Quét mã QR đăng nhập qua App PhimBook sẽ sớm ra mắt.'));
   };
 
   const handleToggleMode = () => {
@@ -119,7 +119,7 @@ export const LoginForm: FC = () => {
 
     if (isRegisterMode) {
       if (!fullName.trim() || !phone.trim() || !email || !password) {
-        message.warning('Vui lòng điền đầy đủ tất cả các trường đăng ký.');
+        message.warning(t('auth:toast_fill_all_fields', 'Vui lòng điền đầy đủ tất cả các trường đăng ký.'));
         return;
       }
 
@@ -155,7 +155,7 @@ export const LoginForm: FC = () => {
     }
 
     if (!email || !password) {
-      message.warning('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
+      message.warning(t('auth:toast_fill_credentials', 'Vui lòng nhập đầy đủ tài khoản và mật khẩu.'));
       return;
     }
 
@@ -192,7 +192,7 @@ export const LoginForm: FC = () => {
         (error as { isBusinessError?: boolean })?.isBusinessError
       );
       if (!isAlreadyHandled) {
-        message.error('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin tài khoản.');
+        message.error(t('auth:toast_login_failed', 'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin tài khoản.'));
       }
     } finally {
       setIsLoading(false);

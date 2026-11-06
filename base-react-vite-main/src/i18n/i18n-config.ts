@@ -32,19 +32,49 @@ export const NAMESPACES = [
 
 export type AppNamespace = (typeof NAMESPACES)[number];
 
+export const SUPPORTED_LANGUAGES = ['vi', 'en', 'ko', 'ja', 'zh'] as const;
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
+// Kiểm tra ngôn ngữ đã được người dùng chủ động lựa chọn hay chưa
+const isUserExplicit =
+  typeof window !== 'undefined' &&
+  localStorage.getItem('app_user_language_selected') === 'true';
+const savedLng =
+  typeof window !== 'undefined' ? localStorage.getItem('i18nextLng') : null;
+const normalizedSavedLng = savedLng ? savedLng.split('-')[0] : null;
+
+// Nếu người dùng chưa từng chủ động đổi ngôn ngữ hoặc giá trị lưu không hợp lệ -> luôn mặc định là 'vi'
+const initialLng: SupportedLanguage =
+  isUserExplicit &&
+  normalizedSavedLng &&
+  SUPPORTED_LANGUAGES.includes(normalizedSavedLng as SupportedLanguage)
+    ? (normalizedSavedLng as SupportedLanguage)
+    : 'vi';
+
+if (typeof window !== 'undefined' && !isUserExplicit) {
+  try {
+    localStorage.setItem('i18nextLng', 'vi');
+  } catch {
+    // Bỏ qua lỗi nếu không ghi được localStorage
+  }
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
+    lng: initialLng,
     fallbackLng: 'vi',
+    supportedLngs: [...SUPPORTED_LANGUAGES],
     defaultNS: 'common',
     ns: [...NAMESPACES],
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng',
       caches: ['localStorage'],
     },
   });

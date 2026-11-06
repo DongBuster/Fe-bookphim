@@ -134,9 +134,9 @@ export function NotificationDropdownMenu({
                     {TYPE_ICON[item.type]}
                   </div>
                   <div className="item-content">
-                    <span className="item-title">{item.title}</span>
-                    <span className="item-desc">{item.desc}</span>
-                    <span className="item-time">{item.time}</span>
+                    <span className="item-title">{item.titleKey ? t(item.titleKey, item.title) : item.title}</span>
+                    <span className="item-desc">{item.descKey ? t(item.descKey, item.desc) : item.desc}</span>
+                    <span className="item-time">{item.timeKey ? t(item.timeKey, item.time) : item.time}</span>
                   </div>
                   {item.isUnread && <span className="unread-dot" />}
                 </S.NotificationItem>

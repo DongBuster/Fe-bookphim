@@ -1,5 +1,6 @@
 import { Button, Result } from 'antd';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import i18n from 'i18next';
 import { ErrorWrapper } from './ErrorBoundary.styles';
 
 interface Props {
@@ -54,11 +55,14 @@ class ErrorBoundary extends Component<Props, State> {
         <ErrorWrapper>
           <Result
             status="500"
-            title="Đã xảy ra lỗi"
-            subTitle={'Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại.'}
+            title={i18n.t('common:error_occurred', 'Đã xảy ra lỗi')}
+            subTitle={i18n.t(
+              'common:error_desc',
+              'Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại.',
+            )}
             extra={
               <Button type="primary" onClick={this.handleReset}>
-                Thử lại
+                {i18n.t('common:retry', 'Thử lại')}
               </Button>
             }
           />

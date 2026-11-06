@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { message } from 'antd';
+import { message } from '@config/notification';
 import { toast } from '@config/notification';
 import { ChevronLeft, Clock, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

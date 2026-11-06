@@ -34,6 +34,13 @@ import {
 } from '@layouts/header/data/header-data';
 import * as S from './Sidebar.styles';
 
+const CITY_KEY_MAP: Record<string, string> = {
+  'Hà Nội': 'header:cities.hanoi',
+  'TP. HCM': 'header:cities.hcmc',
+  'Đà Nẵng': 'header:cities.danang',
+};
+
+
 export interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -115,6 +122,9 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
   };
 
   const handleSelectLang = (code: string) => () => {
+    try {
+      localStorage.setItem('app_user_language_selected', 'true');
+    } catch {}
     i18n.changeLanguage(code);
   };
 
@@ -205,7 +215,7 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
             <div className="city-chips">
               {CITIES.map((city) => (
                 <S.CityChip
-                  key={city}
+                  key={t(CITY_KEY_MAP[city] || city, city)}
                   $isSelected={selectedCity === city}
                   onClick={handleSelectCity(city)}
                 >

@@ -19,6 +19,11 @@ export function LangSwitcher() {
   };
 
   const handleSelectLang = (code: string) => () => {
+    try {
+      localStorage.setItem('app_user_language_selected', 'true');
+    } catch {
+      // ignore
+    }
     i18n.changeLanguage(code);
     setIsOpen(false);
   };

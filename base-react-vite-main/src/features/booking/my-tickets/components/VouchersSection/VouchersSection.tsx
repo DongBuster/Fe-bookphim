@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Sparkles, Copy } from 'lucide-react';
 import type { VoucherData } from '../../data/past-tickets.data';
 import * as S from './VouchersSection.styles';
@@ -11,6 +12,8 @@ export function VouchersSection({
   vouchers,
   onCopyCode,
 }: VouchersSectionProps) {
+  const { t } = useTranslation();
+
   const handleCopy = (code: string) => () => {
     onCopyCode(code);
   };
@@ -20,11 +23,13 @@ export function VouchersSection({
       <S.VoucherSectionHeader>
         <h2>
           <Sparkles size={20} color="#ffb955" />
-          <span>Ví Voucher &amp; Ưu Đãi Độc Quyền</span>
+          <span>{t('booking:vouchers_vault_title', 'Ví Voucher & Ưu Đãi Độc Quyền')}</span>
         </h2>
         <span className="sub">
-          Các mã khuyến mãi đang có hiệu lực trong tài khoản thành viên VIP
-          CinePass của bạn.
+          {t(
+            'booking:vouchers_vault_desc',
+            'Các mã khuyến mãi đang có hiệu lực trong tài khoản thành viên VIP CinePass của bạn.',
+          )}
         </span>
       </S.VoucherSectionHeader>
 
@@ -46,7 +51,7 @@ export function VouchersSection({
                 onClick={handleCopy(voucher.code)}
               >
                 <Copy size={12} />
-                <span>Sao chép mã</span>
+                <span>{t('booking:copy_code_btn', 'Sao chép mã')}</span>
               </button>
             </div>
           </S.VoucherCard>

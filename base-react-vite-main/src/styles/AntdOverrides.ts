@@ -457,46 +457,134 @@ input.ant-input,
 }
 
 /* ===== _notification.scss ===== */
-.ant-notification .ant-notification-notice {
-  background: var(--bg-card, #1c1b1c) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75) !important;
+.ant-notification {
+  .ant-notification-notice {
+    background: #18181b !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(16px) !important;
+    padding: 16px 20px !important;
 
-  .ant-notification-notice-message {
-    color: #ffffff !important;
-    font-size: 15px !important;
-    font-weight: 700 !important;
-  }
-
-  .ant-notification-notice-description {
-    color: #ae8786 !important;
-    font-size: 13.5px !important;
-    line-height: 1.5 !important;
-  }
-
-  .ant-notification-notice-close {
-    color: #8c90a4 !important;
-    &:hover {
+    /* Title: Ultra-crisp high contrast white for both AntD 6 and AntD 5 */
+    .ant-notification-notice-title,
+    .ant-notification-notice-title > *,
+    .ant-notification-notice-message,
+    .ant-notification-notice-message > * {
       color: #ffffff !important;
+      font-size: 15px !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.2px !important;
+      margin-bottom: 4px !important;
+      line-height: 1.4 !important;
+    }
+
+    /* Description: High-contrast crisp light slate white for ultra-clear readability */
+    .ant-notification-notice-description,
+    .ant-notification-notice-description > *,
+    .ant-notification-notice-description p {
+      color: #f1f5f9 !important;
+      font-size: 13.5px !important;
+      font-weight: 400 !important;
+      line-height: 1.55 !important;
+      opacity: 0.96 !important;
+    }
+
+    /* Close button */
+    .ant-notification-notice-close {
+      color: rgba(255, 255, 255, 0.65) !important;
+      transition: all 0.2s ease !important;
+      top: 16px !important;
+      right: 16px !important;
+      &:hover {
+        color: #ffffff !important;
+        transform: scale(1.1);
+      }
+    }
+
+    /* Progress bar base */
+    .ant-notification-notice-progress {
+      background: transparent !important;
+      &::-webkit-progress-bar {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+      }
+    }
+
+    /* Type-specific left borders, glows and progress bars */
+    &.ant-notification-notice-error {
+      border-left: 4px solid #ff535a !important;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), -4px 0 20px rgba(255, 83, 90, 0.25) !important;
+
+      .ant-notification-notice-progress {
+        background: #ff535a !important;
+        &::-webkit-progress-value {
+          background: #ff535a !important;
+        }
+        &::-moz-progress-bar {
+          background: #ff535a !important;
+        }
+      }
+    }
+
+    &.ant-notification-notice-success {
+      border-left: 4px solid #34c759 !important;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), -4px 0 20px rgba(52, 199, 89, 0.25) !important;
+
+      .ant-notification-notice-progress {
+        background: #34c759 !important;
+        &::-webkit-progress-value {
+          background: #34c759 !important;
+        }
+        &::-moz-progress-bar {
+          background: #34c759 !important;
+        }
+      }
+    }
+
+    &.ant-notification-notice-warning {
+      border-left: 4px solid #ffb955 !important;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), -4px 0 20px rgba(255, 185, 85, 0.25) !important;
+
+      .ant-notification-notice-progress {
+        background: #ffb955 !important;
+        &::-webkit-progress-value {
+          background: #ffb955 !important;
+        }
+        &::-moz-progress-bar {
+          background: #ffb955 !important;
+        }
+      }
+    }
+
+    &.ant-notification-notice-info {
+      border-left: 4px solid #178fe2 !important;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), -4px 0 20px rgba(23, 143, 226, 0.25) !important;
+
+      .ant-notification-notice-progress {
+        background: #178fe2 !important;
+        &::-webkit-progress-value {
+          background: #178fe2 !important;
+        }
+        &::-moz-progress-bar {
+          background: #178fe2 !important;
+        }
+      }
     }
   }
+}
 
-  &.ant-notification-notice-error {
-    border-left: 4px solid var(--primary, #ff535a) !important;
-  }
+/* Fallback un-nested rules for portaled elements */
+.ant-notification-notice-title,
+.ant-notification-notice-title > *,
+.ant-notification-notice-message,
+.ant-notification-notice-message > * {
+  color: #ffffff !important;
+}
 
-  &.ant-notification-notice-success {
-    border-left: 4px solid var(--success, #34c759) !important;
-  }
-
-  &.ant-notification-notice-warning {
-    border-left: 4px solid var(--warning, #ffb955) !important;
-  }
-
-  &.ant-notification-notice-info {
-    border-left: 4px solid var(--info, #178fe2) !important;
-  }
+.ant-notification-notice-description,
+.ant-notification-notice-description > *,
+.ant-notification-notice-description p {
+  color: #f1f5f9 !important;
 }
 
 /* ===== _message.scss ===== */

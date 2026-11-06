@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Lock } from 'lucide-react';
-import { message } from 'antd';
+import { message } from '@config/notification';
 import { toast } from '@config/notification';
 import { useTranslation } from 'react-i18next';
 import { useBooking } from '../context/useBooking';

@@ -1,6 +1,7 @@
 import { DisconnectOutlined, WifiOutlined } from '@ant-design/icons';
 import { notification } from 'antd';
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useOnlineStatus } from './useOnlineStatus';
 
@@ -13,6 +14,7 @@ const ErrorDisconnectIcon = styled(DisconnectOutlined)`
 `;
 
 export function NetworkDetector() {
+  const { t } = useTranslation();
   const isOnline = useOnlineStatus();
   const previousOnlineRef = useRef(isOnline);
 
@@ -26,8 +28,11 @@ export function NetworkDetector() {
     if (isOnline) {
       notification.destroy('offline-notification');
       notification.success({
-        message: 'Đã kết nối mạng',
-        description: 'Kết nối internet đã được khôi phục.',
+        message: t('common:network_online_title', 'Đã kết nối mạng'),
+        description: t(
+          'common:network_online_desc',
+          'Kết nối internet đã được khôi phục.',
+        ),
         placement: 'bottomRight',
         duration: 3,
         icon: <SuccessWifiIcon />,
@@ -36,17 +41,19 @@ export function NetworkDetector() {
     }
 
     notification.error({
-      message: 'Mất kết nối mạng',
-      description: 'Bạn đang offline. Vui lòng kiểm tra kết nối internet.',
+      message: t('common:network_offline_title', 'Mất kết nối mạng'),
+      description: t(
+        'common:network_offline_desc',
+        'Bạn đang offline. Vui lòng kiểm tra kết nối internet.',
+      ),
       placement: 'bottomRight',
       duration: 0,
       key: 'offline-notification',
       icon: <ErrorDisconnectIcon />,
     });
-  }, [isOnline]);
+  }, [isOnline, t]);
 
   return null;
 }
 
 export default NetworkDetector;
-

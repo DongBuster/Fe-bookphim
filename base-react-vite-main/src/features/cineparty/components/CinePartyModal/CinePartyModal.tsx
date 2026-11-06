@@ -1,7 +1,7 @@
 import type { FC, FormEvent } from 'react';
 import { useState } from 'react';
 import { Users, X, Share2, CreditCard, Loader2, Sparkles } from 'lucide-react';
-import { message } from 'antd';
+import { message } from '@config/notification';
 import {
   createGroupRoomApi,
   joinGroupRoomApi,

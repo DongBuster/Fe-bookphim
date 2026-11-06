@@ -80,8 +80,11 @@ export default function MyTicketsPage() {
             {/* Teaser lịch sử gần đây */}
             <TicketHistory
               tickets={pastTickets.slice(0, 3)}
-              title="Lịch Sử Đặt Vé Gần Đây"
-              subtitle="Các tác phẩm điện ảnh đỉnh cao bạn đã thưởng thức tại hệ thống PhimBook"
+              title={t('booking:recent_history_title', 'Lịch Sử Đặt Vé Gần Đây')}
+              subtitle={t(
+                'booking:recent_history_subtitle',
+                'Các tác phẩm điện ảnh đỉnh cao bạn đã thưởng thức tại hệ thống PhimBook',
+              )}
               historyFilter={historyFilter}
               onFilterChange={setHistoryFilter}
               onToast={triggerToast}
@@ -94,13 +97,19 @@ export default function MyTicketsPage() {
         {activeTab === 'history' && (
           <TicketHistory
             tickets={pastTickets}
-            title={`Toàn Bộ Lịch Sử Đặt Vé ( ${pastTickets.length} Buổi Chiếu )`}
-            subtitle="Lưu trữ vĩnh viễn các giao dịch, đánh giá phim và điểm thưởng CinePass"
+            title={t('booking:full_history_title', {
+              defaultValue: 'Toàn Bộ Lịch Sử Đặt Vé ( {{count}} Buổi Chiếu )',
+              count: pastTickets.length,
+            })}
+            subtitle={t(
+              'booking:full_history_subtitle',
+              'Lưu trữ vĩnh viễn các giao dịch, đánh giá phim và điểm thưởng CinePass',
+            )}
             historyFilter={historyFilter}
             onFilterChange={setHistoryFilter}
             onToast={triggerToast}
-            exportLabel="Xuất Hóa Đơn VAT"
-            exportToast="Đang xuất tệp hóa đơn điện tử VAT (.pdf)..."
+            exportLabel={t('booking:export_vat_label', 'Xuất Hóa Đơn VAT')}
+            exportToast={t('booking:export_vat_toast', 'Đang xuất tệp hóa đơn điện tử VAT (.pdf)...')}
           />
         )}
 

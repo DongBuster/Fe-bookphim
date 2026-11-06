@@ -1,4 +1,4 @@
-import { theme as antdTheme, type ConfigProviderProps, type ThemeConfig } from 'antd';
+import { ConfigProvider, theme as antdTheme, type ConfigProviderProps, type ThemeConfig } from 'antd';
 import viVN from 'antd/locale/vi_VN';
 
 export const palette = {
@@ -72,9 +72,10 @@ export const theme: ThemeConfig = {
       borderRadiusLG: 16,
     },
     Notification: {
-      colorBgElevated: palette.surface,
-      colorText: palette.textPrimary,
-      colorTextHeading: palette.textPrimary,
+      colorBgElevated: '#18181b',
+      colorText: '#ffffff',
+      colorTextHeading: '#ffffff',
+      colorTextDescription: '#f1f5f9',
     },
     Message: {
       contentBg: palette.surface,
@@ -94,6 +95,11 @@ export const theme: ThemeConfig = {
     },
   },
 };
+
+// Set global theme for Ant Design static methods (notification, message, modal)
+ConfigProvider.config({
+  theme,
+});
 
 const antdDefaultConfig: ConfigProviderProps = {
   locale: viVN,
