@@ -18,7 +18,8 @@ export interface ActiveTicketData {
 }
 
 export const DEFAULT_ACTIVE_TICKET: ActiveTicketData = {
-  orderId: '#VN - 8849204',
+  orderId: '#VN-8849204',
+  orderCode: 'VN-8849204',
   status: 'ĐÃ THANH TOÁN THÀNH CÔNG • SẴN SÀNG VÀO RẠP',
   movieTitle: 'DUNE: HÀNH TINH CÁT - PHẦN HAI',
   movieOriginalTitle: 'Dune: Part Two (2024)',
@@ -33,5 +34,5 @@ export const DEFAULT_ACTIVE_TICKET: ActiveTicketData = {
   seatsType: 'VIP Prime Center',
   combo: '1x Combo Độc Quyền: Dune Sandworm Bucket & 02 Pepsi Zero 32oz',
   totalAmount: 510000,
-  qrCodeValue: 'PBK - 8849204',
+  qrCodeValue: 'PBK-8849204',
 };

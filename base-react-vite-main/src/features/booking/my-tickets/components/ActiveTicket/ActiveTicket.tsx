@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Ticket,
@@ -40,6 +40,10 @@ export function ActiveTicket({
   )}&color=0d0c0f&bgcolor=ffffff`;
 
   const [qrSrc, setQrSrc] = useState(backendQrUrl);
+
+  useEffect(() => {
+    setQrSrc(backendQrUrl);
+  }, [backendQrUrl]);
 
   const handleAddToWallet = () => {
     onToast(t('booking:add_wallet_success', 'Đã thêm vé vào Apple / Google Wallet thành công!'));

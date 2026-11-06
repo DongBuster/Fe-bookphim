@@ -367,8 +367,25 @@ export interface TicketDto {
 
 export interface TurnstileCheckInRequest {
   passCode: string;
-  deviceId: string;
-  gateNumber: string;
+  deviceId?: string;
+  gateNumber?: string;
+}
+
+export interface TurnstileCheckInResponseData {
+  success: boolean;
+  message?: string;
+  passCode?: string;
+  seatLabel?: string;
+  movieTitle?: string;
+  checkedInAt?: string;
+}
+
+export interface TicketRefundResponseData {
+  success: boolean;
+  message?: string;
+  passCode?: string;
+  refundAmount?: number;
+  status?: string;
 }
 
 

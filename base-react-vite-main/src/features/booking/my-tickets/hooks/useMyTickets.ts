@@ -63,16 +63,18 @@ export function useMyTickets() {
 
   // Đồng bộ trạng thái vé thật từ Backend Railway khi load trang
   useEffect(() => {
-    const rawCode =
+    const rawCode = (
       activeTicket.orderCode ||
-      (activeTicket.orderId ? activeTicket.orderId.replace('#', '').trim() : null);
+      (activeTicket.orderId ? activeTicket.orderId.replace(/[\s#]/g, '') : null)
+    )?.trim();
 
-    if (!rawCode) return;
+    // Bỏ qua không gọi API nếu chưa có mã vé hoặc là mã vé mẫu mặc định
+    if (!rawCode || rawCode === 'VN-8849204' || rawCode === 'PBK-8849204') return;
 
     let isMounted = true;
 
-    // 1. Thử gọi API lấy thông tin vé điện tử theo passCode
-    getTicketPassApi(rawCode)
+    // 1. Thử gọi API lấy thông tin vé điện tử theo passCode (chế độ silent để không spam toast)
+    getTicketPassApi(rawCode, { silent: true })
       .then((ticketDto) => {
         if (!isMounted || !ticketDto) return;
         setActiveTicket((prev) => ({
@@ -93,7 +95,7 @@ export function useMyTickets() {
       })
       .catch(() => {
         // 2. Nếu vé chưa có mã passCode độc lập, kiểm tra trạng thái đơn hàng thật
-        getOrderByCodeApi(rawCode)
+        getOrderByCodeApi(rawCode, { silent: true })
           .then((orderDto) => {
             if (!isMounted || !orderDto) return;
             if (orderDto.status === 'PAID') {
@@ -114,27 +116,46 @@ export function useMyTickets() {
 
   // Xử lý mô phỏng soát vé tự động qua POST /api/v1/tickets/turnstile-checkin
   const handleTurnstileCheckIn = async () => {
-    const code =
+    const rawCode =
       activeTicket.qrCodeValue ||
       activeTicket.orderCode ||
-      activeTicket.orderId?.replace('#', '').trim();
+      activeTicket.orderId;
 
-    if (!code) {
+    if (!rawCode) {
       triggerToast('Không tìm thấy mã vé hợp lệ!');
       return;
     }
 
-    try {
-      await turnstileCheckInApi({
-        passCode: code,
-        deviceId: 'GATE_TURNSTILE_01',
-        gateNumber: 'Cổng VIP Fast-Track 01',
-      });
+    const code = rawCode.replace(/[\s#]/g, '').trim();
+
+    // Nếu là mã vé demo/mẫu mặc định, mô phỏng thành công trực quan trên UI
+    if (code === 'PBK-8849204' || code === 'VN-8849204') {
       setActiveTicket((prev) => ({
         ...prev,
         status: 'ĐÃ CHECK-IN VÀO CỬA • CHÚC BẠN XEM PHIM VUI VẺ',
       }));
       triggerToast('Soát vé tự động thành công! Cổng vào rạp đã mở.');
+      return;
+    }
+
+    try {
+      const checkinResult = await turnstileCheckInApi(
+        {
+          passCode: code,
+          deviceId: 'GATE_TURNSTILE_01',
+          gateNumber: 'Cổng VIP Fast-Track 01',
+        },
+        { silent: true },
+      );
+
+      setActiveTicket((prev) => ({
+        ...prev,
+        status: 'ĐÃ CHECK-IN VÀO CỬA • CHÚC BẠN XEM PHIM VUI VẺ',
+      }));
+      triggerToast(
+        checkinResult?.message ||
+          'Soát vé tự động thành công! Cổng vào rạp đã mở.',
+      );
     } catch (err: unknown) {
       const errorObj = err as {
         response?: { data?: { message?: string } };
@@ -150,23 +171,38 @@ export function useMyTickets() {
 
   // Xử lý yêu cầu hoàn vé qua POST /api/v1/tickets/{passCode}/refund
   const handleRefund = async () => {
-    const code =
+    const rawCode =
       activeTicket.qrCodeValue ||
       activeTicket.orderCode ||
-      activeTicket.orderId?.replace('#', '').trim();
+      activeTicket.orderId;
 
-    if (!code) {
+    if (!rawCode) {
       triggerToast('Không tìm thấy mã vé!');
       return;
     }
 
-    try {
-      await refundTicketApi(code);
+    const code = rawCode.replace(/[\s#]/g, '').trim();
+
+    // Nếu là mã vé demo/mẫu mặc định, mô phỏng hoàn vé trực quan trên UI
+    if (code === 'PBK-8849204' || code === 'VN-8849204') {
       setActiveTicket((prev) => ({
         ...prev,
         status: 'ĐÃ HỦY VÉ & HOÀN TIỀN THÀNH CÔNG',
       }));
-      triggerToast('Yêu cầu hoàn vé đã được hệ thống phê duyệt thành công!');
+      triggerToast('Yêu cầu đổi/hoàn vé đã được hệ thống phê duyệt thành công!');
+      return;
+    }
+
+    try {
+      const refundResult = await refundTicketApi(code, { silent: true });
+      setActiveTicket((prev) => ({
+        ...prev,
+        status: 'ĐÃ HỦY VÉ & HOÀN TIỀN THÀNH CÔNG',
+      }));
+      triggerToast(
+        refundResult?.message ||
+          'Yêu cầu hoàn vé đã được hệ thống phê duyệt thành công!',
+      );
     } catch (err: unknown) {
       const errorObj = err as {
         response?: { data?: { message?: string } };

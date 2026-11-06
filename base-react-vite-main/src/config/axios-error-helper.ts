@@ -74,41 +74,65 @@ export async function tryParseBlobErrorResponse(blob: Blob) {
   }
 }
 
-export function handleCommonHttpError(error: AxiosError<IResponse<unknown>>) {
+export function handleCommonHttpError(
+  error: AxiosError<IResponse<unknown>>,
+  shouldNotify = true,
+) {
   (error as { isHandled?: boolean }).isHandled = true;
 
   if (!error.response) {
-    notify.error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.');
+    if (shouldNotify) {
+      notify.error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.');
+    }
     return Promise.reject(error);
   }
 
   const { status, data } = error.response;
 
   if (isBusinessResponseFailed(data)) {
-    return rejectBusinessError(data);
+    return rejectBusinessError(data, shouldNotify);
   }
 
   if (status === 401) {
-    notify.warning('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    if (shouldNotify) {
+      notify.warning('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    }
     return Promise.reject(error);
   }
 
   if (status === 403) {
-    notify.warning('Bạn không có quyền thực hiện hành động này.');
+    if (shouldNotify) {
+      notify.warning('Bạn không có quyền thực hiện hành động này.');
+    }
     return Promise.reject(error);
   }
 
   if (status === 404) {
-    notify.warning('Không tìm thấy tài nguyên hoặc đường dẫn yêu cầu.');
+    if (shouldNotify) {
+      notify.warning('Không tìm thấy tài nguyên hoặc đường dẫn yêu cầu.');
+    }
     return Promise.reject(error);
   }
 
   if (status >= 500) {
-    notify.error('Hệ thống đang bận hoặc gặp sự cố. Vui lòng thử lại sau ít phút.');
+    if (shouldNotify) {
+      notify.error('Hệ thống đang bận hoặc gặp sự cố. Vui lòng thử lại sau ít phút.');
+    }
     return Promise.reject(error);
   }
 
-  const fallbackMsg = getBackendErrorMessage(data ?? {});
-  notify.error(fallbackMsg);
+  // Bóc tách thông báo lỗi chi tiết nếu backend trả về RFC 9110 ProblemDetails (status 400)
+  let fallbackMsg = getBackendErrorMessage(data ?? {});
+  const errorsObj = (data as unknown as { errors?: Record<string, string[]> })?.errors;
+  if (errorsObj && typeof errorsObj === 'object') {
+    const errorList = Object.values(errorsObj).flat();
+    if (errorList.length > 0) {
+      fallbackMsg = errorList[0];
+    }
+  }
+
+  if (shouldNotify) {
+    notify.error(fallbackMsg);
+  }
   return Promise.reject(error);
 }

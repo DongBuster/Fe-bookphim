@@ -59,49 +59,54 @@ export const PassportPage: FC = () => {
   });
 
   // Fallback passport for display
-  const effectivePassport: PassportDto = passport || {
-    userId: 'current-user',
-    fullName: localStorage.getItem('user_name') || 'VIP Elite Cinephile',
+  const effectivePassport: PassportDto = {
+    userId: passport?.userId || 'current-user',
+    fullName: passport?.fullName || localStorage.getItem('user_name') || 'VIP Elite Cinephile',
     avatarUrl:
+      passport?.avatarUrl ||
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-    membershipTier: 'DIAMOND',
-    cinephileTitle: 'Tín Đồ Màn Bạc',
-    totalPoints: 1250,
-    moviesWatchedCount: 14,
-    theatersVisitedCount: 5,
-    stamps: [
-      {
-        stampId: 'st-1',
-        movieTitle: 'Dune: Hành Tinh Cát 2',
-        theaterName: 'PhimBook Landmark 81 IMAX',
-        format: 'IMAX Laser 3D',
-        acquiredAt: '2025-03-01T20:00:00Z',
-        hologramEffect: 'GOLD_SHINE',
-      },
-      {
-        stampId: 'st-2',
-        movieTitle: 'Godzilla x Kong: Đế Chế Mới',
-        theaterName: 'PhimBook Đồng Khởi',
-        format: 'ScreenX 2D',
-        acquiredAt: '2025-02-14T18:30:00Z',
-        hologramEffect: 'LASER_FIRE',
-      },
-      {
-        stampId: 'st-3',
-        movieTitle: 'Oppenheimer',
-        theaterName: 'PhimBook Sala Dolby Cinema',
-        format: 'Dolby Atmos',
-        acquiredAt: '2025-01-20T21:15:00Z',
-        hologramEffect: 'PLATINUM',
-      },
-    ],
-    badges: [],
+    membershipTier: passport?.membershipTier || 'STANDARD',
+    cinephileTitle: passport?.cinephileTitle || (passport as any)?.cinephileRank || 'Tân Binh Điện Ảnh',
+    totalPoints: passport?.totalPoints ?? 0,
+    moviesWatchedCount: passport?.moviesWatchedCount ?? (passport as any)?.totalStamps ?? 0,
+    theatersVisitedCount: passport?.theatersVisitedCount ?? 0,
+    stamps:
+      passport?.stamps && passport.stamps.length > 0
+        ? passport.stamps
+        : (passport as any)?.recentStamps && (passport as any).recentStamps.length > 0
+          ? (passport as any).recentStamps.map((s: any) => ({
+              stampId: s.id || s.stampId || Math.random().toString(),
+              movieTitle: s.movieTitle,
+              theaterName: s.theaterName || 'Rạp PhimBook',
+              format: s.format || '2D Digital',
+              acquiredAt: s.watchedAt || s.acquiredAt || new Date().toISOString(),
+              hologramEffect: s.hologramTheme || s.hologramEffect || 'GOLDEN_EMBOSS',
+            }))
+          : [],
+    badges: passport?.badges || [],
   };
 
-  const effectiveBadges: BadgeDto[] =
+  const rawBadges =
     badgesData && badgesData.length > 0
       ? badgesData
-      : [
+      : passport?.badges && passport.badges.length > 0
+        ? passport.badges
+        : null;
+
+  const effectiveBadges: BadgeDto[] = rawBadges
+    ? rawBadges.map((b: any) => ({
+        badgeId: b.badgeId || b.id || b.code,
+        code: b.code,
+        name: b.name,
+        description: b.description,
+        iconUrl: b.iconUrl || '',
+        category: b.category,
+        isUnlocked: !!b.isUnlocked,
+        unlockedAt: b.unlockedAt,
+        rewardPoints: b.rewardPoints ?? b.bonusPoints ?? 0,
+        isRewardClaimed: !!b.isRewardClaimed,
+      }))
+    : [
           {
             badgeId: 'b-1',
             code: 'FIRST_TICKET',
@@ -185,7 +190,7 @@ export const PassportPage: FC = () => {
             <S.StatBox>
               <span className="stat-val">
                 <Coins size={16} style={{ display: 'inline', marginRight: 4 }} />
-                {effectivePassport.totalPoints.toLocaleString('vi-VN')}
+                {(effectivePassport.totalPoints ?? 0).toLocaleString('vi-VN')}
               </span>
               <span className="stat-label">{t('profile:accumulated_points_label', 'Điểm Tích Lũy')}</span>
             </S.StatBox>
@@ -193,7 +198,7 @@ export const PassportPage: FC = () => {
             <S.StatBox>
               <span className="stat-val">
                 <Film size={16} style={{ display: 'inline', marginRight: 4 }} />
-                {effectivePassport.moviesWatchedCount}
+                {effectivePassport.moviesWatchedCount ?? 0}
               </span>
               <span className="stat-label">{t('profile:movies_watched_label', 'Phim Đã Thưởng Thức')}</span>
             </S.StatBox>
@@ -204,7 +209,7 @@ export const PassportPage: FC = () => {
                   size={16}
                   style={{ display: 'inline', marginRight: 4 }}
                 />
-                {effectivePassport.theatersVisitedCount}
+                {effectivePassport.theatersVisitedCount ?? 0}
               </span>
               <span className="stat-label">{t('profile:theaters_visited_label', 'Cụm Rạp Check-in')}</span>
             </S.StatBox>

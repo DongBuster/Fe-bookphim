@@ -14,6 +14,13 @@ import {
 import { handleRefreshToken } from '../shared/utils/refreshToken';
 import tokenManager from '../shared/utils/tokenManager';
 
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    silent?: boolean;
+    skipNotification?: boolean;
+  }
+}
+
 export interface IOriginRequest extends AxiosRequestConfig {
   _retry: boolean;
 }
@@ -39,10 +46,14 @@ const handleRequestError = (error: AxiosError): Promise<AxiosError> => {
 };
 
 const handleResponse = (response: AxiosResponse<IResponse<unknown>>) => {
-  const { data } = response;
+  const { data, config } = response;
+  const isSilent = Boolean(
+    (config as AxiosRequestConfig)?.silent ||
+    (config as AxiosRequestConfig)?.skipNotification
+  );
 
   if (data?.success === false) {
-    return rejectBusinessError(data);
+    return rejectBusinessError(data, !isSilent);
   }
 
   if (response.config.method === 'get') {
@@ -62,7 +73,12 @@ const handleResponseError = async (error: AxiosError<IResponse<unknown>>) => {
     return handleRefreshToken(originalRequest);
   }
 
-  return handleCommonHttpError(error);
+  const isSilent = Boolean(
+    (error.config as AxiosRequestConfig)?.silent ||
+    (error.config as AxiosRequestConfig)?.skipNotification
+  );
+
+  return handleCommonHttpError(error, !isSilent);
 };
 
 const axiosClient = axios.create({

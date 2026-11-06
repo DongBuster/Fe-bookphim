@@ -34,6 +34,39 @@ export const TrailerModal = styled.div`
       border: none;
     }
 
+    .trailer-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      text-align: center;
+      background: radial-gradient(circle at center, #1f1f23 0%, #0d0d0e 100%);
+
+      .fallback-icon {
+        color: #ff535a;
+        margin-bottom: 16px;
+        opacity: 0.9;
+      }
+
+      .fallback-title {
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .fallback-desc {
+        color: #94a3b8;
+        font-size: 14px;
+        max-width: 420px;
+        line-height: 1.5;
+        margin: 0;
+      }
+    }
+
     .close-btn {
       position: absolute;
       top: 14px;

@@ -465,6 +465,8 @@
     "format_all": "All Formats",
     "format_screenx": "ScreenX & 3D",
     "close_trailer": "Close trailer",
+    "trailer_unavailable_title": "Trailer Not Available",
+    "trailer_unavailable_desc": "The video trailer for this movie is currently being updated. Please check back later!",
     "tag_today": "TODAY",
     "tag_tomorrow": "TOMORROW",
     "tag_weekend": "WEEKEND",

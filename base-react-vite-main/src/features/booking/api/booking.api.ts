@@ -10,6 +10,8 @@ import type {
   SeatMapDto,
   TicketDto,
   TurnstileCheckInRequest,
+  TurnstileCheckInResponseData,
+  TicketRefundResponseData,
   UnlockSeatsRequest,
 } from '@shared/types/api.types';
 
@@ -19,10 +21,12 @@ import type {
  */
 export const getTicketPassApi = async (
   passCode: string,
+  options?: { silent?: boolean },
 ): Promise<TicketDto> => {
-  const res = (await axiosClient.get(`/tickets/${passCode}`)) as unknown as
-    | BaseResponse<TicketDto>
-    | TicketDto;
+  const cleanCode = passCode.replace(/[\s#]/g, '').trim();
+  const res = (await axiosClient.get(`/tickets/${encodeURIComponent(cleanCode)}`, {
+    silent: options?.silent,
+  })) as unknown as BaseResponse<TicketDto> | TicketDto;
 
   if (res && typeof res === 'object' && 'data' in res && res.data) {
     return res.data;
@@ -36,10 +40,12 @@ export const getTicketPassApi = async (
  */
 export const getOrderByCodeApi = async (
   orderCode: string,
+  options?: { silent?: boolean },
 ): Promise<OrderDto> => {
-  const res = (await axiosClient.get(`/orders/code/${orderCode}`)) as unknown as
-    | BaseResponse<OrderDto>
-    | OrderDto;
+  const cleanCode = orderCode.replace(/[\s#]/g, '').trim();
+  const res = (await axiosClient.get(`/orders/code/${encodeURIComponent(cleanCode)}`, {
+    silent: options?.silent,
+  })) as unknown as BaseResponse<OrderDto> | OrderDto;
 
   if (res && typeof res === 'object' && 'data' in res && res.data) {
     return res.data;
@@ -53,10 +59,11 @@ export const getOrderByCodeApi = async (
  */
 export const getOrderByIdApi = async (
   id: string,
+  options?: { silent?: boolean },
 ): Promise<OrderDto> => {
-  const res = (await axiosClient.get(`/orders/${encodeURIComponent(id)}`)) as unknown as
-    | BaseResponse<OrderDto>
-    | OrderDto;
+  const res = (await axiosClient.get(`/orders/${encodeURIComponent(id)}`, {
+    silent: options?.silent,
+  })) as unknown as BaseResponse<OrderDto> | OrderDto;
 
   if (res && typeof res === 'object' && 'data' in res && res.data) {
     return res.data;
@@ -69,7 +76,8 @@ export const getOrderByIdApi = async (
  * Endpoint: GET /api/v1/tickets/qr/{passCode}
  */
 export const getTicketQrUrl = (passCode: string): string => {
-  return `/api/v1/tickets/qr/${encodeURIComponent(passCode)}`;
+  const cleanCode = passCode.replace(/[\s#]/g, '').trim();
+  return `/api/v1/tickets/qr/${encodeURIComponent(cleanCode)}`;
 };
 
 /**
@@ -78,16 +86,24 @@ export const getTicketQrUrl = (passCode: string): string => {
  */
 export const turnstileCheckInApi = async (
   body: TurnstileCheckInRequest,
-): Promise<boolean> => {
-  const res = (await axiosClient.post<BaseResponse<boolean>>(
+  options?: { silent?: boolean },
+): Promise<TurnstileCheckInResponseData> => {
+  const res = (await axiosClient.post<BaseResponse<TurnstileCheckInResponseData>>(
     '/tickets/turnstile-checkin',
-    body,
-  )) as unknown as BaseResponse<boolean> | boolean;
+    {
+      passCode: body.passCode.replace(/[\s#]/g, '').trim(),
+      deviceId: body.deviceId || 'GATE_TURNSTILE_01',
+      gateNumber: body.gateNumber || 'Cổng VIP Fast-Track 01',
+    },
+    {
+      silent: options?.silent,
+    },
+  )) as unknown as BaseResponse<TurnstileCheckInResponseData> | TurnstileCheckInResponseData;
 
-  if (res && typeof res === 'object' && 'success' in res) {
-    return Boolean(res.success);
+  if (res && typeof res === 'object' && 'data' in res && res.data) {
+    return res.data;
   }
-  return Boolean(res);
+  return res as TurnstileCheckInResponseData;
 };
 
 /**
@@ -96,15 +112,21 @@ export const turnstileCheckInApi = async (
  */
 export const refundTicketApi = async (
   passCode: string,
-): Promise<boolean> => {
-  const res = (await axiosClient.post<BaseResponse<boolean>>(
-    `/tickets/${passCode}/refund`,
-  )) as unknown as BaseResponse<boolean> | boolean;
+  options?: { silent?: boolean },
+): Promise<TicketRefundResponseData> => {
+  const cleanCode = passCode.replace(/[\s#]/g, '').trim();
+  const res = (await axiosClient.post<BaseResponse<TicketRefundResponseData>>(
+    `/tickets/${encodeURIComponent(cleanCode)}/refund`,
+    {},
+    {
+      silent: options?.silent,
+    },
+  )) as unknown as BaseResponse<TicketRefundResponseData> | TicketRefundResponseData;
 
-  if (res && typeof res === 'object' && 'success' in res) {
-    return Boolean(res.success);
+  if (res && typeof res === 'object' && 'data' in res && res.data) {
+    return res.data;
   }
-  return Boolean(res);
+  return res as TicketRefundResponseData;
 };
 
 /**
