@@ -1,3 +1,4 @@
+import { CinematicLetterbox } from '@/shared/animations/components/CinematicLetterbox/CinematicLetterbox';
 import { HeroSpotlight } from './components/HeroSpotlight/HeroSpotlight';
 import { NowShowing } from './components/NowShowing/NowShowing';
 import { AiCineAdvisor } from './components/AiCineAdvisor/AiCineAdvisor';
@@ -10,6 +11,7 @@ import * as S from './Home.styles';
 export default function Home() {
   return (
     <S.HomeContainer>
+      <CinematicLetterbox />
       <HeroSpotlight />
       <NowShowing />
       <div id="ai-tro-ly">

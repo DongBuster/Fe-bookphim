@@ -106,12 +106,12 @@ export const Grid = styled.div`
 
 export const CardImage = styled.img`
   position: absolute;
-  top: 0;
+  top: -12%;
   right: 0;
-  bottom: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 124%;
+  will-change: transform;
   object-fit: cover;
   object-position: center;
   transition-property: transform;

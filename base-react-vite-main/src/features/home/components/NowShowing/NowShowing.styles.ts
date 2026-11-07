@@ -189,6 +189,15 @@ export const MovieCard = styled.div`
   box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   cursor: pointer;
+  will-change: transform;
+  transform-style: preserve-3d;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    box-shadow: 0px 16px 40px rgba(255, 185, 85, 0.16), 0 0 24px rgba(255, 83, 90, 0.12);
+    border-color: rgba(255, 185, 85, 0.45);
+  }
 `;
 
 export const PosterContainer = styled.div`

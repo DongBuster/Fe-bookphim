@@ -16,6 +16,7 @@ export interface SpotlightMovie {
   duration: string;
   audioSub: string;
   director: string;
+  trailerUrl: string;
 }
 
 // ─── Spotlight Carousel Data ──────────────────────────────────────────────────
@@ -39,6 +40,7 @@ export const SPOTLIGHT_MOVIES: SpotlightMovie[] = [
     duration: '166 Phút',
     audioSub: 'Tiếng Anh • Phụ đề Tiếng Việt',
     director: 'Denis Villeneuve',
+    trailerUrl: 'https://www.youtube.com/embed/Way9Dexny3w',
   },
   {
     id: 2,
@@ -58,6 +60,7 @@ export const SPOTLIGHT_MOVIES: SpotlightMovie[] = [
     duration: '128 Phút',
     audioSub: 'Tiếng Anh • Phụ đề Tiếng Việt',
     director: 'Shawn Levy',
+    trailerUrl: 'https://www.youtube.com/embed/73_1biulkYk',
   },
   {
     id: 3,
@@ -77,6 +80,7 @@ export const SPOTLIGHT_MOVIES: SpotlightMovie[] = [
     duration: '110 Phút',
     audioSub: 'Tiếng Anh • Phụ đề Tiếng Việt',
     director: 'Jeff Fowler',
+    trailerUrl: 'https://www.youtube.com/embed/qSu6i2iFMO0',
   },
   {
     id: 4,
@@ -96,6 +100,7 @@ export const SPOTLIGHT_MOVIES: SpotlightMovie[] = [
     duration: '96 Phút',
     audioSub: 'Lồng tiếng & Phụ đề Tiếng Việt',
     director: 'Kelsey Mann',
+    trailerUrl: 'https://www.youtube.com/embed/LEjhY15eCx0',
   },
 ];
 
@@ -111,69 +116,23 @@ export const BOOKING_MOVIES = [
 
 export const BOOKING_CINEMAS = [
   'CGV Landmark 81 (IMAX Laser)',
-  'CGV Vincom Đồng Khởi',
-  'BHD Star Cineplex Thảo Điền',
-  'Lotte Cinema Cantavil',
-  'Galaxy Cinema Nguyễn Du',
+  'Lotte Cinema Nam Sài Gòn',
+  'BHD Star Bitexco',
+  'Galaxy Sala (IMAX Laser)',
 ];
 
-export interface BookingDateOption {
-  key: string;
-  defaultLabel: string;
-}
-
-export interface BookingShowtimeOption {
-  key: string;
-  defaultLabel: string;
-}
-
-const VI_DAY_NAMES = [
-  'Chủ Nhật',
-  'Thứ Hai',
-  'Thứ Ba',
-  'Thứ Tư',
-  'Thứ Năm',
-  'Thứ Sáu',
-  'Thứ Bảy',
+export const BOOKING_DATES = [
+  { key: 'today', defaultLabel: 'Hôm nay, 24 Tháng 03' },
+  { key: 'tomorrow', defaultLabel: 'Ngày mai, 25 Tháng 03' },
+  { key: 'wed', defaultLabel: 'Thứ Tư, 26 Tháng 03' },
+  { key: 'thu', defaultLabel: 'Thứ Năm, 27 Tháng 03' },
 ];
 
-export const generateBookingDates = (): BookingDateOption[] => {
-  const dates: BookingDateOption[] = [];
-  const now = new Date();
-
-  for (let i = 0; i < 5; i++) {
-    const d = new Date(now);
-    d.setDate(now.getDate() + i);
-
-    const dayOfMonth = d.getDate();
-    const month = d.getMonth() + 1;
-    const dayOfWeek = VI_DAY_NAMES[d.getDay()];
-
-    let prefix = dayOfWeek;
-    let key = `day_${i}`;
-    if (i === 0) {
-      prefix = 'Hôm nay';
-      key = 'today';
-    } else if (i === 1) {
-      prefix = 'Ngày mai';
-      key = 'tomorrow';
-    }
-
-    dates.push({
-      key,
-      defaultLabel: `${prefix}, ${dayOfMonth} Tháng ${month}`,
-    });
-  }
-
-  return dates;
-};
-
-export const BOOKING_DATES: BookingDateOption[] = generateBookingDates();
-
-export const BOOKING_SHOWTIMES: BookingShowtimeOption[] = [
-  { key: 'time_1', defaultLabel: '10:15 • 2D Phụ đề' },
-  { key: 'time_2', defaultLabel: '14:30 • 3D Lồng tiếng' },
-  { key: 'time_3', defaultLabel: '17:00 • 2D Phụ đề' },
+export const BOOKING_SHOWTIMES = [
+  { key: 'time_1', defaultLabel: '14:30 • 2D Phụ đề' },
+  { key: 'time_2', defaultLabel: '16:00 • 3D Lồng tiếng' },
+  { key: 'time_3', defaultLabel: '18:15 • 2D Phụ đề' },
   { key: 'time_4', defaultLabel: '19:45 • Phòng IMAX' },
-  { key: 'time_5', defaultLabel: '22:15 • IMAX Laser' },
+  { key: 'time_5', defaultLabel: '21:30 • 2D Phụ đề' },
+  { key: 'time_6', defaultLabel: '22:15 • 3D Phụ đề' },
 ];

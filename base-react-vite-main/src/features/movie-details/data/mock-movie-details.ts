@@ -1936,7 +1936,36 @@ export const JOHN_WICK_4_MOVIE_DATA: MovieDetails = {
   featuredAuthor: 'The Hollywood Reporter',
 };
 
+export const SONIC_3_MOVIE_DATA: MovieDetails = {
+  ...DUNE_MOVIE_DATA,
+  id: 106,
+  title: 'Nhím Sonic 3',
+  originalTitle: 'Sonic the Hedgehog 3 (2024)',
+  posterUrl: 'https://image.tmdb.org/t/p/w500/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg',
+  backdropUrl: 'https://image.tmdb.org/t/p/original/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg',
+  trailerUrl: 'https://www.youtube.com/embed/qSu6i2iFMO0?autoplay=1',
+  rating: 9.0,
+  ratingCount: '15.2k lượt',
+  rottenTomatoes: '88%',
+  ageRating: 'P • DOLBY ATMOS 2D',
+  runtime: "110'",
+  releaseDate: '20/12/2024',
+  director: {
+    name: 'Jeff Fowler',
+    role: 'Đạo diễn',
+    works: 'Sonic the Hedgehog 1, 2, 3',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
+  },
+  synopsisP1:
+    'Sonic, Tails và Knuckles tái hợp để chống lại một kẻ thù bí ẩn và mạnh mẽ mới mang tên Shadow the Hedgehog, một nhân vật có sức mạnh vượt xa mọi thứ họ từng đối mặt trước đây.',
+};
+
 export const MOVIE_DETAILS_MAP: Record<string, MovieDetails> = {
+  // Spotlight Slugs
+  'dune-phan-hai': DUNE_MOVIE_DATA,
+  'deadpool-va-wolverine': DEADPOOL_WOLVERINE_MOVIE_DATA,
+  'nhim-sonic-3': SONIC_3_MOVIE_DATA,
+  'nhung-manh-ghep-cam-xuc-2': INSIDE_OUT_2_MOVIE_DATA,
   // Discovery Movies 1..24
   '1': { ...DUNE_MOVIE_DATA, id: 1 },
   'dune-2': DUNE_MOVIE_DATA,

@@ -9,10 +9,54 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import * as S from './ExclusiveOffers.styles';
+import { useRef } from 'react';
+import { useGSAP, gsap } from '@/shared/animations';
 
 export const ExclusiveOffers: FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const sectionRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        if (headerRef.current) {
+          gsap.from(headerRef.current, {
+            opacity: 0,
+            y: 28,
+            duration: 0.6,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+        }
+
+        if (gridRef.current) {
+          // Wave stagger entrance
+          gsap.from(gridRef.current.children, {
+            opacity: 0,
+            y: 45,
+            duration: 0.75,
+            stagger: 0.14,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+        }
+      });
+      return () => mm.revert();
+    },
+    { scope: sectionRef },
+  );
 
   const handleNavigateExplore = () => {
     navigate('/kham-pha');
@@ -27,10 +71,10 @@ export const ExclusiveOffers: FC = () => {
   };
 
   return (
-    <S.ExclusiveOffersSection>
+    <S.ExclusiveOffersSection ref={sectionRef}>
       <S.Container>
         {/* Header Section */}
-        <S.HeaderWrapper>
+        <S.HeaderWrapper ref={headerRef}>
           <S.HeaderTextGroup>
             <S.HeaderSubtitle>{t('home:offers.subtitle')}</S.HeaderSubtitle>
             <S.HeaderTitle>{t('home:offers.title')}</S.HeaderTitle>
@@ -42,7 +86,7 @@ export const ExclusiveOffers: FC = () => {
         </S.HeaderWrapper>
 
         {/* Promotional Cards Triplet */}
-        <S.CardsGrid>
+        <S.CardsGrid ref={gridRef}>
           {/* Card 1: Bank Partners */}
           <S.CardWrapper>
             <S.Card1Blur />

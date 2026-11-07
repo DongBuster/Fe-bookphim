@@ -27,7 +27,10 @@ import { MovieHero } from './components/MovieHero/MovieHero';
 import { MovieSynopsis } from './components/MovieSynopsis/MovieSynopsis';
 import { ShowtimePicker } from './components/ShowtimePicker/ShowtimePicker';
 import { StickyBookingBar } from './components/StickyBookingBar/StickyBookingBar';
-import { TrailerModal } from './components/TrailerModal/TrailerModal';
+import {
+  TrailerModal,
+  type TrailerPlaylistItem,
+} from './components/TrailerModal/TrailerModal';
 import * as S from './MovieDetailsPage.styles';
 
 export const MovieDetailsPage: FC = () => {
@@ -230,6 +233,60 @@ export const MovieDetailsPage: FC = () => {
       cinema.address.toLowerCase().includes(searchCinema.toLowerCase());
     return matchesSearch;
   });
+  // Playlist of trailers for consecutive playback on Movie Details page
+  const detailsPlaylist: TrailerPlaylistItem[] = useMemo(() => {
+    const list: TrailerPlaylistItem[] = [
+      {
+        id: `main-${movie.id}`,
+        title: movie.title,
+        subTitle: `${movie.originalTitle || movie.title} • Trailer Chính Thức 4K`,
+        trailerUrl: movie.trailerUrl,
+        posterUrl: movie.posterUrl || movie.backdropUrl,
+        badge: t('movie:official_trailer', 'TRAILER CHÍNH THỨC'),
+      },
+    ];
+
+    const relatedTrailers: TrailerPlaylistItem[] = [
+      {
+        id: 'dune-2',
+        title: 'Dune: Part Two',
+        subTitle: 'Hành Tinh Cát - Phần Hai • Trailer 4K',
+        trailerUrl: 'https://www.youtube.com/embed/Way9Dexny3w',
+        posterUrl:
+          'https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg',
+        badge: 'BOM TẤN VIỄN TƯỞNG',
+      },
+      {
+        id: 'deadpool-wolverine',
+        title: 'Deadpool & Wolverine',
+        subTitle: 'Đại chiến đa vũ trụ • Trailer 4K',
+        trailerUrl: 'https://www.youtube.com/embed/73_1biulkYk',
+        posterUrl:
+          'https://image.tmdb.org/t/p/w500/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg',
+        badge: 'HÀNH ĐỘNG MARVEL',
+      },
+      {
+        id: 'sonic-3',
+        title: 'Nhím Sonic 3',
+        subTitle: 'Sonic The Hedgehog 3 • Trailer 4K',
+        trailerUrl: 'https://www.youtube.com/embed/qSu6i2iFMO0',
+        posterUrl:
+          'https://image.tmdb.org/t/p/w500/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg',
+        badge: 'HOẠT HÌNH GIA ĐÌNH',
+      },
+      {
+        id: 'inside-out-2',
+        title: 'Những Mảnh Ghép Cảm Xúc 2',
+        subTitle: 'Inside Out 2 • Trailer 4K',
+        trailerUrl: 'https://www.youtube.com/embed/LEjhY15eCx0',
+        posterUrl:
+          'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg',
+        badge: 'HOẠT HÌNH PIXAR',
+      },
+    ].filter((item) => !item.trailerUrl.includes(movie.trailerUrl));
+
+    return [...list, ...relatedTrailers];
+  }, [movie, t]);
 
   return (
     <S.PageContainer>
@@ -286,8 +343,8 @@ export const MovieDetailsPage: FC = () => {
       <TrailerModal
         isOpen={isTrailerOpen}
         onClose={handleCloseTrailer}
-        trailerUrl={movie.trailerUrl}
-        title={movie.title}
+        playlist={detailsPlaylist}
+        initialIndex={0}
       />
     </S.PageContainer>
   );

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
@@ -23,6 +23,11 @@ import {
 import { useSpotlightCarousel } from './hooks/useSpotlightCarousel';
 import { SlideItem } from './components/SlideItem/SlideItem';
 import { isFeatureEnabled } from '@/config/features.config';
+import { useMagneticEffect, useGSAP, gsap } from '@/shared/animations';
+import {
+  TrailerModal,
+  type TrailerPlaylistItem,
+} from '@/features/movie-details/components/TrailerModal/TrailerModal';
 
 export const HeroSpotlight: FC = () => {
   const navigate = useNavigate();
@@ -43,6 +48,8 @@ export const HeroSpotlight: FC = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+  const [trailerStartIndex, setTrailerStartIndex] = useState(0);
+
   const isPaused =
     isHovered || isFocused || activeDropdown !== null || isTrailerOpen;
 
@@ -51,6 +58,44 @@ export const HeroSpotlight: FC = () => {
     useSpotlightCarousel({ isExternalPaused: isPaused });
 
   const bookingBarRef = useRef<HTMLDivElement>(null);
+  const quickBookBtnRef = useRef<HTMLButtonElement>(null);
+  useMagneticEffect(quickBookBtnRef, { strength: 0.28, maxDisplacement: 14 });
+
+  useGSAP(() => {
+    if (bookingBarRef.current) {
+      gsap.from(bookingBarRef.current, {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        delay: 0.6,
+        ease: 'power3.out',
+      });
+    }
+  }, { scope: bookingBarRef });
+
+  // Spotlight Trailer Playlist for continuous playback
+  const spotlightPlaylist: TrailerPlaylistItem[] = useMemo(
+    () =>
+      SPOTLIGHT_MOVIES.map((m) => ({
+        id: m.id,
+        title: m.mainTitle,
+        subTitle: m.subTitle,
+        trailerUrl: m.trailerUrl,
+        posterUrl: m.bgImage,
+        badge: m.imaxBadge,
+      })),
+    [],
+  );
+
+  const handleOpenTrailer = (index: number) => {
+    console.log('[HeroSpotlight] handleOpenTrailer called with index:', index);
+    setTrailerStartIndex(index);
+    setIsTrailerOpen(true);
+  };
+
+  const handleCloseTrailer = () => {
+    setIsTrailerOpen(false);
+  };
 
   // Sync quick booking bar movie with active slide during render
   const [prevIndex, setPrevIndex] = useState(selectedIndex);
@@ -190,13 +235,13 @@ export const HeroSpotlight: FC = () => {
         <S.ImageContainer>
           <S.SliderViewport ref={emblaRef}>
             <S.SliderTrack>
-              {SPOTLIGHT_MOVIES.map((movie) => (
+              {SPOTLIGHT_MOVIES.map((movie, idx) => (
                 <SlideItem
                   key={movie.id}
                   movie={movie}
                   selectedIndex={selectedIndex}
                   onDotClick={handleDotClick}
-                  onTrailerStateChange={setIsTrailerOpen}
+                  onWatchTrailer={() => handleOpenTrailer(idx)}
                 />
               ))}
             </S.SliderTrack>
@@ -413,7 +458,7 @@ export const HeroSpotlight: FC = () => {
               </S.BookingDropdown>
             )}
           </S.StepItem>
-          <S.QuickBookSubmitButton
+          <S.QuickBookSubmitButton ref={quickBookBtnRef}
             type="button"
             onClick={handleQuickBookSubmit}
             aria-label={t('home:hero.quick_book_btn', 'Đặt vé ngay')}
@@ -423,6 +468,14 @@ export const HeroSpotlight: FC = () => {
           </S.QuickBookSubmitButton>
         </S.QuickBookingBar>
       )}
+
+      {/* ── Global Trailer Modal with Consecutive Playlist ── */}
+      <TrailerModal
+        isOpen={isTrailerOpen}
+        onClose={handleCloseTrailer}
+        playlist={spotlightPlaylist}
+        initialIndex={trailerStartIndex}
+      />
     </S.SectionContainer>
   );
 };

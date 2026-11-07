@@ -67,43 +67,43 @@ export const PassportPage: FC = () => {
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     membershipTier: passport?.membershipTier || 'STANDARD',
     cinephileTitle: passport?.cinephileTitle || (passport as any)?.cinephileRank || 'Tân Binh Điện Ảnh',
-    totalPoints: passport?.totalPoints ?? 0,
-    moviesWatchedCount: passport?.moviesWatchedCount ?? (passport as any)?.totalStamps ?? 0,
-    theatersVisitedCount: passport?.theatersVisitedCount ?? 0,
+    totalPoints: Number(passport?.totalPoints ?? 0) || 0,
+    moviesWatchedCount: Number(passport?.moviesWatchedCount ?? (passport as any)?.totalStamps ?? 0) || 0,
+    theatersVisitedCount: Number(passport?.theatersVisitedCount ?? 0) || 0,
     stamps:
-      passport?.stamps && passport.stamps.length > 0
+      Array.isArray(passport?.stamps) && passport.stamps.length > 0
         ? passport.stamps
-        : (passport as any)?.recentStamps && (passport as any).recentStamps.length > 0
+        : Array.isArray((passport as any)?.recentStamps) && (passport as any).recentStamps.length > 0
           ? (passport as any).recentStamps.map((s: any) => ({
               stampId: s.id || s.stampId || Math.random().toString(),
-              movieTitle: s.movieTitle,
+              movieTitle: s.movieTitle || 'Vé xem phim',
               theaterName: s.theaterName || 'Rạp PhimBook',
               format: s.format || '2D Digital',
               acquiredAt: s.watchedAt || s.acquiredAt || new Date().toISOString(),
               hologramEffect: s.hologramTheme || s.hologramEffect || 'GOLDEN_EMBOSS',
             }))
           : [],
-    badges: passport?.badges || [],
+    badges: Array.isArray(passport?.badges) ? passport.badges : [],
   };
 
   const rawBadges =
-    badgesData && badgesData.length > 0
+    Array.isArray(badgesData) && badgesData.length > 0
       ? badgesData
-      : passport?.badges && passport.badges.length > 0
+      : Array.isArray(passport?.badges) && passport.badges.length > 0
         ? passport.badges
         : null;
 
   const effectiveBadges: BadgeDto[] = rawBadges
     ? rawBadges.map((b: any) => ({
-        badgeId: b.badgeId || b.id || b.code,
-        code: b.code,
-        name: b.name,
-        description: b.description,
+        badgeId: b.badgeId || b.id || b.code || Math.random().toString(),
+        code: b.code || '',
+        name: b.name || '',
+        description: b.description || '',
         iconUrl: b.iconUrl || '',
-        category: b.category,
+        category: b.category || 'WATCH_COUNT',
         isUnlocked: !!b.isUnlocked,
-        unlockedAt: b.unlockedAt,
-        rewardPoints: b.rewardPoints ?? b.bonusPoints ?? 0,
+        unlockedAt: b.unlockedAt || null,
+        rewardPoints: Number(b.rewardPoints ?? b.bonusPoints ?? 0) || 0,
         isRewardClaimed: !!b.isRewardClaimed,
       }))
     : [
@@ -271,7 +271,7 @@ export const PassportPage: FC = () => {
                   <h3 className="movie-name">{s.movieTitle}</h3>
                   <span className="theater-info">{s.theaterName}</span>
                   <span className="date-badge">
-                    {s.format} • {new Date(s.acquiredAt).toLocaleDateString('vi-VN')}
+                    {s.format} • {s.acquiredAt ? new Date(s.acquiredAt).toLocaleDateString('vi-VN') : ''}
                   </span>
                 </S.StampCard>
               ))}

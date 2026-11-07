@@ -7,6 +7,7 @@ import AuthGuard from '@guards/AuthGuard';
 import GuestGuard from '@guards/GuestGuard';
 import MainLayout from '@layouts/MainLayout';
 import BookingLayout from '@layouts/BookingLayout';
+import RouteErrorFallback from '@shared/components/error-boundary/RouteErrorFallback';
 import { HOME_PATH } from '@shared/constants/path';
 import { isFeatureEnabled } from './features.config';
 
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <MainLayout />,
+    errorElement: <RouteErrorFallback />,
     children: [
       { index: true, element: <Home /> },
       { path: HOME_PATH, element: <Home /> },

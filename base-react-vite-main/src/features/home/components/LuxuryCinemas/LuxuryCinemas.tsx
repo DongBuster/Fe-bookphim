@@ -2,6 +2,8 @@ import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import * as S from './LuxuryCinemas.styles';
+import { useRef } from 'react';
+import { useGSAP, gsap } from '@/shared/animations';
 
 const cinemas = [
   {
@@ -54,16 +56,73 @@ const cinemas = [
 export const LuxuryCinemas: FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const sectionRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        if (headerRef.current) {
+          gsap.from(headerRef.current, {
+            opacity: 0,
+            y: 28,
+            duration: 0.6,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+        }
+
+        if (gridRef.current) {
+          // Stagger card reveal
+          gsap.from(gridRef.current.children, {
+            opacity: 0,
+            y: 40,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+
+          // Parallax depth scrub on room images
+          const images = gridRef.current.querySelectorAll('.parallax-cinema-img');
+          images.forEach((img) => {
+            gsap.to(img, {
+              yPercent: 12,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: img.closest('div'),
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1.2,
+              },
+            });
+          });
+        }
+      });
+      return () => mm.revert();
+    },
+    { scope: sectionRef },
+  );
 
   const handleNavigateSchedule = () => {
     navigate('/lich-chieu');
   };
 
   return (
-    <S.Section>
+    <S.Section ref={sectionRef}>
       <S.Container>
         {/* Header Section */}
-        <S.HeaderContainer>
+        <S.HeaderContainer ref={headerRef}>
           <S.TitleGroup>
             <S.Subtitle>{t('home:luxury.subtitle')}</S.Subtitle>
             <S.Title>{t('home:luxury.title')}</S.Title>
@@ -75,13 +134,13 @@ export const LuxuryCinemas: FC = () => {
         </S.HeaderContainer>
 
         {/* Luxury Cinemas Grid */}
-        <S.Grid>
+        <S.Grid ref={gridRef}>
           {cinemas.map((cinema) => (
             <S.Card key={cinema.id}>
               {/* Image Container */}
               <S.ImageContainer>
                 {/* Image */}
-                <S.CardImage src={cinema.image} alt={cinema.name} />
+                <S.CardImage className="parallax-cinema-img" src={cinema.image} alt={cinema.name} />
 
                 {/* Gradient */}
                 <S.ImageGradient />

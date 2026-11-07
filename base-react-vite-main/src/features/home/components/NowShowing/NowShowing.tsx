@@ -7,6 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getMoviesApi } from "@features/movie-discovery/api/movie.api";
 import type { MovieDto } from "@shared/types/api.types";
 import * as S from "./NowShowing.styles";
+import { useRef } from "react";
+import { useGSAP, gsap } from "@/shared/animations";
+import { CountUpScore } from "./components/CountUpScore/CountUpScore";
 
 const getTabs = (t: (key: string) => string) => [
   t('home:now_showing.tab_all'),
@@ -40,6 +43,41 @@ export const NowShowing: FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const tabs = useMemo(() => getTabs(t), [t]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // 3D Card Gyroscope Tilt
+  const handleCardPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -6.5;
+    const rotateY = ((x - centerX) / centerX) * 6.5;
+
+    gsap.to(card, {
+      rotateX,
+      rotateY,
+      scale: 1.025,
+      duration: 0.25,
+      ease: 'power2.out',
+      transformPerspective: 900,
+    });
+  };
+
+  const handleCardPointerLeave = (e: React.PointerEvent<HTMLDivElement>) => {
+    gsap.to(e.currentTarget, {
+      rotateX: 0,
+      rotateY: 0,
+      scale: 1,
+      duration: 0.6,
+      ease: 'elastic.out(1.1, 0.4)',
+    });
+  };
 
   // Gọi API lấy danh sách phim đang chiếu thật bằng TanStack Query
   const { data: moviesResponse, isLoading } = useQuery({
@@ -115,11 +153,50 @@ export const NowShowing: FC = () => {
     return movies;
   }, [movies, activeTab]);
 
+  // WOW #4: ScrollTrigger reveal for header and movie cards
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        if (headerRef.current) {
+          gsap.from(headerRef.current, {
+            opacity: 0,
+            y: 28,
+            duration: 0.6,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+        }
+
+        if (gridRef.current && gridRef.current.children.length > 0) {
+          gsap.from(gridRef.current.children, {
+            opacity: 0,
+            y: 40,
+            duration: 0.65,
+            stagger: 0.075,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+        }
+      });
+      return () => mm.revert();
+    },
+    { scope: sectionRef, dependencies: [filteredMovies] },
+  );
+
   return (
-    <S.Section>
+    <S.Section ref={sectionRef}>
       <S.InnerContainer>
         {/* Header with tabs */}
-        <S.Header>
+        <S.Header ref={headerRef}>
           {/* Title Area */}
           <S.TitleArea>
             <S.SubtitleContainer>
@@ -170,17 +247,18 @@ export const NowShowing: FC = () => {
 
         {/* Movies Grid */}
         {!isLoading && (
-          <S.MoviesGrid>
+          <S.MoviesGrid ref={gridRef}>
             {filteredMovies.map((movie) => {
               const ageStyle = getAgeBadgeStyle(movie.ageRating as string);
               const formatText = movie.formats?.slice(0, 2).join(' • ') || '2D';
               const metaText = `${movie.durationMinutes} ${t('home:now_showing.duration_mins', 'phút')} • ${movie.genres?.slice(0, 2).join(', ')}`;
-              const ratingText = movie.imdbRating ? movie.imdbRating.toFixed(1) : '8.5';
-
+              
               return (
                 <S.MovieCard
                   key={movie.id}
                   onClick={handleMovieCardClick(movie)}
+                  onPointerMove={handleCardPointerMove}
+                  onPointerLeave={handleCardPointerLeave}
                 >
                   {/* Poster Container */}
                   <S.PosterContainer>
@@ -201,7 +279,7 @@ export const NowShowing: FC = () => {
                     <S.TopLeftBadges>
                       <S.RatingBadge>
                         <Star color="#FFB955" fill="#FFB955" size={10} />
-                        <S.RatingText>{ratingText}</S.RatingText>
+                        <S.RatingText><CountUpScore score={movie.imdbRating ?? 8.5} /></S.RatingText>
                       </S.RatingBadge>
                       <S.AgeBadge $bgColor={ageStyle.bg}>
                         <S.AgeText $color={ageStyle.text}>{movie.ageRating}</S.AgeText>
