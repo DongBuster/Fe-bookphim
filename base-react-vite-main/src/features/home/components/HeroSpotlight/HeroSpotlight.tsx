@@ -41,15 +41,15 @@ export const HeroSpotlight: FC = () => {
 
   // ── Quick Booking Bar State ───────────────────────────────────────────────
   const [selectedMovie, setSelectedMovie] = useState('Dune: Part Two');
-  const [selectedCinema, setSelectedCinema] = useState<string>(
-    () => availableCinemas[0] || 'CGV Landmark 81 (IMAX Laser)',
-  );
+  const [selectedCinemaOverride, setSelectedCinemaOverride] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (availableCinemas.length > 0 && !availableCinemas.includes(selectedCinema)) {
-      setSelectedCinema(availableCinemas[0]);
+  // Derive active cinema directly during render to prevent cascading re-renders
+  const selectedCinema = useMemo(() => {
+    if (selectedCinemaOverride && availableCinemas.includes(selectedCinemaOverride)) {
+      return selectedCinemaOverride;
     }
-  }, [availableCinemas, selectedCinema]);
+    return availableCinemas[0] || 'CGV Landmark 81 (IMAX Laser)';
+  }, [availableCinemas, selectedCinemaOverride]);
   const [selectedDateKey, setSelectedDateKey] = useState('today');
   const [selectedShowtimeKey, setSelectedShowtimeKey] = useState('time_4');
   const [activeDropdown, setActiveDropdown] = useState<
@@ -167,7 +167,7 @@ export const HeroSpotlight: FC = () => {
     };
 
   const handleSelectCinema = (cinema: string) => () => {
-    setSelectedCinema(cinema);
+    setSelectedCinemaOverride(cinema);
     setActiveDropdown(null);
   };
 
@@ -175,7 +175,7 @@ export const HeroSpotlight: FC = () => {
     (cinema: string) => (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        setSelectedCinema(cinema);
+        setSelectedCinemaOverride(cinema);
         setActiveDropdown(null);
       }
     };

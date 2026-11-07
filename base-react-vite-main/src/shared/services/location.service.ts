@@ -9,8 +9,12 @@ const CITY_EVENT_NAME = 'phimbook:city-change';
  */
 export function getSavedCity(): CityName {
   if (typeof window === 'undefined') return 'TP. HCM';
-  const saved = localStorage.getItem(CITY_STORAGE_KEY);
-  return normalizeCityName(saved);
+  try {
+    const saved = localStorage.getItem(CITY_STORAGE_KEY);
+    return normalizeCityName(saved);
+  } catch {
+    return 'TP. HCM';
+  }
 }
 
 /**
@@ -19,7 +23,11 @@ export function getSavedCity(): CityName {
 export function setSavedCity(city: string): CityName {
   const normalized = normalizeCityName(city);
   if (typeof window !== 'undefined') {
-    localStorage.setItem(CITY_STORAGE_KEY, normalized);
+    try {
+      localStorage.setItem(CITY_STORAGE_KEY, normalized);
+    } catch {
+      // Safely ignore storage quotas or private browsing DOMExceptions
+    }
     window.dispatchEvent(
       new CustomEvent(CITY_EVENT_NAME, { detail: { city: normalized } }),
     );

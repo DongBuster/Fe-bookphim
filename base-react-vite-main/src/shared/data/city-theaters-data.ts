@@ -320,13 +320,17 @@ export const ALL_CINEMAS: CinemaMeta[] = [
 function createSlots(
   times: string[],
   basePrice: number,
-  mysteryIndex = -1,
+  mysteryIndexOrPrefix: number | string = -1,
+  prefix = '',
 ): ShowtimeSlot[] {
+  const mysteryIndex = typeof mysteryIndexOrPrefix === 'number' ? mysteryIndexOrPrefix : -1;
+  const effectivePrefix = typeof mysteryIndexOrPrefix === 'string' ? mysteryIndexOrPrefix : prefix;
   return times.map((time, idx) => {
     const isMystery = idx === mysteryIndex;
     const price = isMystery ? Math.round(basePrice * 0.6) : basePrice;
+    const prefixId = effectivePrefix ? `${effectivePrefix}-` : '';
     return {
-      id: `slot-${time.replace(':', '')}-${idx}`,
+      id: `${prefixId}slot-${time.replace(':', '')}-${idx}`,
       time,
       statusText: idx === 1 ? 'Sắp kín (8)' : 'Còn ghế',
       isAlmostFull: idx === 1,
@@ -348,7 +352,7 @@ export function getCinemasScheduleByMovieAndCity(
   const slug = String(movieIdOrSlug).toLowerCase();
 
   return cityCinemas.map((cinema) => {
-    let formats: ScreenFormatGroup[] = [];
+    const formats: ScreenFormatGroup[] = [];
 
     // Phân bổ lịch chiếu theo từng bộ phim cụ thể
     if (slug.includes('dune') || slug === '1') {
@@ -357,38 +361,38 @@ export function getCinemasScheduleByMovieAndCity(
         formats.push({
           formatName: 'IMAX LASER 3D • PHỤ ĐỀ',
           roomDetails: `${cinema.name} - Phòng chiếu IMAX #01 (Màn hình 28m)`,
-          slots: createSlots(['10:30', '14:15', '18:00', '21:45'], 210000, 3),
+          slots: createSlots(['10:30', '14:15', '18:00', '21:45'], 210000, 3, cinema.id),
         });
       }
       if (cinema.supportedFormats.includes('Gold Class') || cinema.supportedFormats.includes('Cine Comfort')) {
         formats.push({
           formatName: 'GOLD CLASS VIP • 2D PHỤ ĐỀ',
           roomDetails: 'Phòng chiếu VIP Lounge (Ghế sofa da ngả điện)',
-          slots: createSlots(['15:30', '19:15', '22:30'], 280000),
+          slots: createSlots(['15:30', '19:15', '22:30'], 280000, cinema.id),
         });
       }
       formats.push({
         formatName: '2D KỸ THUẬT SỐ • DOLBY ATMOS',
         roomDetails: 'Phòng chiếu tiêu chuẩn #02 & #03',
-        slots: createSlots(['11:45', '16:30', '19:45', '22:15'], 120000, 3),
+        slots: createSlots(['11:45', '16:30', '19:45', '22:15'], 120000, 3, cinema.id),
       });
     } else if (slug.includes('sonic') || slug === '2') {
       // NHÍM SONIC 3 - Ưu tiên 2D Lồng tiếng & Phụ đề cho gia đình
       formats.push({
         formatName: '2D LỒNG TIẾNG VIỆT • GIA ĐÌNH',
         roomDetails: 'Phòng chiếu #01 (Âm lượng chuẩn trẻ em)',
-        slots: createSlots(['09:15', '11:30', '14:00', '16:30'], 110000),
+        slots: createSlots(['09:15', '11:30', '14:00', '16:30'], 110000, cinema.id),
       });
       formats.push({
         formatName: '2D PHỤ ĐỀ TIÊU CHUẨN',
         roomDetails: 'Phòng chiếu #04',
-        slots: createSlots(['18:15', '20:30'], 125000),
+        slots: createSlots(['18:15', '20:30'], 125000, cinema.id),
       });
       if (cinema.supportedFormats.includes('IMAX Laser')) {
         formats.push({
           formatName: 'IMAX LASER 2D • PHỤ ĐỀ',
           roomDetails: 'Phòng chiếu IMAX #01',
-          slots: createSlots(['13:15', '17:45', '21:00'], 180000, 2),
+          slots: createSlots(['13:15', '17:45', '21:00'], 180000, 2, cinema.id),
         });
       }
     } else if (slug.includes('deadpool') || slug === '3') {
@@ -396,13 +400,13 @@ export function getCinemasScheduleByMovieAndCity(
       formats.push({
         formatName: '2D PHỤ ĐỀ TIÊU CHUẨN (T18)',
         roomDetails: 'Phòng chiếu #02 & #05',
-        slots: createSlots(['13:00', '16:00', '19:00', '21:30', '23:45'], 130000, 4),
+        slots: createSlots(['13:00', '16:00', '19:00', '21:30', '23:45'], 130000, 4, cinema.id),
       });
       if (cinema.supportedFormats.includes('ScreenX') || cinema.supportedFormats.includes('IMAX Laser')) {
         formats.push({
           formatName: 'IMAX / SCREENX LASER 3D',
           roomDetails: 'Phòng chiếu công nghệ cao #01',
-          slots: createSlots(['17:30', '20:45'], 220000),
+          slots: createSlots(['17:30', '20:45'], 220000, cinema.id),
         });
       }
     } else if (slug.includes('inside-out') || slug.includes('manh-ghep') || slug === '4') {
@@ -410,25 +414,25 @@ export function getCinemasScheduleByMovieAndCity(
       formats.push({
         formatName: '2D LỒNG TIẾNG VIỆT',
         roomDetails: 'Phòng chiếu #01 & #03',
-        slots: createSlots(['09:30', '11:45', '14:15', '16:45'], 115000),
+        slots: createSlots(['09:30', '11:45', '14:15', '16:45'], 115000, cinema.id),
       });
       formats.push({
         formatName: '2D PHỤ ĐỀ TIÊU CHUẨN',
         roomDetails: 'Phòng chiếu #02',
-        slots: createSlots(['18:30', '20:45'], 120000, 1),
+        slots: createSlots(['18:30', '20:45'], 120000, 1, cinema.id),
       });
     } else {
       // Phim tổng quát
       formats.push({
         formatName: '2D KỸ THUẬT SỐ TIÊU CHUẨN',
         roomDetails: 'Phòng chiếu #01 & #02',
-        slots: createSlots(['10:15', '13:30', '16:45', '19:30', '22:15'], 120000, 4),
+        slots: createSlots(['10:15', '13:30', '16:45', '19:30', '22:15'], 120000, 4, cinema.id),
       });
       if (cinema.supportedFormats.includes('IMAX Laser')) {
         formats.push({
           formatName: 'IMAX LASER 2D • PHỤ ĐỀ',
           roomDetails: 'Phòng chiếu IMAX #01',
-          slots: createSlots(['14:00', '18:15', '21:00'], 190000),
+          slots: createSlots(['14:00', '18:15', '21:00'], 190000, cinema.id),
         });
       }
     }
@@ -454,10 +458,18 @@ export function getCinemasScheduleByMovieAndCity(
  */
 export function normalizeCityName(input?: string | null): CityName {
   if (!input) return 'TP. HCM';
-  const trimmed = input.trim();
-  if (trimmed.includes('Hà Nội') || trimmed.includes('Hanoi')) return 'Hà Nội';
-  if (trimmed.includes('Đà Nẵng') || trimmed.includes('Danang')) return 'Đà Nẵng';
+  const lower = input.trim().toLowerCase();
+  if (lower.includes('hà nội') || lower.includes('hanoi')) return 'Hà Nội';
+  if (lower.includes('đà nẵng') || lower.includes('da nang') || lower.includes('danang')) return 'Đà Nẵng';
   return 'TP. HCM';
+}
+
+/**
+ * Lấy danh sách toàn bộ cụm rạp tại thành phố
+ */
+export function getCinemasByCity(cityName: string): CinemaMeta[] {
+  const normCity = normalizeCityName(cityName);
+  return ALL_CINEMAS.filter((c) => c.city === normCity);
 }
 
 /**

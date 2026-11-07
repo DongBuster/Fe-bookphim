@@ -74,7 +74,7 @@ export const LuxuryCinemas: FC = () => {
       });
       return () => mm.revert();
     },
-    { scope: sectionRef },
+    { scope: sectionRef, dependencies: [selectedCity] },
   );
 
   const handleNavigateSchedule = () => {

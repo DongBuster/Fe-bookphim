@@ -146,6 +146,11 @@ export const MovieDetailsPage: FC = () => {
     slot: ShowtimeSlot;
   } | null>(null);
 
+  // Invalidate selected slot when active city changes so user doesn't book a slot from another city
+  useEffect(() => {
+    setUserSelectedSlot(null);
+  }, [selectedCity]);
+
   const selectedSlot = useMemo(() => {
     if (userSelectedSlot) return userSelectedSlot;
     if (realCinemas.length > 0 && realCinemas[0].formats.length > 0) {
