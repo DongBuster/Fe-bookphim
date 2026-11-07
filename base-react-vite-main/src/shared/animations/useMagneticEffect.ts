@@ -8,16 +8,17 @@ interface MagneticOptions {
   maxDisplacement?: number;
   /** Ease for quickTo tracking (default: 'power2.out') */
   ease?: string;
-  /** Duration of tracking in seconds (default: 0.3) */
+  /** Duration of tracking in seconds (default: 0.25) */
   duration?: number;
   /** Whether magnetic effect is enabled */
   enabled?: boolean;
 }
 
 /**
- * Hook: attaches magnetic attraction to a button/card so it pulls toward
- * the user's cursor on hover and bounces back smoothly with elastic physics.
- * Uses gsap.quickTo() for 60FPS GPU performance without layout reflow.
+ * High-Performance Magnetic Attraction Hook:
+ * - Uses gsap.quickTo() to reuse running tweens rather than creating new objects on every move.
+ * - Caches getBoundingClientRect() on pointerenter to completely eliminate layout reflow / thrashing during pointermove.
+ * - Promotes layer with will-change: transform only while hovered, releasing GPU memory on leave.
  */
 export function useMagneticEffect<T extends HTMLElement>(
   targetRef: RefObject<T | null>,
@@ -41,13 +42,24 @@ export function useMagneticEffect<T extends HTMLElement>(
     }
 
     // Prepare quickTo tweens for x and y
-    const xTo = gsap.quickTo(el, 'x', { duration, ease });
-    const yTo = gsap.quickTo(el, 'y', { duration, ease });
+    const xTo = gsap.quickTo(el, 'x', { duration, ease, overwrite: 'auto' });
+    const yTo = gsap.quickTo(el, 'y', { duration, ease, overwrite: 'auto' });
+
+    let cachedRect: DOMRect | null = null;
+
+    const handlePointerEnter = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      cachedRect = el.getBoundingClientRect();
+      el.style.willChange = 'transform';
+    };
 
     const handlePointerMove = (e: PointerEvent) => {
-      const rect = el.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
+      if (e.pointerType !== 'mouse') return;
+      if (!cachedRect) {
+        cachedRect = el.getBoundingClientRect();
+      }
+      const centerX = cachedRect.left + cachedRect.width / 2;
+      const centerY = cachedRect.top + cachedRect.height / 2;
 
       let deltaX = (e.clientX - centerX) * strength;
       let deltaY = (e.clientY - centerY) * strength;
@@ -61,24 +73,38 @@ export function useMagneticEffect<T extends HTMLElement>(
     };
 
     const handlePointerLeave = () => {
+      cachedRect = null;
       // Elastic spring back to center
       gsap.to(el, {
         x: 0,
         y: 0,
-        duration: 0.7,
+        duration: 0.65,
         ease: 'elastic.out(1.1, 0.4)',
         overwrite: 'auto',
+        onComplete: () => {
+          if (el) {
+            el.style.willChange = 'auto';
+          }
+        },
       });
     };
 
+    const handleScroll = () => {
+      cachedRect = null;
+    };
+
+    el.addEventListener('pointerenter', handlePointerEnter);
     el.addEventListener('pointermove', handlePointerMove);
     el.addEventListener('pointerleave', handlePointerLeave);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
+      el.removeEventListener('pointerenter', handlePointerEnter);
       el.removeEventListener('pointermove', handlePointerMove);
       el.removeEventListener('pointerleave', handlePointerLeave);
+      window.removeEventListener('scroll', handleScroll);
       gsap.killTweensOf(el);
-      gsap.set(el, { x: 0, y: 0 });
+      gsap.set(el, { x: 0, y: 0, clearProps: 'willChange' });
     };
   }, [targetRef, strength, maxDisplacement, ease, duration, enabled]);
 }

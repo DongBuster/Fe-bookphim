@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { BiCameraMovie } from 'react-icons/bi';
 import tokenManager from '@shared/utils/tokenManager';
+import { useSelectedCity } from '@/shared/services/location.service';
 import {
   LANGUAGES,
   INITIAL_NOTIFICATIONS,
@@ -52,7 +53,7 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedCity, setSelectedCity] = useState('TP. HCM');
+  const [selectedCity, setSelectedCity] = useSelectedCity();
   const [searchQuery, setSearchQuery] = useState('');
 
   const isLoggedIn = Boolean(tokenManager.getAccessToken());

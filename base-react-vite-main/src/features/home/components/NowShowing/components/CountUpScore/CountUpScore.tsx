@@ -1,13 +1,16 @@
-import { type FC, useEffect, useRef, useState } from 'react';
-import { gsap, ScrollTrigger } from '@/shared/animations';
+import { type FC, useEffect, useRef } from 'react';
+import { gsap } from '@/shared/animations';
 
 interface CountUpScoreProps {
   score: number;
   duration?: number;
 }
 
-export const CountUpScore: FC<CountUpScoreProps> = ({ score, duration = 1.0 }) => {
-  const [displayValue, setDisplayValue] = useState('0.0');
+/**
+ * High-Performance Counter: updates DOM text directly via GSAP without
+ * triggering 60fps React component re-renders.
+ */
+export const CountUpScore: FC<CountUpScoreProps> = ({ score, duration = 0.85 }) => {
   const spanRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -15,7 +18,7 @@ export const CountUpScore: FC<CountUpScoreProps> = ({ score, duration = 1.0 }) =
     if (!el) return;
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setDisplayValue(score.toFixed(1));
+      el.textContent = score.toFixed(1);
       return;
     }
 
@@ -31,15 +34,17 @@ export const CountUpScore: FC<CountUpScoreProps> = ({ score, duration = 1.0 }) =
         once: true,
       },
       onUpdate: () => {
-        setDisplayValue(proxy.val.toFixed(1));
+        if (el) {
+          el.textContent = proxy.val.toFixed(1);
+        }
       },
     });
 
     return () => {
+      tween.scrollTrigger?.kill();
       tween.kill();
-      ScrollTrigger.getById(el.id)?.kill();
     };
   }, [score, duration]);
 
-  return <span ref={spanRef}>{displayValue}</span>;
+  return <span ref={spanRef}>0.0</span>;
 };

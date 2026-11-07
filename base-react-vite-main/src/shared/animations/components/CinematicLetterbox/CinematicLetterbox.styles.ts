@@ -4,7 +4,7 @@ export const Overlay = styled.div<{ $isDone: boolean }>`
   position: fixed;
   inset: 0;
   z-index: 99999;
-  pointer-events: ${({ $isDone }) => ($isDone ? 'none' : 'auto')};
+  pointer-events: none;
   overflow: hidden;
   display: ${({ $isDone }) => ($isDone ? 'none' : 'block')};
 `;

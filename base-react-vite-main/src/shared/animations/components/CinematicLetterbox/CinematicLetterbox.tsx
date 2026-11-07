@@ -25,8 +25,13 @@ export const CinematicLetterbox: FC<CinematicLetterboxProps> = ({
   const brandingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Check if already played in this browser session
-    const hasPlayed = sessionStorage.getItem('phimbook_letterbox_shown');
+    // Check if already played in this browser session (safe check for Safari Private Mode)
+    let hasPlayed: string | null = null;
+    try {
+      hasPlayed = sessionStorage.getItem('phimbook_letterbox_shown');
+    } catch {
+      // Ignore sessionStorage security error in sandboxed or private browsing
+    }
     const isHeadless = /HeadlessChrome/.test(navigator.userAgent);
     if ((hasPlayed || isHeadless) && !forcePlay) {
       setIsDone(true);
@@ -41,7 +46,11 @@ export const CinematicLetterbox: FC<CinematicLetterboxProps> = ({
 
     const tl = gsap.timeline({
       onComplete: () => {
-        sessionStorage.setItem('phimbook_letterbox_shown', 'true');
+        try {
+          sessionStorage.setItem('phimbook_letterbox_shown', 'true');
+        } catch {
+          // Ignore private mode write restriction
+        }
         setIsDone(true);
         onComplete?.();
       },
@@ -83,7 +92,12 @@ export const CinematicLetterbox: FC<CinematicLetterboxProps> = ({
       );
     }
 
+    const fallbackTimer = setTimeout(() => {
+      setIsDone(true);
+    }, 2200);
+
     return () => {
+      clearTimeout(fallbackTimer);
       tl.kill();
     };
   }, [forcePlay, onComplete]);

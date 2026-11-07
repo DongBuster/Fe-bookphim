@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Check, ChevronDown, MapPin } from 'lucide-react';
 import { CITIES } from '../../data/header-data';
 import { useClickOutside } from '../../hooks/useClickOutside';
+import { useSelectedCity } from '@/shared/services/location.service';
 import * as S from './LocationPicker.styles';
 
 const CITY_KEY_MAP: Record<string, string> = {
@@ -14,7 +15,7 @@ const CITY_KEY_MAP: Record<string, string> = {
 export function LocationPicker() {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedCity, setSelectedCity] = useState('TP. HCM');
+  const [selectedCity, setSelectedCity] = useSelectedCity();
   const ref = useRef<HTMLDivElement>(null);
 
   const handleClose = () => {

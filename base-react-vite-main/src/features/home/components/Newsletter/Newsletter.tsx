@@ -16,17 +16,21 @@ export const Newsletter: FC = () => {
       const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         if (bannerRef.current) {
-          gsap.from(bannerRef.current, {
-            y: 32,
-            opacity: 0,
-            duration: 0.75,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: bannerRef.current,
-              start: 'top 90%',
-              toggleActions: 'play none none reverse',
+          gsap.fromTo(
+            bannerRef.current,
+            { y: 28, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.7,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: bannerRef.current,
+                start: 'top 90%',
+                once: true,
+              },
             },
-          });
+          );
         }
       });
       return () => mm.revert();

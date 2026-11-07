@@ -114,9 +114,7 @@ export const CardImage = styled.img`
   will-change: transform;
   object-fit: cover;
   object-position: center;
-  transition-property: transform;
-  transition-duration: 700ms;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition: filter 0.4s ease;
   z-index: -10;
 `;
 
@@ -135,7 +133,7 @@ export const Card = styled.div`
   cursor: pointer;
 
   &:hover ${CardImage} {
-    transform: scale(1.05);
+    filter: brightness(1.08);
   }
 `;
 
@@ -311,7 +309,6 @@ export const ActionButton = styled.button`
   border-radius: 12px;
   transition-property:
     color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
   border: none;
   cursor: pointer;

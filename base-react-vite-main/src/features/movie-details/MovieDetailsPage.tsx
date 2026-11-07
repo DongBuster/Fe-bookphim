@@ -17,7 +17,6 @@ import type { MovieDetailDto, TheaterShowtimesGroupDto } from '@shared/types/api
 import {
   getMovieDetails,
   DAY_OPTIONS,
-  CINEMAS_DATA,
   type ShowtimeSlot,
   type CinemaSchedule,
   type ScreenFormatGroup,
@@ -31,6 +30,8 @@ import {
   TrailerModal,
   type TrailerPlaylistItem,
 } from './components/TrailerModal/TrailerModal';
+import { useSelectedCity } from '@/shared/services/location.service';
+import { getCinemasScheduleByMovieAndCity } from '@/shared/data/city-theaters-data';
 import * as S from './MovieDetailsPage.styles';
 
 export const MovieDetailsPage: FC = () => {
@@ -51,10 +52,11 @@ export const MovieDetailsPage: FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  const [selectedCity, setSelectedCity] = useSelectedCity();
   // 2. Dùng ID của phim để gọi tiếp API Lịch Chiếu (Dependent Query)
   const { data: apiShowtimes } = useQuery<TheaterShowtimesGroupDto[]>({
-    queryKey: ['showtimes', apiMovie?.id],
-    queryFn: () => getShowtimesApi({ MovieId: apiMovie?.id }),
+    queryKey: ['showtimes', apiMovie?.id, selectedCity],
+    queryFn: () => getShowtimesApi({ MovieId: apiMovie?.id, City: selectedCity }),
     enabled: Boolean(apiMovie?.id),
     staleTime: 2 * 60 * 1000,
   });
@@ -96,7 +98,9 @@ export const MovieDetailsPage: FC = () => {
 
   // Chuyển đổi danh sách rạp và suất chiếu thật từ API sang định dạng UI
   const realCinemas: CinemaSchedule[] = useMemo(() => {
-    if (!apiShowtimes || apiShowtimes.length === 0) return CINEMAS_DATA;
+    if (!apiShowtimes || apiShowtimes.length === 0) {
+      return getCinemasScheduleByMovieAndCity(effectiveSlug, selectedCity);
+    }
 
     return apiShowtimes.map((theater) => ({
       id: theater.theaterId,
@@ -126,9 +130,9 @@ export const MovieDetailsPage: FC = () => {
         },
       ],
     }));
-  }, [apiShowtimes, t]);
+  }, [apiShowtimes, effectiveSlug, selectedCity, t]);
 
-  const [selectedCity, setSelectedCity] = useState('TP. Hồ Chí Minh');
+
   const [searchCinema, setSearchCinema] = useState('');
   const [selectedDate, setSelectedDate] = useState(DAY_OPTIONS[0]);
   const [selectedFormat, setSelectedFormat] = useState('all');

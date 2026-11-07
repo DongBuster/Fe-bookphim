@@ -1,61 +1,16 @@
-import type { FC } from 'react';
+import { type FC, useRef, useMemo } from 'react';
+import { useSelectedCity } from '@/shared/services/location.service';
+import { getLuxuryCinemasByCity } from '@/shared/data/city-theaters-data';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import * as S from './LuxuryCinemas.styles';
-import { useRef } from 'react';
 import { useGSAP, gsap } from '@/shared/animations';
-
-const cinemas = [
-  {
-    id: 1,
-    image:
-      'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=800&auto=format&fit=crop',
-    brand: 'CGV Flagship',
-    brandColor: '#FFB3B0',
-    format: 'IMAX LASER • GOLD CLASS',
-    formatBg: '#DC9100',
-    formatText: '#4F3100',
-    name: 'CGV Vincom Landmark 81',
-    address:
-      'Tầng B1, TTTM Vincom Landmark 81, 720A Điện Biên Phủ, P.22, Bình Thạnh, TP.HCM',
-    desc: 'Trang bị màn hình IMAX lớn nhất Việt Nam cùng hệ thống âm thanh vòm 12 kênh thế hệ mới. Phòng chiếu Gold Class phục vụ trà chiều và chăn len riêng biệt.',
-    shows: '28',
-  },
-  {
-    id: 2,
-    image:
-      'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop',
-    brand: 'Galaxy Premium',
-    brandColor: '#FFB955',
-    format: 'IMAX LASER • LA ROSA BED',
-    formatBg: '#FF535A',
-    formatText: '#5B000D',
-    name: 'Galaxy Sala Thủ Thiêm',
-    address:
-      'Tầng 3, TTTM Thiso Mall Sala, 10 Mai Chí Thọ, Thủ Thiêm, TP. Thủ Đức, TP.HCM',
-    desc: 'Cụm rạp tích hợp công nghệ chiếu Laser 4K thế hệ mới nhất với phòng chiếu La Rosa trang bị giường nằm bọc da cao cấp cùng quầy bar ẩm thực riêng.',
-    shows: '34',
-  },
-  {
-    id: 3,
-    image:
-      'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?q=80&w=800&auto=format&fit=crop',
-    brand: 'Lotte Diamond',
-    brandColor: '#FFB3B0',
-    format: 'CHARLOTTE • CINEUM LED',
-    formatBg: '#4F3100',
-    formatText: '#FFB955',
-    name: 'Lotte Cinema Diamond Plaza',
-    address:
-      'Tầng 13, Diamond Plaza, 34 Lê Duẩn, Bến Nghé, Quận 1, TP.HCM',
-    desc: 'Phòng chiếu Charlotte Suite đỉnh cao với phòng chờ riêng phục vụ rượu vang, ghế massage chỉnh điện đa điểm và màn hình công nghệ LED Cineum không viền.',
-    shows: '42',
-  },
-];
 
 export const LuxuryCinemas: FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [selectedCity] = useSelectedCity();
+  const cinemas = useMemo(() => getLuxuryCinemasByCity(selectedCity), [selectedCity]);
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -65,33 +20,41 @@ export const LuxuryCinemas: FC = () => {
       const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         if (headerRef.current) {
-          gsap.from(headerRef.current, {
-            opacity: 0,
-            y: 28,
-            duration: 0.6,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
+          gsap.fromTo(
+            headerRef.current,
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: 'top 90%',
+                once: true,
+              },
             },
-          });
+          );
         }
 
         if (gridRef.current) {
           // Stagger card reveal
-          gsap.from(gridRef.current.children, {
-            opacity: 0,
-            y: 40,
-            duration: 0.7,
-            stagger: 0.12,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: gridRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
+          gsap.fromTo(
+            gridRef.current.children,
+            { opacity: 0, y: 36 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              stagger: 0.12,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: gridRef.current,
+                start: 'top 85%',
+                once: true,
+              },
             },
-          });
+          );
 
           // Parallax depth scrub on room images
           const images = gridRef.current.querySelectorAll('.parallax-cinema-img');

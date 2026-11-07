@@ -24,33 +24,41 @@ export const ExclusiveOffers: FC = () => {
       const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         if (headerRef.current) {
-          gsap.from(headerRef.current, {
-            opacity: 0,
-            y: 28,
-            duration: 0.6,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
+          gsap.fromTo(
+            headerRef.current,
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: 'top 90%',
+                once: true,
+              },
             },
-          });
+          );
         }
 
         if (gridRef.current) {
           // Wave stagger entrance
-          gsap.from(gridRef.current.children, {
-            opacity: 0,
-            y: 45,
-            duration: 0.75,
-            stagger: 0.14,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: gridRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
+          gsap.fromTo(
+            gridRef.current.children,
+            { opacity: 0, y: 36 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.75,
+              stagger: 0.12,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: gridRef.current,
+                start: 'top 85%',
+                once: true,
+              },
             },
-          });
+          );
         }
       });
       return () => mm.revert();

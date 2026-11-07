@@ -12,11 +12,12 @@ import {
   Check,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSelectedCity } from '@/shared/services/location.service';
+import { getQuickBookCinemasByCity } from '@/shared/data/city-theaters-data';
 import * as S from './HeroSpotlight.styles';
 import {
   SPOTLIGHT_MOVIES,
   BOOKING_MOVIES,
-  BOOKING_CINEMAS,
   BOOKING_DATES,
   BOOKING_SHOWTIMES,
 } from './data/spotlight-data';
@@ -33,11 +34,22 @@ export const HeroSpotlight: FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const [selectedCity] = useSelectedCity();
+  const availableCinemas = useMemo(() => {
+    return getQuickBookCinemasByCity(selectedCity);
+  }, [selectedCity]);
+
   // ── Quick Booking Bar State ───────────────────────────────────────────────
   const [selectedMovie, setSelectedMovie] = useState('Dune: Part Two');
-  const [selectedCinema, setSelectedCinema] = useState(
-    'CGV Landmark 81 (IMAX Laser)',
+  const [selectedCinema, setSelectedCinema] = useState<string>(
+    () => availableCinemas[0] || 'CGV Landmark 81 (IMAX Laser)',
   );
+
+  useEffect(() => {
+    if (availableCinemas.length > 0 && !availableCinemas.includes(selectedCinema)) {
+      setSelectedCinema(availableCinemas[0]);
+    }
+  }, [availableCinemas, selectedCinema]);
   const [selectedDateKey, setSelectedDateKey] = useState('today');
   const [selectedShowtimeKey, setSelectedShowtimeKey] = useState('time_4');
   const [activeDropdown, setActiveDropdown] = useState<
@@ -338,7 +350,7 @@ export const HeroSpotlight: FC = () => {
 
             {activeDropdown === 'cinema' && (
               <S.BookingDropdown $alignRight onClick={handleStopPropagation}>
-                {BOOKING_CINEMAS.map((cinema) => (
+                {availableCinemas.map((cinema) => (
                   <S.BookingDropdownItem
                     key={cinema}
                     role="button"

@@ -18,27 +18,35 @@ export const AiCineAdvisor: FC = () => {
       const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         if (cardRef.current) {
-          gsap.from(cardRef.current, {
-            y: 35,
-            opacity: 0,
-            duration: 0.8,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: cardRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
+          gsap.fromTo(
+            cardRef.current,
+            { y: 30, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.75,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: cardRef.current,
+                start: 'top 88%',
+                once: true,
+              },
             },
-          });
+          );
         }
 
         if (badgeRef.current) {
+          // GPU-optimized pulse: animates transform scale only and pauses when off-screen
           gsap.to(badgeRef.current, {
-            scale: 1.04,
-            boxShadow: '0 0 16px rgba(255, 83, 90, 0.45)',
+            scale: 1.045,
             duration: 1.4,
             repeat: -1,
             yoyo: true,
             ease: 'sine.inOut',
+            scrollTrigger: {
+              trigger: cardRef.current,
+              toggleActions: 'play pause resume pause',
+            },
           });
         }
       });

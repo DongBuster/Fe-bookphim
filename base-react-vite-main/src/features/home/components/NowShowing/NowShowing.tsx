@@ -47,35 +47,64 @@ export const NowShowing: FC = () => {
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // 3D Card Gyroscope Tilt
-  const handleCardPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  // 3D Card Gyroscope Tilt with quickTo & cached dimensions (zero layout reflow)
+  const cardTweens = useRef<
+    WeakMap<
+      HTMLElement,
+      {
+        rect: DOMRect;
+        rotX: (v: number) => void;
+        rotY: (v: number) => void;
+        scale: (v: number) => void;
+      }
+    >
+  >(new WeakMap());
+
+  const handleCardPointerEnter = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'mouse') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    const rotX = gsap.quickTo(card, 'rotateX', { duration: 0.22, ease: 'power2.out', overwrite: 'auto' });
+    const rotY = gsap.quickTo(card, 'rotateY', { duration: 0.22, ease: 'power2.out', overwrite: 'auto' });
+    const scale = gsap.quickTo(card, 'scale', { duration: 0.22, ease: 'power2.out', overwrite: 'auto' });
+
+    gsap.set(card, { transformPerspective: 900 });
+    scale(1.025);
+    card.style.willChange = 'transform';
+    cardTweens.current.set(card, { rect, rotX, rotY, scale });
+  };
+
+  const handleCardPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const card = e.currentTarget;
+    const tracker = cardTweens.current.get(card);
+    if (!tracker) return;
+
+    const x = e.clientX - tracker.rect.left;
+    const y = e.clientY - tracker.rect.top;
+    const centerX = tracker.rect.width / 2;
+    const centerY = tracker.rect.height / 2;
     const rotateX = ((y - centerY) / centerY) * -6.5;
     const rotateY = ((x - centerX) / centerX) * 6.5;
 
-    gsap.to(card, {
-      rotateX,
-      rotateY,
-      scale: 1.025,
-      duration: 0.25,
-      ease: 'power2.out',
-      transformPerspective: 900,
-    });
+    tracker.rotX(rotateX);
+    tracker.rotY(rotateY);
   };
 
   const handleCardPointerLeave = (e: React.PointerEvent<HTMLDivElement>) => {
-    gsap.to(e.currentTarget, {
+    const card = e.currentTarget;
+    cardTweens.current.delete(card);
+    gsap.to(card, {
       rotateX: 0,
       rotateY: 0,
       scale: 1,
-      duration: 0.6,
+      duration: 0.65,
       ease: 'elastic.out(1.1, 0.4)',
+      overwrite: 'auto',
+      onComplete: () => {
+        card.style.willChange = 'auto';
+      },
     });
   };
 
@@ -153,38 +182,56 @@ export const NowShowing: FC = () => {
     return movies;
   }, [movies, activeTab]);
 
-  // WOW #4: ScrollTrigger reveal for header and movie cards
+  // Section Header reveal: runs ONCE on mount, never flickers on category tab clicks
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         if (headerRef.current) {
-          gsap.from(headerRef.current, {
-            opacity: 0,
-            y: 28,
-            duration: 0.6,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
+          gsap.fromTo(
+            headerRef.current,
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.55,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: 'top 92%',
+                once: true,
+              },
             },
-          });
+          );
         }
+      });
+      return () => mm.revert();
+    },
+    { scope: sectionRef },
+  );
 
+  // Movie Cards Grid reveal: re-triggers stagger cleanly when tab changes or API data arrives
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
         if (gridRef.current && gridRef.current.children.length > 0) {
-          gsap.from(gridRef.current.children, {
-            opacity: 0,
-            y: 40,
-            duration: 0.65,
-            stagger: 0.075,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: gridRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
+          gsap.fromTo(
+            gridRef.current.children,
+            { opacity: 0, y: 36 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.65,
+              stagger: 0.06,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: gridRef.current,
+                start: 'top 88%',
+                once: true,
+              },
             },
-          });
+          );
         }
       });
       return () => mm.revert();
@@ -257,6 +304,7 @@ export const NowShowing: FC = () => {
                 <S.MovieCard
                   key={movie.id}
                   onClick={handleMovieCardClick(movie)}
+                  onPointerEnter={handleCardPointerEnter}
                   onPointerMove={handleCardPointerMove}
                   onPointerLeave={handleCardPointerLeave}
                 >

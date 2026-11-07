@@ -140,7 +140,7 @@ export const ShowtimePicker = forwardRef<HTMLDivElement, ShowtimePickerProps>(
 
           <div className="header-controls">
             <S.CitySelect value={selectedCity} onChange={handleCityChange}>
-              <option value="TP. Hồ Chí Minh">🏙 TP. Hồ Chí Minh</option>
+              <option value="TP. HCM">🏙 TP. Hồ Chí Minh</option>
               <option value="Hà Nội">🏙 Hà Nội</option>
               <option value="Đà Nẵng">🏙 Đà Nẵng</option>
             </S.CitySelect>

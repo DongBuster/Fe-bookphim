@@ -107,19 +107,17 @@ export const TrailerButton = styled.button`
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 
   &:hover {
     background: rgba(255, 255, 255, 0.14);
     border-color: rgba(255, 255, 255, 0.35);
-    transform: translateY(-2px);
     box-shadow:
       0 8px 24px rgba(0, 0, 0, 0.5),
       0 0 16px rgba(255, 83, 90, 0.25);
   }
 
   &:active {
-    transform: translateY(0);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
@@ -153,7 +151,7 @@ export const PlayIconContainer = styled.div`
   );
   border: 1.5px solid rgba(255, 83, 90, 0.65);
   box-shadow: 0 0 10px rgba(255, 83, 90, 0.3);
-  transition: all 0.25s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   flex-shrink: 0;
 
   ${TrailerButton}:hover & {

@@ -182,7 +182,7 @@ export const CineBotWidget: FC = () => {
             </div>
             <div className="header-info">
               <h4>CineBot AI Concierge</h4>
-              <span>Trực tuyến 24/7 • Gemini Pro</span>
+              <span>Trực tuyến 24/7</span>
             </div>
           </div>
           <button
