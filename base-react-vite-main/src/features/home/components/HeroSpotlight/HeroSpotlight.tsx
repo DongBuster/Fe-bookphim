@@ -28,10 +28,6 @@ export const HeroSpotlight: FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  // ── Carousel ──────────────────────────────────────────────────────────────
-  const { emblaRef, selectedIndex, handlePrev, handleNext, handleDotClick } =
-    useSpotlightCarousel();
-
   // ── Quick Booking Bar State ───────────────────────────────────────────────
   const [selectedMovie, setSelectedMovie] = useState('Dune: Part Two');
   const [selectedCinema, setSelectedCinema] = useState(
@@ -42,6 +38,17 @@ export const HeroSpotlight: FC = () => {
   const [activeDropdown, setActiveDropdown] = useState<
     'movie' | 'cinema' | 'date' | 'showtime' | null
   >(null);
+
+  // ── Hover, Focus, Modal & Pause States ────────────────────────────────────
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+  const isPaused =
+    isHovered || isFocused || activeDropdown !== null || isTrailerOpen;
+
+  // ── Carousel ──────────────────────────────────────────────────────────────
+  const { emblaRef, selectedIndex, handlePrev, handleNext, handleDotClick } =
+    useSpotlightCarousel({ isExternalPaused: isPaused });
 
   const bookingBarRef = useRef<HTMLDivElement>(null);
 
@@ -149,6 +156,13 @@ export const HeroSpotlight: FC = () => {
     if (e.key === 'ArrowRight') handleNext();
   };
 
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = (e: React.FocusEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      setIsFocused(false);
+    }
+  };
+
   const handleStopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -163,7 +177,14 @@ export const HeroSpotlight: FC = () => {
   };
 
   return (
-    <S.SectionContainer tabIndex={0} onKeyDown={handleSectionKeyDown}>
+    <S.SectionContainer
+      tabIndex={0}
+      onKeyDown={handleSectionKeyDown}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    >
       {/* ── Background / Carousel ── */}
       <S.BackgroundWrapper>
         <S.ImageContainer>
@@ -175,6 +196,7 @@ export const HeroSpotlight: FC = () => {
                   movie={movie}
                   selectedIndex={selectedIndex}
                   onDotClick={handleDotClick}
+                  onTrailerStateChange={setIsTrailerOpen}
                 />
               ))}
             </S.SliderTrack>
@@ -206,194 +228,200 @@ export const HeroSpotlight: FC = () => {
       {/* ── Quick Booking Bar ── */}
       {isFeatureEnabled('quickBooking') && (
         <S.QuickBookingBar ref={bookingBarRef} className="no-drag">
-        {/* Step 1 – Movie */}
-        <S.StepItem
-          role="button"
-          tabIndex={0}
-          $isOpen={activeDropdown === 'movie'}
-          onClick={handleToggleDropdown('movie')}
-          onKeyDown={handleToggleDropdownKeyDown('movie')}
-        >
-          <S.StepIconBox $bg="rgba(255, 83, 90, 0.15)">
-            <Ticket color="#FFB3B0" size={16} />
-          </S.StepIconBox>
-          <S.StepContent>
-            <S.StepLabel>{t('home:hero.step_movie')}</S.StepLabel>
-            <S.StepValueRow>
-              <S.StepValue>{selectedMovie}</S.StepValue>
-              <S.DropdownChevron $isOpen={activeDropdown === 'movie'}>
-                <ChevronDown color="#AE8786" size={14} />
-              </S.DropdownChevron>
-            </S.StepValueRow>
-          </S.StepContent>
+          {/* Step 1 – Movie */}
+          <S.StepItem
+            role="button"
+            tabIndex={0}
+            $isOpen={activeDropdown === 'movie'}
+            onClick={handleToggleDropdown('movie')}
+            onKeyDown={handleToggleDropdownKeyDown('movie')}
+          >
+            <S.StepIconBox $bg="rgba(255, 83, 90, 0.15)">
+              <Ticket color="#FFB3B0" size={16} />
+            </S.StepIconBox>
+            <S.StepContent>
+              <S.StepLabel>{t('home:hero.step_movie')}</S.StepLabel>
+              <S.StepValueRow>
+                <S.StepValue>{selectedMovie}</S.StepValue>
+                <S.DropdownChevron $isOpen={activeDropdown === 'movie'}>
+                  <ChevronDown color="#AE8786" size={14} />
+                </S.DropdownChevron>
+              </S.StepValueRow>
+            </S.StepContent>
 
-          {activeDropdown === 'movie' && (
-            <S.BookingDropdown onClick={handleStopPropagation}>
-              {BOOKING_MOVIES.map((movie) => (
-                <S.BookingDropdownItem
-                  key={movie}
-                  role="button"
-                  tabIndex={0}
-                  $isSelected={selectedMovie === movie}
-                  onClick={handleSelectMovie(movie)}
-                  onKeyDown={handleSelectMovieKeyDown(movie)}
-                >
-                  <span>{movie}</span>
-                  {selectedMovie === movie && (
-                    <Check className="check-icon" size={14} />
+            {activeDropdown === 'movie' && (
+              <S.BookingDropdown onClick={handleStopPropagation}>
+                {BOOKING_MOVIES.map((movie) => (
+                  <S.BookingDropdownItem
+                    key={movie}
+                    role="button"
+                    tabIndex={0}
+                    $isSelected={selectedMovie === movie}
+                    onClick={handleSelectMovie(movie)}
+                    onKeyDown={handleSelectMovieKeyDown(movie)}
+                  >
+                    <span>{movie}</span>
+                    {selectedMovie === movie && (
+                      <Check className="check-icon" size={14} />
+                    )}
+                  </S.BookingDropdownItem>
+                ))}
+              </S.BookingDropdown>
+            )}
+          </S.StepItem>
+
+          {/* Step 2 – Cinema */}
+          <S.StepItem
+            role="button"
+            tabIndex={0}
+            $isOpen={activeDropdown === 'cinema'}
+            onClick={handleToggleDropdown('cinema')}
+            onKeyDown={handleToggleDropdownKeyDown('cinema')}
+          >
+            <S.StepIconBox $bg="rgba(255, 185, 85, 0.15)">
+              <MapPin color="#FFB955" size={16} />
+            </S.StepIconBox>
+            <S.StepContent>
+              <S.StepLabel>{t('home:hero.step_cinema')}</S.StepLabel>
+              <S.StepValueRow>
+                <S.StepValue>{selectedCinema}</S.StepValue>
+                <S.DropdownChevron $isOpen={activeDropdown === 'cinema'}>
+                  <ChevronDown color="#AE8786" size={14} />
+                </S.DropdownChevron>
+              </S.StepValueRow>
+            </S.StepContent>
+
+            {activeDropdown === 'cinema' && (
+              <S.BookingDropdown $alignRight onClick={handleStopPropagation}>
+                {BOOKING_CINEMAS.map((cinema) => (
+                  <S.BookingDropdownItem
+                    key={cinema}
+                    role="button"
+                    tabIndex={0}
+                    $isSelected={selectedCinema === cinema}
+                    onClick={handleSelectCinema(cinema)}
+                    onKeyDown={handleSelectCinemaKeyDown(cinema)}
+                  >
+                    <span>{cinema}</span>
+                    {selectedCinema === cinema && (
+                      <Check className="check-icon" size={14} />
+                    )}
+                  </S.BookingDropdownItem>
+                ))}
+              </S.BookingDropdown>
+            )}
+          </S.StepItem>
+
+          {/* Step 3 – Date */}
+          <S.StepItem
+            role="button"
+            tabIndex={0}
+            $isOpen={activeDropdown === 'date'}
+            onClick={handleToggleDropdown('date')}
+            onKeyDown={handleToggleDropdownKeyDown('date')}
+          >
+            <S.StepIconBox $bg="rgba(140, 144, 164, 0.2)">
+              <Calendar color="#C2C5DB" size={16} />
+            </S.StepIconBox>
+            <S.StepContent>
+              <S.StepLabel>{t('home:hero.step_date')}</S.StepLabel>
+              <S.StepValueRow>
+                <S.StepValue>
+                  {t(
+                    `home:hero.dates.${selectedDateKey}`,
+                    BOOKING_DATES.find((d) => d.key === selectedDateKey)
+                      ?.defaultLabel ||
+                      BOOKING_DATES[0]?.defaultLabel ||
+                      'Hôm nay',
                   )}
-                </S.BookingDropdownItem>
-              ))}
-            </S.BookingDropdown>
-          )}
-        </S.StepItem>
+                </S.StepValue>
+                <S.DropdownChevron $isOpen={activeDropdown === 'date'}>
+                  <ChevronDown color="#AE8786" size={14} />
+                </S.DropdownChevron>
+              </S.StepValueRow>
+            </S.StepContent>
 
-        {/* Step 2 – Cinema */}
-        <S.StepItem
-          role="button"
-          tabIndex={0}
-          $isOpen={activeDropdown === 'cinema'}
-          onClick={handleToggleDropdown('cinema')}
-          onKeyDown={handleToggleDropdownKeyDown('cinema')}
-        >
-          <S.StepIconBox $bg="rgba(255, 185, 85, 0.15)">
-            <MapPin color="#FFB955" size={16} />
-          </S.StepIconBox>
-          <S.StepContent>
-            <S.StepLabel>{t('home:hero.step_cinema')}</S.StepLabel>
-            <S.StepValueRow>
-              <S.StepValue>{selectedCinema}</S.StepValue>
-              <S.DropdownChevron $isOpen={activeDropdown === 'cinema'}>
-                <ChevronDown color="#AE8786" size={14} />
-              </S.DropdownChevron>
-            </S.StepValueRow>
-          </S.StepContent>
+            {activeDropdown === 'date' && (
+              <S.BookingDropdown onClick={handleStopPropagation}>
+                {BOOKING_DATES.map((date) => (
+                  <S.BookingDropdownItem
+                    key={date.key}
+                    role="button"
+                    tabIndex={0}
+                    $isSelected={selectedDateKey === date.key}
+                    onClick={handleSelectDate(date.key)}
+                    onKeyDown={handleSelectDateKeyDown(date.key)}
+                  >
+                    <span>
+                      {t(`home:hero.dates.${date.key}`, date.defaultLabel)}
+                    </span>
+                    {selectedDateKey === date.key && (
+                      <Check className="check-icon" size={14} />
+                    )}
+                  </S.BookingDropdownItem>
+                ))}
+              </S.BookingDropdown>
+            )}
+          </S.StepItem>
 
-          {activeDropdown === 'cinema' && (
-            <S.BookingDropdown $alignRight onClick={handleStopPropagation}>
-              {BOOKING_CINEMAS.map((cinema) => (
-                <S.BookingDropdownItem
-                  key={cinema}
-                  role="button"
-                  tabIndex={0}
-                  $isSelected={selectedCinema === cinema}
-                  onClick={handleSelectCinema(cinema)}
-                  onKeyDown={handleSelectCinemaKeyDown(cinema)}
-                >
-                  <span>{cinema}</span>
-                  {selectedCinema === cinema && (
-                    <Check className="check-icon" size={14} />
+          {/* Step 4 – Showtime */}
+          <S.StepItem
+            role="button"
+            tabIndex={0}
+            $isOpen={activeDropdown === 'showtime'}
+            onClick={handleToggleDropdown('showtime')}
+            onKeyDown={handleToggleDropdownKeyDown('showtime')}
+          >
+            <S.StepIconBox $bg="var(--bg-border-light)">
+              <Clock color="#E7BCBA" size={16} />
+            </S.StepIconBox>
+            <S.StepContent>
+              <S.StepLabel>{t('home:hero.step_showtime')}</S.StepLabel>
+              <S.StepValueRow>
+                <S.StepValue $color="var(--secondary)">
+                  {t(
+                    `home:hero.showtimes.${selectedShowtimeKey}`,
+                    BOOKING_SHOWTIMES.find((s) => s.key === selectedShowtimeKey)
+                      ?.defaultLabel || '19:45 • Phòng IMAX',
                   )}
-                </S.BookingDropdownItem>
-              ))}
-            </S.BookingDropdown>
-          )}
-        </S.StepItem>
+                </S.StepValue>
+                <S.DropdownChevron $isOpen={activeDropdown === 'showtime'}>
+                  <ChevronDown color="#AE8786" size={14} />
+                </S.DropdownChevron>
+              </S.StepValueRow>
+            </S.StepContent>
 
-        {/* Step 3 – Date */}
-        <S.StepItem
-          role="button"
-          tabIndex={0}
-          $isOpen={activeDropdown === 'date'}
-          onClick={handleToggleDropdown('date')}
-          onKeyDown={handleToggleDropdownKeyDown('date')}
-        >
-          <S.StepIconBox $bg="rgba(140, 144, 164, 0.2)">
-            <Calendar color="#C2C5DB" size={16} />
-          </S.StepIconBox>
-          <S.StepContent>
-            <S.StepLabel>{t('home:hero.step_date')}</S.StepLabel>
-            <S.StepValueRow>
-              <S.StepValue>
-                {t(
-                  `home:hero.dates.${selectedDateKey}`,
-                  BOOKING_DATES.find((d) => d.key === selectedDateKey)
-                    ?.defaultLabel || BOOKING_DATES[0]?.defaultLabel || 'Hôm nay',
-                )}
-              </S.StepValue>
-              <S.DropdownChevron $isOpen={activeDropdown === 'date'}>
-                <ChevronDown color="#AE8786" size={14} />
-              </S.DropdownChevron>
-            </S.StepValueRow>
-          </S.StepContent>
-
-          {activeDropdown === 'date' && (
-            <S.BookingDropdown onClick={handleStopPropagation}>
-              {BOOKING_DATES.map((date) => (
-                <S.BookingDropdownItem
-                  key={date.key}
-                  role="button"
-                  tabIndex={0}
-                  $isSelected={selectedDateKey === date.key}
-                  onClick={handleSelectDate(date.key)}
-                  onKeyDown={handleSelectDateKeyDown(date.key)}
-                >
-                  <span>{t(`home:hero.dates.${date.key}`, date.defaultLabel)}</span>
-                  {selectedDateKey === date.key && (
-                    <Check className="check-icon" size={14} />
-                  )}
-                </S.BookingDropdownItem>
-              ))}
-            </S.BookingDropdown>
-          )}
-        </S.StepItem>
-
-        {/* Step 4 – Showtime */}
-        <S.StepItem
-          role="button"
-          tabIndex={0}
-          $isOpen={activeDropdown === 'showtime'}
-          onClick={handleToggleDropdown('showtime')}
-          onKeyDown={handleToggleDropdownKeyDown('showtime')}
-        >
-          <S.StepIconBox $bg="var(--bg-border-light)">
-            <Clock color="#E7BCBA" size={16} />
-          </S.StepIconBox>
-          <S.StepContent>
-            <S.StepLabel>{t('home:hero.step_showtime')}</S.StepLabel>
-            <S.StepValueRow>
-              <S.StepValue $color="var(--secondary)">
-                {t(
-                  `home:hero.showtimes.${selectedShowtimeKey}`,
-                  BOOKING_SHOWTIMES.find((s) => s.key === selectedShowtimeKey)
-                    ?.defaultLabel || '19:45 • Phòng IMAX',
-                )}
-              </S.StepValue>
-              <S.DropdownChevron $isOpen={activeDropdown === 'showtime'}>
-                <ChevronDown color="#AE8786" size={14} />
-              </S.DropdownChevron>
-            </S.StepValueRow>
-          </S.StepContent>
-
-          {activeDropdown === 'showtime' && (
-            <S.BookingDropdown $alignRight onClick={handleStopPropagation}>
-              {BOOKING_SHOWTIMES.map((time) => (
-                <S.BookingDropdownItem
-                  key={time.key}
-                  role="button"
-                  tabIndex={0}
-                  $isSelected={selectedShowtimeKey === time.key}
-                  onClick={handleSelectShowtime(time.key)}
-                  onKeyDown={handleSelectShowtimeKeyDown(time.key)}
-                >
-                  <span>{t(`home:hero.showtimes.${time.key}`, time.defaultLabel)}</span>
-                  {selectedShowtimeKey === time.key && (
-                    <Check className="check-icon" size={14} />
-                  )}
-                </S.BookingDropdownItem>
-              ))}
-            </S.BookingDropdown>
-          )}
-        </S.StepItem>
-        <S.QuickBookSubmitButton
-          type="button"
-          onClick={handleQuickBookSubmit}
-          aria-label={t('home:hero.quick_book_btn', 'Đặt vé ngay')}
-        >
-          <Ticket size={16} />
-          <span>{t('home:hero.quick_book_btn', 'ĐẶT VÉ NGAY')}</span>
-        </S.QuickBookSubmitButton>
-      </S.QuickBookingBar>
+            {activeDropdown === 'showtime' && (
+              <S.BookingDropdown $alignRight onClick={handleStopPropagation}>
+                {BOOKING_SHOWTIMES.map((time) => (
+                  <S.BookingDropdownItem
+                    key={time.key}
+                    role="button"
+                    tabIndex={0}
+                    $isSelected={selectedShowtimeKey === time.key}
+                    onClick={handleSelectShowtime(time.key)}
+                    onKeyDown={handleSelectShowtimeKeyDown(time.key)}
+                  >
+                    <span>
+                      {t(`home:hero.showtimes.${time.key}`, time.defaultLabel)}
+                    </span>
+                    {selectedShowtimeKey === time.key && (
+                      <Check className="check-icon" size={14} />
+                    )}
+                  </S.BookingDropdownItem>
+                ))}
+              </S.BookingDropdown>
+            )}
+          </S.StepItem>
+          <S.QuickBookSubmitButton
+            type="button"
+            onClick={handleQuickBookSubmit}
+            aria-label={t('home:hero.quick_book_btn', 'Đặt vé ngay')}
+          >
+            <Ticket size={16} />
+            <span>{t('home:hero.quick_book_btn', 'ĐẶT VÉ NGAY')}</span>
+          </S.QuickBookSubmitButton>
+        </S.QuickBookingBar>
       )}
     </S.SectionContainer>
   );

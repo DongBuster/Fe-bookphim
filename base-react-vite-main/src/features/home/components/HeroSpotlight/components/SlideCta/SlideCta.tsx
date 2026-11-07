@@ -9,13 +9,17 @@ import * as S from './SlideCta.styles';
 
 interface SlideCTAProps {
   movieId: number | string;
+  onTrailerStateChange?: (isOpen: boolean) => void;
 }
 
 /**
  * Renders the "Đặt vé ngay" and "Xem Trailer 4K" action buttons for each slide.
  * Navigation target is derived directly from the movie's detailMovieId.
  */
-export const SlideCTA: FC<SlideCTAProps> = ({ movieId }) => {
+export const SlideCTA: FC<SlideCTAProps> = ({
+  movieId,
+  onTrailerStateChange,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
@@ -31,10 +35,12 @@ export const SlideCTA: FC<SlideCTAProps> = ({ movieId }) => {
   const handleWatchTrailer = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsTrailerOpen(true);
+    onTrailerStateChange?.(true);
   };
 
   const handleCloseTrailer = () => {
     setIsTrailerOpen(false);
+    onTrailerStateChange?.(false);
   };
 
   return (
@@ -54,7 +60,12 @@ export const SlideCTA: FC<SlideCTAProps> = ({ movieId }) => {
 
         <S.TrailerButton type="button" onClick={handleWatchTrailer}>
           <S.PlayIconContainer>
-            <Play color="#FFFFFF" fill="#FFFFFF" size={10} style={{ marginLeft: 2 }} />
+            <Play
+              color="#FFFFFF"
+              fill="#FFFFFF"
+              size={10}
+              style={{ marginLeft: 2 }}
+            />
           </S.PlayIconContainer>
           <S.TrailerButtonText>
             <span className="btn-full">

@@ -10,6 +10,7 @@ interface SlideItemProps {
   movie: SpotlightMovie;
   selectedIndex: number;
   onDotClick: (index: number) => void;
+  onTrailerStateChange?: (isOpen: boolean) => void;
 }
 
 /**
@@ -20,6 +21,7 @@ export const SlideItem: FC<SlideItemProps> = ({
   movie,
   selectedIndex,
   onDotClick,
+  onTrailerStateChange,
 }) => {
   const { t } = useTranslation();
 
@@ -113,7 +115,10 @@ export const SlideItem: FC<SlideItemProps> = ({
             </S.KeyMetas>
 
             {/* Action CTAs */}
-            <SlideCTA movieId={movie.detailMovieId || movie.id} />
+            <SlideCTA
+              movieId={movie.detailMovieId || movie.id}
+              onTrailerStateChange={onTrailerStateChange}
+            />
 
             {/* Slide Pagination Indicators */}
             <SlidePagination
