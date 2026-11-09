@@ -79,20 +79,23 @@ export const CineBotWidget: FC = () => {
     }
   }, [isOpen, messages.length]);
 
+  const handleSendRef = useRef<(text?: string) => void>(() => {});
+  handleSendRef.current = (text?: string) => { void handleSendMessage(text); };
+
   // Lắng nghe sự kiện mở CineBot từ các trang khác (ví dụ: Trang chủ AiCineAdvisor)
   useEffect(() => {
     const handleOpenEvent = (e: Event) => {
       const custom = e as CustomEvent<{ message?: string }>;
       setIsOpen(true);
       if (custom.detail?.message) {
-        handleSendMessage(custom.detail.message);
+        handleSendRef.current(custom.detail.message);
       }
     };
     window.addEventListener('phimbook:open-cinebot', handleOpenEvent);
     return () => {
       window.removeEventListener('phimbook:open-cinebot', handleOpenEvent);
     };
-  }, [messages, selectedCity]);
+  }, []);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -102,6 +105,7 @@ export const CineBotWidget: FC = () => {
   }, [messages, isOpen, isLoading]);
 
   const handleSendMessage = async (textToSend?: string) => {
+    handleSendRef.current = handleSendMessage;
     const text = (textToSend || inputText).trim();
     if (!text || isLoading) return;
 

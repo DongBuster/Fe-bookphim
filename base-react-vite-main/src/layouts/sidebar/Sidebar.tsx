@@ -125,7 +125,9 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
   const handleSelectLang = (code: string) => () => {
     try {
       localStorage.setItem('app_user_language_selected', 'true');
-    } catch {}
+    } catch {
+      // ignore storage error
+    }
     i18n.changeLanguage(code);
   };
 

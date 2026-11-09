@@ -180,24 +180,40 @@ export const MoviesGrid = styled.div`
 `;
 
 export const MovieCard = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background-color: var(--bg-card);
   border-radius: 16px;
+  padding: 1.5px;
+  background: radial-gradient(
+    220px circle at var(--cursor-x, var(--cx, -500px)) var(--cursor-y, var(--cy, -500px)),
+    rgba(255, 83, 90, calc(var(--border-glow-opacity, var(--o, 0)) * 0.95)),
+    rgba(255, 185, 85, calc(var(--border-glow-opacity, var(--o, 0)) * 0.5)) 40%,
+    transparent 70%
+  ), rgba(255, 255, 255, 0.07);
   box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   cursor: pointer;
   will-change: transform;
   transform-style: preserve-3d;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: box-shadow 0.3s ease;
 
   &:hover {
-    box-shadow: 0px 16px 40px rgba(255, 185, 85, 0.16), 0 0 24px rgba(255, 83, 90, 0.12);
-    border-color: rgba(255, 185, 85, 0.45);
+    box-shadow: 0px 16px 40px rgba(255, 185, 85, 0.16), 0 0 24px rgba(255, 83, 90, 0.15);
   }
+`;
+
+export const MovieCardInner = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border-radius: 14.5px;
+  background-color: var(--bg-card);
+  overflow: hidden;
 `;
 
 export const PosterContainer = styled.div`

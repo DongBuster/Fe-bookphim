@@ -1,6 +1,6 @@
 // Disable styled-components speedy mode in production for React 19 hydration stability
 if (typeof window !== 'undefined') {
-  (window as any).SC_DISABLE_SPEEDY = true;
+  (window as unknown as { SC_DISABLE_SPEEDY?: boolean }).SC_DISABLE_SPEEDY = true;
 }
 
 // Styles

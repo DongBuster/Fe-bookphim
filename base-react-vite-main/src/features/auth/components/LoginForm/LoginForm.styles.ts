@@ -2,14 +2,14 @@ import styled from 'styled-components';
 
 export const RightPanel = styled.div`
   background: #171618;
-  padding: 44px 48px;
+  padding: 24px 36px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   min-width: 0;
 
   @media (max-width: 600px) {
-    padding: 32px 20px;
+    padding: 20px 16px;
   }
 `;
 
@@ -38,10 +38,10 @@ export const GateBadge = styled.div`
 
 export const FormTitle = styled.h2`
   font-family: 'Be Vietnam Pro', sans-serif;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   color: #ffffff;
-  margin: 4px 0 0 0;
+  margin: 2px 0 0 0;
   letter-spacing: -0.3px;
 `;
 
@@ -63,11 +63,11 @@ export const TabSwitchWrapper = styled.div`
   align-items: center;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 4px;
+  border-radius: 10px;
+  padding: 3px;
   gap: 4px;
-  margin-top: 18px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 12px;
 `;
 
 export const TabButton = styled.button<{ $isActive: boolean }>`
@@ -97,8 +97,8 @@ export const TabButton = styled.button<{ $isActive: boolean }>`
 export const FieldGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 4px;
+  margin-bottom: 10px;
 `;
 
 export const FieldLabelRow = styled.div`
@@ -138,9 +138,9 @@ export const InputBox = styled.div`
   align-items: center;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 0 14px;
-  height: 46px;
+  border-radius: 10px;
+  padding: 0 12px;
+  height: 42px;
   gap: 10px;
   transition: all 0.2s ease;
 

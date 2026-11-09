@@ -1,4 +1,4 @@
-import { forwardRef, useState, useEffect } from 'react';
+import { forwardRef, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, MapPin, ExternalLink, ChevronDown } from 'lucide-react';
 import { isFeatureEnabled } from '@/config/features.config';
@@ -56,32 +56,24 @@ export const ShowtimePicker = forwardRef<HTMLDivElement, ShowtimePickerProps>(
   ) => {
     const { t } = useTranslation();
 
-    // Default active cinema to the first available or currently selected cinema
-    const [activeCinemaId, setActiveCinemaId] = useState<string | number>(() => {
-      if (selectedSlot?.cinema?.id) return selectedSlot.cinema.id;
-      if (cinemas.length > 0) return cinemas[0].id;
-      return '';
-    });
+    // Default active cinema to user selection, selected slot or first available cinema
+    const [selectedCinemaId, setSelectedCinemaId] = useState<string | number | null>(null);
 
-    // Ensure activeCinemaId stays valid when cinemas list updates (e.g., search/city change)
-    useEffect(() => {
-      if (cinemas.length > 0) {
-        const exists = cinemas.some((c) => c.id === activeCinemaId);
-        if (!exists) {
-          setActiveCinemaId(cinemas[0].id);
-        }
+    const activeCinema = useMemo(() => {
+      if (selectedCinemaId !== null) {
+        if (selectedCinemaId === '') return null;
+        const found = cinemas.find((c) => c.id === selectedCinemaId);
+        if (found) return found;
       }
-    }, [cinemas, activeCinemaId]);
-
-    // Keep active cinema synced when a slot is chosen
-    useEffect(() => {
       if (selectedSlot?.cinema?.id) {
-        setActiveCinemaId(selectedSlot.cinema.id);
+        const found = cinemas.find((c) => c.id === selectedSlot.cinema.id);
+        if (found) return found;
       }
-    }, [selectedSlot?.cinema?.id]);
+      return cinemas[0] || null;
+    }, [cinemas, selectedCinemaId, selectedSlot]);
 
-    const activeCinema =
-      cinemas.find((c) => c.id === activeCinemaId) || cinemas[0] || null;
+    const activeCinemaId = activeCinema?.id ?? '';
+    const setActiveCinemaId = setSelectedCinemaId;
 
     const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       onSelectCity(e.target.value);

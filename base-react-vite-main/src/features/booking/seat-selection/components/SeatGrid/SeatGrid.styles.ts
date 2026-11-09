@@ -233,3 +233,61 @@ export const SweetboxCouple = styled.button<{
     `;
   }}
 `;
+
+export const SeatPreviewTooltip = styled.div`
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(18, 17, 24, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 185, 85, 0.4);
+  border-radius: 8px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(255, 185, 85, 0.2);
+
+  .seat-code {
+    font-size: 11px;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .seat-type-tag {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .seat-price {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--secondary, #ffb955);
+  }
+  .seat-angle-score {
+    font-size: 9.5px;
+    color: #a0aec0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(18, 17, 24, 0.95);
+  }
+`;

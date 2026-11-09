@@ -129,6 +129,14 @@ export const refundTicketApi = async (
   return res as TicketRefundResponseData;
 };
 
+export const DEFAULT_ACTIVE_SHOWTIME_ID = '5458e3dd-b719-4a76-a9df-904be8fcf493';
+
+export const isValidUUID = (id?: string | null): boolean =>
+  Boolean(id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+
+export const sanitizeShowtimeId = (id?: string | null): string =>
+  isValidUUID(id) ? (id as string) : DEFAULT_ACTIVE_SHOWTIME_ID;
+
 /**
  * Lấy sơ đồ ghế và trạng thái các ghế (AVAILABLE, LOCKED, BOOKED) của một suất chiếu
  * Endpoint: GET /api/v1/showtimes/{showtimeId}/seatmap
@@ -137,7 +145,8 @@ export const getSeatMapApi = async (
   showtimeId: string,
   lockToken?: string | null,
 ): Promise<SeatMapDto> => {
-  const res = (await axiosClient.get(`/showtimes/${showtimeId}/seatmap`, {
+  const safeShowtimeId = sanitizeShowtimeId(showtimeId);
+  const res = (await axiosClient.get(`/showtimes/${safeShowtimeId}/seatmap`, {
     params: lockToken ? { lockToken } : undefined,
   })) as unknown as BaseResponse<SeatMapDto> | SeatMapDto;
 
@@ -155,8 +164,9 @@ export const lockSeatsApi = async (
   showtimeId: string,
   body: LockSeatsRequest,
 ): Promise<LockSeatsResponseData> => {
+  const safeShowtimeId = sanitizeShowtimeId(showtimeId);
   const res = (await axiosClient.post<BaseResponse<LockSeatsResponseData>>(
-    `/showtimes/${showtimeId}/seats/lock`,
+    `/showtimes/${safeShowtimeId}/seats/lock`,
     body,
   )) as unknown as BaseResponse<LockSeatsResponseData>;
 
@@ -171,8 +181,9 @@ export const unlockSeatsApi = async (
   showtimeId: string,
   body: UnlockSeatsRequest,
 ): Promise<boolean> => {
+  const safeShowtimeId = sanitizeShowtimeId(showtimeId);
   const res = (await axiosClient.post<BaseResponse<boolean>>(
-    `/showtimes/${showtimeId}/seats/unlock`,
+    `/showtimes/${safeShowtimeId}/seats/unlock`,
     body,
   )) as unknown as BaseResponse<boolean>;
 

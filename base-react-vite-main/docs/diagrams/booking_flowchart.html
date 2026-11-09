@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PHIMBOOK - Lưu Đồ Quy Trình Nghiệp Vụ Đặt Vé & Khóa Ghế Realtime</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0B0B0C;
+      --surface: #18181B;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --primary: #FF535A;
+      --accent: #FFB955;
+      --purple: #A855F7;
+      --green: #22C55E;
+      --blue: #38BDF8;
+      --border: rgba(255, 255, 255, 0.1);
+      --font-sans: 'Be Vietnam Pro', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      max-width: 900px;
+      margin-bottom: 30px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 185, 85, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(255, 185, 85, 0.3);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #FFFFFF;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .diagram-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      padding: 24px;
+      max-width: 1000px;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">Lưu Đồ Nghiệp Vụ • Booking Flow</div>
+    <h1>Quy Trình Đặt Vé, Khóa Ghế 10 Phút & Soát Vé Turnstile</h1>
+    <p class="subtitle">Mô hình hóa chuỗi quyết định logic từ bước Chọn suất chiếu bí ẩn đến Check-in tự động tại rạp chiếu</p>
+  </header>
+
+  <div class="diagram-container">
+    <svg viewBox="0 0 920 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="flow-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#94A3B8"/>
+        </marker>
+        <marker id="flow-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#FF535A"/>
+        </marker>
+        <marker id="flow-arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#22C55E"/>
+        </marker>
+      </defs>
+
+      <!-- Step 1: Start -->
+      <g transform="translate(360, 20)">
+        <rect width="200" height="50" rx="25" fill="#222124" stroke="#94A3B8" stroke-width="1.5"/>
+        <text x="100" y="30" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">Bắt Đầu: Chọn Phim & Suất</text>
+      </g>
+
+      <!-- Arrow 1 -> Decision Suất bí ẩn -->
+      <path d="M 460 70 L 460 110" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#flow-arrow)"/>
+
+      <!-- Decision 1: Suất chiếu bí ẩn? -->
+      <g transform="translate(360, 110)">
+        <polygon points="100,0 200,45 100,90 0,45" fill="#18181B" stroke="#A855F7" stroke-width="1.5"/>
+        <text x="100" y="42" fill="#A855F7" font-size="12" font-weight="700" text-anchor="middle">Suất Bí Ẩn</text>
+        <text x="100" y="58" fill="#CBD5E1" font-size="10" text-anchor="middle">(> 22:00)?</text>
+      </g>
+
+      <!-- Branch: Yes (Mystery Discount) -->
+      <path d="M 560 155 L 680 155 L 680 220" stroke="#A855F7" stroke-width="1.5" marker-end="url(#flow-arrow)"/>
+      <text x="610" y="145" fill="#A855F7" font-size="11" font-weight="600">ĐÚNG</text>
+      <g transform="translate(580, 220)">
+        <rect width="200" height="60" rx="8" fill="rgba(168,85,247,0.15)" stroke="#A855F7" stroke-width="1.2"/>
+        <text x="100" y="28" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">Áp Dụng Giảm 40%</text>
+        <text x="100" y="46" fill="#A855F7" font-size="10" text-anchor="middle">🔮 Giữ kín tên phim đến giờ chiếu</text>
+      </g>
+
+      <!-- Branch: No -->
+      <path d="M 460 200 L 460 220" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#flow-arrow)"/>
+      <text x="470" y="212" fill="#94A3B8" font-size="11" font-weight="600">SAI</text>
+
+      <!-- Join to Seat Selection -->
+      <path d="M 680 280 L 680 300 L 460 300" stroke="#94A3B8" stroke-width="1.2"/>
+      <path d="M 460 220 L 460 320" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#flow-arrow)"/>
+
+      <!-- Step 2: Sơ đồ ghế -->
+      <g transform="translate(360, 320)">
+        <rect width="200" height="60" rx="8" fill="#222124" stroke="#FF535A" stroke-width="1.4"/>
+        <text x="100" y="26" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">Sơ Đồ Ghế Cong</text>
+        <text x="100" y="44" fill="#FF535A" font-size="11" text-anchor="middle">Gửi POST /seats/lock</text>
+      </g>
+
+      <!-- Arrow to Decision Lock -->
+      <path d="M 460 380 L 460 410" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#flow-arrow)"/>
+
+      <!-- Decision 2: Ghế trống? -->
+      <g transform="translate(360, 410)">
+        <polygon points="100,0 200,40 100,80 0,40" fill="#18181B" stroke="#FF535A" stroke-width="1.5"/>
+        <text x="100" y="38" fill="#FF535A" font-size="12" font-weight="700" text-anchor="middle">Redis Khóa Ghế</text>
+        <text x="100" y="52" fill="#CBD5E1" font-size="10" text-anchor="middle">Thành Công?</text>
+      </g>
+
+      <!-- Seat Conflict Branch -->
+      <path d="M 360 450 L 180 450 L 180 350 L 350 350" stroke="#FF535A" stroke-width="1.4" marker-end="url(#flow-arrow-red)"/>
+      <text x="240" y="440" fill="#FF535A" font-size="11" font-weight="600">THẤT BẠI (Ghế đã giữ)</text>
+      <g transform="translate(70, 385)">
+        <rect width="180" height="40" rx="6" fill="rgba(255,83,90,0.15)" stroke="#FF535A" stroke-width="1"/>
+        <text x="90" y="24" fill="#FF535A" font-size="10" font-weight="600" text-anchor="middle">Báo lỗi & Refresh sơ đồ ghế</text>
+      </g>
+
+      <!-- Lock OK Branch -->
+      <path d="M 460 490 L 460 520" stroke="#22C55E" stroke-width="1.5" marker-end="url(#flow-arrow-green)"/>
+      <text x="470" y="508" fill="#22C55E" font-size="11" font-weight="600">THÀNH CÔNG</text>
+
+      <!-- Step 3: Đếm ngược 10 phút & Thanh toán -->
+      <g transform="translate(350, 520)">
+        <rect width="220" height="70" rx="8" fill="#222124" stroke="#FFB955" stroke-width="1.4"/>
+        <text x="110" y="24" fill="#FFFFFF" font-size="12" font-weight="700" text-anchor="middle">Booking Timer: 10:00 Phút</text>
+        <text x="110" y="42" fill="#FFB955" font-size="11" text-anchor="middle">Thêm Bắp Nước & Áp Voucher</text>
+        <text x="110" y="58" fill="#94A3B8" font-size="10" text-anchor="middle">MoMo • VNPAY • Quick-Pay</text>
+      </g>
+
+      <!-- Arrow to QR Pass -->
+      <path d="M 460 590 L 460 620" stroke="#94A3B8" stroke-width="1.5" marker-end="url(#flow-arrow)"/>
+
+      <!-- Step 4: Xuất vé QR & Turnstile Check-in -->
+      <g transform="translate(330, 620)">
+        <rect width="260" height="70" rx="12" fill="rgba(34,197,94,0.15)" stroke="#22C55E" stroke-width="1.5"/>
+        <text x="130" y="28" fill="#FFFFFF" font-size="13" font-weight="700" text-anchor="middle">Sinh Vé Điện Tử QR Code Ký HMAC</text>
+        <text x="130" y="48" fill="#22C55E" font-size="11" font-weight="600" text-anchor="middle">Soát Vé Tự Động Cổng Turnstile</text>
+        <text x="130" y="62" fill="#CBD5E1" font-size="10" text-anchor="middle">Check-in thành công • Chào mừng vào rạp</text>
+      </g>
+
+    </svg>
+  </div>
+
+</body>
+</html>

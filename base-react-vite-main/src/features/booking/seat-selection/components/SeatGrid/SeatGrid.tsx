@@ -1,4 +1,4 @@
-import { Fragment, useMemo, type FC } from 'react';
+import { Fragment, useMemo, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MoveHorizontal } from 'lucide-react';
 import { useBooking } from '../../../context/useBooking';
@@ -19,6 +19,8 @@ export const SeatGrid: FC<SeatGridProps> = ({
 }) => {
   const { t } = useTranslation();
   const { state } = useBooking();
+  // Lucian UX/UI Prompt #106 & #278 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#106
+  const [hoveredSeatId, setHoveredSeatId] = useState<string | number | null>(null);
 
   // Group seats by row label (A, B, C, ...)
   const rows = useMemo(() => {
@@ -120,16 +122,11 @@ export const SeatGrid: FC<SeatGridProps> = ({
                           return seat.seatNumber;
                         };
 
-                        const getTooltip = () => {
-                          if (seat.status === 'BOOKED')
-                            return t('booking:seat_tooltip_booked', { seat: seatLabel });
-                          if (
-                            seat.status === 'LOCKED' &&
-                            !seat.isLockedByCurrentUser
-                          )
-                            return t('booking:seat_tooltip_locked', { seat: seatLabel });
-                          return `${seatLabel} • ${seat.seatType?.toUpperCase()} • ${seat.price.toLocaleString('vi-VN')}đ`;
-                        };
+
+
+                        const isHovered = hoveredSeatId === (seat.seatId || seatLabel);
+                        const centerDist = Math.abs(seat.seatNumber - 6);
+                        const viewScore = Math.max(76, 99 - centerDist * 4);
 
                         return (
                           <S.SeatBox
@@ -139,7 +136,8 @@ export const SeatGrid: FC<SeatGridProps> = ({
                             $isSold={isSold}
                             disabled={isSold}
                             onClick={() => !isSold && onSeatClick(seat)}
-                            title={getTooltip()}
+                            onPointerEnter={() => !isSold && setHoveredSeatId(seat.seatId || seatLabel)}
+                            onPointerLeave={() => setHoveredSeatId(null)}
                             role="button"
                             tabIndex={isSold ? -1 : 0}
                             aria-label={`${seatLabel}, ${seat.seatType || 'Ghế'}, ${isSold ? 'Đã bán' : isSelected ? 'Đang chọn' : 'Còn trống'}`}
@@ -152,6 +150,39 @@ export const SeatGrid: FC<SeatGridProps> = ({
                             }}
                           >
                             {getDisplayContent()}
+                            {isHovered && !isSold && (
+                              <S.SeatPreviewTooltip>
+                                <div className="seat-code">
+                                  <span>{seatLabel}</span>
+                                  <span
+                                    className="seat-type-tag"
+                                    style={{
+                                      background:
+                                        normalizedType === 'vip'
+                                          ? 'rgba(255, 185, 85, 0.2)'
+                                          : normalizedType === 'sweetbox'
+                                            ? 'rgba(255, 83, 90, 0.2)'
+                                            : 'rgba(255, 255, 255, 0.1)',
+                                      color:
+                                        normalizedType === 'vip'
+                                          ? '#ffb955'
+                                          : normalizedType === 'sweetbox'
+                                            ? '#ff9e9e'
+                                            : '#e2e8f0',
+                                    }}
+                                  >
+                                    {seat.seatType || 'Standard'}
+                                  </span>
+                                </div>
+                                <span className="seat-price">{seat.price.toLocaleString('vi-VN')}đ</span>
+                                <span className="seat-angle-score">
+                                  <span>Góc nhìn:</span>
+                                  <strong style={{ color: viewScore > 90 ? '#52B788' : '#FFB955' }}>
+                                    {viewScore}%
+                                  </strong>
+                                </span>
+                              </S.SeatPreviewTooltip>
+                            )}
                           </S.SeatBox>
                         );
                       })}

@@ -79,7 +79,7 @@ export const HeroSpotlight: FC = () => {
         y: 40,
         opacity: 0,
         duration: 0.8,
-        delay: 0.6,
+        delay: 1.3,
         ease: 'power3.out',
       });
     }

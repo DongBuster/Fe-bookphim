@@ -9,6 +9,8 @@ import {
   ChevronRight,
   Play,
   ListVideo,
+  Minimize2,
+  Maximize2,
 } from 'lucide-react';
 import * as S from './TrailerModal.styles';
 
@@ -43,7 +45,7 @@ export interface ParsedTrailerUrls {
  * - https://www.youtube.com/shorts/VIDEO_ID
  * Always returns https://www.youtube-nocookie.com/embed/VIDEO_ID?autoplay=1&rel=0&enablejsapi=1
  */
-export function formatYouTubeEmbedUrl(
+function formatYouTubeEmbedUrl(
   url?: string,
   autoplay = true,
 ): ParsedTrailerUrls {
@@ -103,17 +105,34 @@ export const TrailerModal: FC<TrailerModalProps> = ({
   }, [playlist, trailerUrl, title]);
 
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  // Lucian UX/UI Prompt #218 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#218
+  const [isDocked, setIsDocked] = useState(false);
+  const [prevOpen, setPrevOpen] = useState(isOpen);
 
-  // Sync index when modal opens or initialIndex changes
-  useEffect(() => {
-    if (isOpen) {
+  if (isOpen !== prevOpen) {
+    setPrevOpen(isOpen);
+    if (!isOpen) {
+      setIsDocked(false);
+    } else {
       const validIndex = Math.max(
         0,
         Math.min(initialIndex, Math.max(0, items.length - 1)),
       );
       setCurrentIndex(validIndex);
     }
-  }, [isOpen, initialIndex, items.length]);
+  }
+
+  // Auto-dock when scrolling down past 350px while trailer is active
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleScroll = () => {
+      if (window.scrollY > 350 && !isDocked) {
+        setIsDocked(true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isOpen, isDocked]);
 
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < items.length - 1;
@@ -166,14 +185,15 @@ export const TrailerModal: FC<TrailerModalProps> = ({
 
   const modalNode = (
     <S.TrailerModalOverlay
-      onClick={onClose}
+      $isDocked={isDocked}
+      onClick={isDocked ? undefined : onClose}
       role="dialog"
-      aria-modal="true"
+      aria-modal={!isDocked}
       aria-labelledby="trailer-modal-title"
     >
-      <S.ModalContainer onClick={handleContentClick}>
+      <S.ModalContainer $isDocked={isDocked} onClick={handleContentClick}>
         {/* Modal Header */}
-        <S.ModalHeaderBar>
+        <S.ModalHeaderBar $isDocked={isDocked}>
           <S.MovieInfoGroup>
             <div className="badge-row">
               <span className="trailer-tag">
@@ -199,7 +219,7 @@ export const TrailerModal: FC<TrailerModalProps> = ({
 
           <S.HeaderActions>
             {/* Playlist Step Navigation */}
-            {items.length > 1 && (
+            {!isDocked && items.length > 1 && (
               <div className="playlist-counter-pill">
                 <button
                   type="button"
@@ -229,7 +249,7 @@ export const TrailerModal: FC<TrailerModalProps> = ({
             )}
 
             {/* External YouTube Link */}
-            {watchUrl && (
+            {!isDocked && watchUrl && (
               <a
                 href={watchUrl}
                 target="_blank"
@@ -241,6 +261,17 @@ export const TrailerModal: FC<TrailerModalProps> = ({
                 <span>YouTube</span>
               </a>
             )}
+
+            {/* Dock / Undock Button (Lucian #218) */}
+            <button
+              type="button"
+              className="close-btn"
+              onClick={() => setIsDocked(!isDocked)}
+              title={isDocked ? t('movie:expand_player', 'Phóng to trailer') : t('movie:dock_mini_player', 'Thu nhỏ góc màn hình')}
+              aria-label={isDocked ? t('movie:expand_player', 'Phóng to trailer') : t('movie:dock_mini_player', 'Thu nhỏ góc màn hình')}
+            >
+              {isDocked ? <Maximize2 size={15} /> : <Minimize2 size={15} />}
+            </button>
 
             {/* Close Button */}
             <button
@@ -307,7 +338,7 @@ export const TrailerModal: FC<TrailerModalProps> = ({
         </S.PlayerWrapper>
 
         {/* Playlist Strip for Consecutive Playback */}
-        {items.length > 1 && (
+        {!isDocked && items.length > 1 && (
           <S.PlaylistSection>
             <S.PlaylistHeader>
               <div className="playlist-title">

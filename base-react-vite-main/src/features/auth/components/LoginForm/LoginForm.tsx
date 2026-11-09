@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { message } from '@config/notification';
 import {
@@ -22,6 +22,7 @@ import {
 import tokenManager from '@shared/utils/tokenManager';
 import { isFeatureEnabled } from '@/config/features.config';
 import { loginApi, registerApi } from '@features/auth/api/auth.api';
+import { FoxMascot } from '@/shared/components/mascot';
 import * as S from './LoginForm.styles';
 
 export const LoginForm: FC = () => {
@@ -29,11 +30,13 @@ export const LoginForm: FC = () => {
   const navigate = useNavigate();
 
   // Mode: Đăng nhập hoặc Đăng ký
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [isRegisterMode, setIsRegisterMode] = useState(searchParams.get('mode') === 'register');
 
   // Mặc định chọn tab email vì backend hỗ trợ email/password
   const [activeTab, setActiveTab] = useState<'phone' | 'email'>('email');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Form states
@@ -203,17 +206,16 @@ export const LoginForm: FC = () => {
   return (
     <S.RightPanel>
       <div>
+        {/* Interactive Fox Mascot (koboyo.com/page-mascot) */}
+        <FoxMascot
+          isPasswordFocused={isPasswordFocused}
+          isPasswordVisible={isPasswordVisible}
+          isRegisterMode={isRegisterMode}
+          size={88}
+        />
+
         {/* Header Form */}
         <S.FormTopHeader>
-          <S.GateBadge>
-            <Ticket size={12} />
-            <span>
-              {isRegisterMode
-                ? t('auth:gate_badge_register')
-                : t('auth:gate_badge_login')}
-            </span>
-          </S.GateBadge>
-
           <S.FormTitle>
             {isRegisterMode ? t('auth:register_title') : t('auth:welcome_back')}
           </S.FormTitle>
@@ -222,7 +224,7 @@ export const LoginForm: FC = () => {
               ? t('auth:register_subtitle_desc')
               : t('auth:login_subtitle_desc')}
             {' '}
-            <span className="gold-highlight">CinePass VIP</span>.
+            <span className="gold-highlight">PhimBook</span>.
           </S.FormSubtitle>
         </S.FormTopHeader>
 
@@ -344,6 +346,12 @@ export const LoginForm: FC = () => {
                 }
                 value={credential}
                 onChange={handleCredentialChange}
+                onFocus={() => {
+                  if (isRegisterMode || activeTab !== 'phone') {
+                    setIsPasswordFocused(true);
+                  }
+                }}
+                onBlur={() => setIsPasswordFocused(false)}
                 required
               />
               <button

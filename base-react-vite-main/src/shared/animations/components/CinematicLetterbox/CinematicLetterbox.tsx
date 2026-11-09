@@ -9,6 +9,10 @@ interface CinematicLetterboxProps {
   onComplete?: () => void;
 }
 
+// In-memory flag: Tự động reset về false khi người dùng F5 hoặc Ctrl + F5 (Full Page Reload),
+// đồng thời giữ nguyên true khi chuyển đổi qua lại giữa các trang trong ứng dụng SPA để không bị lặp lại.
+let hasPlayedInSpaSession = false;
+
 /**
  * WOW #1: Cinematic Letterbox Opening Overlay
  * Dramatic opening curtain that splits vertically, simulating the theatre
@@ -18,75 +22,83 @@ export const CinematicLetterbox: FC<CinematicLetterboxProps> = ({
   forcePlay = false,
   onComplete,
 }) => {
-  const [isDone, setIsDone] = useState(false);
+  const shouldSkip =
+    (!forcePlay && hasPlayedInSpaSession) ||
+    (!forcePlay && typeof navigator !== 'undefined' && /HeadlessChrome/.test(navigator.userAgent)) ||
+    (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const [isDone, setIsDone] = useState(shouldSkip);
   const containerRef = useRef<HTMLDivElement>(null);
   const topBarRef = useRef<HTMLDivElement>(null);
   const bottomBarRef = useRef<HTMLDivElement>(null);
   const brandingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Check if already played in this browser session (safe check for Safari Private Mode)
-    let hasPlayed: string | null = null;
-    try {
-      hasPlayed = sessionStorage.getItem('phimbook_letterbox_shown');
-    } catch {
-      // Ignore sessionStorage security error in sandboxed or private browsing
-    }
-    const isHeadless = /HeadlessChrome/.test(navigator.userAgent);
-    if ((hasPlayed || isHeadless) && !forcePlay) {
-      setIsDone(true);
+    if (shouldSkip) {
       return;
     }
 
-    // Check reduced motion preference
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setIsDone(true);
-      return;
+    // Đánh dấu đã chạy cho phiên SPA hiện tại
+    hasPlayedInSpaSession = true;
+
+    // Dọn dẹp cờ sessionStorage cũ nếu có để luôn kích hoạt lại mượt mà khi F5 / Ctrl + F5
+    try {
+      sessionStorage.removeItem('phimbook_letterbox_shown');
+    } catch {
+      // Ignore private mode write restriction
     }
 
     const tl = gsap.timeline({
       onComplete: () => {
-        try {
-          sessionStorage.setItem('phimbook_letterbox_shown', 'true');
-        } catch {
-          // Ignore private mode write restriction
-        }
         setIsDone(true);
         onComplete?.();
       },
     });
 
-    // 1. Hold suspense for 0.25s
-    tl.to({}, { duration: 0.25 });
-
-    // 2. Branding pulses and fades out
+    // 1. Hiệu ứng thương hiệu xuất hiện trang trọng & giữ nhịp hồi hộp điện ảnh (Cinematic Suspense)
     if (brandingRef.current) {
+      tl.fromTo(
+        brandingRef.current,
+        { opacity: 0, scale: 0.94 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.65,
+          ease: 'power2.out',
+        },
+      );
+      // Giữ nhịp để người dùng cảm nhận trọn vẹn thương hiệu PhimBook
+      tl.to({}, { duration: 0.65 });
+
+      // 2. Logo tan dần vào không gian rạp trước khi mở màn trập
       tl.to(brandingRef.current, {
         opacity: 0,
-        scale: 0.94,
-        duration: 0.35,
+        scale: 1.05,
+        duration: 0.55,
         ease: 'power2.in',
       });
+    } else {
+      tl.to({}, { duration: 0.9 });
     }
 
-    // 3. Top and bottom letterbox curtains split dramatically
+    // 3. Màn trập trên & dưới tách ra uyển chuyển, chậm rãi hơn tạo cảm giác màn chiếu IMAX mở ra
     if (topBarRef.current && bottomBarRef.current) {
       tl.to(
         topBarRef.current,
         {
           yPercent: -100,
-          duration: 0.95,
-          ease: 'power4.inOut',
+          duration: 1.55,
+          ease: 'power3.inOut',
         },
-        '-=0.1',
+        '-=0.15',
       );
 
       tl.to(
         bottomBarRef.current,
         {
           yPercent: 100,
-          duration: 0.95,
-          ease: 'power4.inOut',
+          duration: 1.55,
+          ease: 'power3.inOut',
         },
         '<',
       );
@@ -94,13 +106,13 @@ export const CinematicLetterbox: FC<CinematicLetterboxProps> = ({
 
     const fallbackTimer = setTimeout(() => {
       setIsDone(true);
-    }, 2200);
+    }, 3800);
 
     return () => {
       clearTimeout(fallbackTimer);
       tl.kill();
     };
-  }, [forcePlay, onComplete]);
+  }, [forcePlay, onComplete, shouldSkip]);
 
   if (isDone) return null;
 

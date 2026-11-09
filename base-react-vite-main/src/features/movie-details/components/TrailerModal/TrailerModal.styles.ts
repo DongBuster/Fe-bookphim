@@ -29,56 +29,64 @@ const pulseGlow = keyframes`
   }
 `;
 
-export const TrailerModalOverlay = styled.div`
+export const TrailerModalOverlay = styled.div<{ $isDocked?: boolean }>`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: ${({ $isDocked }) => ($isDocked ? 'transparent' : 'rgba(0, 0, 0, 0.88)')};
+  backdrop-filter: ${({ $isDocked }) => ($isDocked ? 'none' : 'blur(16px)')};
+  -webkit-backdrop-filter: ${({ $isDocked }) => ($isDocked ? 'none' : 'blur(16px)')};
   z-index: 99999;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  overflow-y: auto;
+  align-items: ${({ $isDocked }) => ($isDocked ? 'flex-end' : 'center')};
+  justify-content: ${({ $isDocked }) => ($isDocked ? 'flex-end' : 'center')};
+  padding: ${({ $isDocked }) => ($isDocked ? '0 24px 24px 0' : '24px')};
+  pointer-events: ${({ $isDocked }) => ($isDocked ? 'none' : 'auto')};
+  overflow-y: ${({ $isDocked }) => ($isDocked ? 'visible' : 'auto')};
   animation: ${fadeIn} 0.25s ease-out;
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
 
   @media (max-width: 768px) {
-    padding: 12px;
+    padding: ${({ $isDocked }) => ($isDocked ? '0 12px 12px 0' : '12px')};
   }
 `;
 
-export const ModalContainer = styled.div`
+export const ModalContainer = styled.div<{ $isDocked?: boolean }>`
   position: relative;
   width: 100%;
-  max-width: 1060px;
-  max-height: calc(100vh - 48px);
+  max-width: ${({ $isDocked }) => ($isDocked ? '340px' : '1060px')};
+  max-height: ${({ $isDocked }) => ($isDocked ? '240px' : 'calc(100vh - 48px)')};
   background: #0f0e13;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.95),
-    0 0 40px rgba(255, 83, 90, 0.15);
+  border-radius: ${({ $isDocked }) => ($isDocked ? '16px' : '20px')};
+  border: 1px solid ${({ $isDocked }) => ($isDocked ? 'rgba(255, 83, 90, 0.4)' : 'rgba(255, 255, 255, 0.12)')};
+  box-shadow: ${({ $isDocked }) =>
+    $isDocked
+      ? '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 83, 90, 0.25)'
+      : '0 30px 80px rgba(0, 0, 0, 0.95), 0 0 40px rgba(255, 83, 90, 0.15)'};
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  pointer-events: auto;
+  transition: max-width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              max-height 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              border-radius 0.3s ease,
+              box-shadow 0.3s ease;
   animation: ${scaleUp} 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 
   @media (max-width: 768px) {
     border-radius: 14px;
-    max-height: calc(100vh - 24px);
+    max-height: ${({ $isDocked }) => ($isDocked ? '220px' : 'calc(100vh - 24px)')};
   }
 `;
 
-export const ModalHeaderBar = styled.div`
+export const ModalHeaderBar = styled.div<{ $isDocked?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
+  padding: ${({ $isDocked }) => ($isDocked ? '8px 12px' : '14px 20px')};
   background: rgba(18, 17, 24, 0.96);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: ${({ $isDocked }) => ($isDocked ? '8px' : '14px')};
+  flex-wrap: ${({ $isDocked }) => ($isDocked ? 'nowrap' : 'wrap')};
 
   @media (max-width: 640px) {
     padding: 10px 14px;

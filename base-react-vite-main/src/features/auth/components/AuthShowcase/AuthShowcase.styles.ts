@@ -2,11 +2,11 @@ import styled from 'styled-components';
 
 export const LeftPanel = styled.div`
   position: relative;
-  padding: 40px;
+  padding: 28px 36px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 720px;
+  min-height: 560px;
   background-color: #0d0c0f;
   background-image:
     radial-gradient(

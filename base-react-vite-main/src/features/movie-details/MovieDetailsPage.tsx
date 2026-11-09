@@ -53,10 +53,20 @@ export const MovieDetailsPage: FC = () => {
   });
 
   const [selectedCity, setSelectedCity] = useSelectedCity();
+
+  // Chuẩn hóa slug thành phố sang tên tiếng Việt có dấu chuẩn cho Backend ASP.NET Core
+  const backendCity = useMemo(() => {
+    if (!selectedCity) return 'Hồ Chí Minh';
+    const lower = selectedCity.toLowerCase();
+    if (lower.includes('ha-noi') || lower.includes('hanoi')) return 'Hà Nội';
+    if (lower.includes('da-nang') || lower.includes('danang')) return 'Đà Nẵng';
+    return 'Hồ Chí Minh';
+  }, [selectedCity]);
+
   // 2. Dùng ID của phim để gọi tiếp API Lịch Chiếu (Dependent Query)
   const { data: apiShowtimes } = useQuery<TheaterShowtimesGroupDto[]>({
-    queryKey: ['showtimes', apiMovie?.id, selectedCity],
-    queryFn: () => getShowtimesApi({ MovieId: apiMovie?.id, City: selectedCity }),
+    queryKey: ['showtimes', apiMovie?.id, backendCity],
+    queryFn: () => getShowtimesApi({ MovieId: apiMovie?.id, City: backendCity }),
     enabled: Boolean(apiMovie?.id),
     staleTime: 2 * 60 * 1000,
   });
@@ -102,34 +112,44 @@ export const MovieDetailsPage: FC = () => {
       return getCinemasScheduleByMovieAndCity(effectiveSlug, selectedCity);
     }
 
-    return apiShowtimes.map((theater) => ({
-      id: theater.theaterId,
-      name: theater.theaterName,
-      badge: theater.chainName || 'VIP Lounge',
-      address: theater.address,
-      distance: theater.distanceKm
-        ? t('movie:distance_km', { distance: theater.distanceKm })
-        : t('movie:nearby'),
-      formats: [
-        {
-          formatName: theater.showtimes[0]?.format || '2D KỸ THUẬT SỐ',
-          roomDetails: theater.showtimes[0]?.auditoriumName || 'Phòng chiếu #01',
-          slots: theater.showtimes.map((s) => ({
-            id: s.showtimeId,
-            time: new Date(s.startTime).toLocaleTimeString('vi-VN', {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            }),
-            statusText: t('movie:on_sale'),
-            priceText: `${Math.round(s.basePrice / 1000)}k`,
-            price: s.basePrice,
-            isMystery: s.isMysteryShowtime,
-            mysteryDiscount: s.mysteryDiscountRate,
-          })),
-        },
-      ],
-    }));
+    return apiShowtimes.map((theater) => {
+      // Nhóm suất chiếu thật theo phòng và định dạng chiếu (IMAX, Dolby Cinema, 2D)
+      const formatMap = new Map<string, typeof theater.showtimes>();
+      theater.showtimes.forEach((st) => {
+        const key = `${st.format || '2D'} - ${st.auditoriumName || 'Phòng chiếu'}`;
+        if (!formatMap.has(key)) formatMap.set(key, []);
+        formatMap.get(key)!.push(st);
+      });
+
+      const formats: ScreenFormatGroup[] = Array.from(formatMap.entries()).map(([, stList]) => ({
+        formatName: stList[0]?.format || '2D KỸ THUẬT SỐ',
+        roomDetails: stList[0]?.auditoriumName || 'Phòng chiếu #01',
+        slots: stList.map((s) => ({
+          id: s.showtimeId, // REAL BACKEND GUID
+          time: new Date(s.startTime).toLocaleTimeString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          }),
+          statusText: t('movie:on_sale'),
+          priceText: `${Math.round((s.basePrice || 135000) / 1000)}k`,
+          price: s.basePrice || 135000,
+          isMystery: s.isMysteryShowtime,
+          mysteryDiscount: s.mysteryDiscountRate,
+        })),
+      }));
+
+      return {
+        id: theater.theaterId,
+        name: theater.theaterName,
+        badge: theater.chainName || 'VIP Lounge',
+        address: theater.address,
+        distance: theater.distanceKm
+          ? t('movie:distance_km', { distance: theater.distanceKm })
+          : t('movie:nearby'),
+        formats,
+      };
+    });
   }, [apiShowtimes, effectiveSlug, selectedCity, t]);
 
 
@@ -147,9 +167,11 @@ export const MovieDetailsPage: FC = () => {
   } | null>(null);
 
   // Invalidate selected slot when active city changes so user doesn't book a slot from another city
-  useEffect(() => {
+  const [prevCity, setPrevCity] = useState(selectedCity);
+  if (selectedCity !== prevCity) {
+    setPrevCity(selectedCity);
     setUserSelectedSlot(null);
-  }, [selectedCity]);
+  }
 
   const selectedSlot = useMemo(() => {
     if (userSelectedSlot) return userSelectedSlot;

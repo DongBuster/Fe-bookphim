@@ -1,4 +1,6 @@
-import type { FC } from 'react';
+import { useState, type FC } from 'react';
+import { ScratchTicketModal } from '@/shared/components/interactive/ScratchTicketModal';
+import { Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   ChevronRight,
@@ -15,6 +17,7 @@ import { useGSAP, gsap } from '@/shared/animations';
 export const ExclusiveOffers: FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [isScratchModalOpen, setIsScratchModalOpen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -87,10 +90,26 @@ export const ExclusiveOffers: FC = () => {
             <S.HeaderSubtitle>{t('home:offers.subtitle')}</S.HeaderSubtitle>
             <S.HeaderTitle>{t('home:offers.title')}</S.HeaderTitle>
           </S.HeaderTextGroup>
-          <S.HeaderButton className="group" onClick={handleNavigateExplore}>
-            <S.HeaderButtonText>{t('home:offers.view_all_btn')}</S.HeaderButtonText>
-            <ChevronRight color="#FFB3B0" size={14} />
-          </S.HeaderButton>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <S.HeaderButton
+              type="button"
+              onClick={() => setIsScratchModalOpen(true)}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,83,90,0.18), rgba(255,185,85,0.18))',
+                borderColor: 'rgba(255,185,85,0.45)',
+                color: '#FFB955',
+              }}
+            >
+              <Sparkles size={14} color="#FFB955" />
+              <S.HeaderButtonText style={{ color: '#FFB955' }}>
+                {t('interactive:mystery_scratch', 'Vé Cào May Mắn')}
+              </S.HeaderButtonText>
+            </S.HeaderButton>
+            <S.HeaderButton className="group" onClick={handleNavigateExplore}>
+              <S.HeaderButtonText>{t('home:offers.view_all_btn')}</S.HeaderButtonText>
+              <ChevronRight color="#FFB3B0" size={14} />
+            </S.HeaderButton>
+          </div>
         </S.HeaderWrapper>
 
         {/* Promotional Cards Triplet */}
@@ -209,6 +228,10 @@ export const ExclusiveOffers: FC = () => {
           </S.GradientCardWrapper>
         </S.CardsGrid>
       </S.Container>
+      <ScratchTicketModal
+        isOpen={isScratchModalOpen}
+        onClose={() => setIsScratchModalOpen(false)}
+      />
     </S.ExclusiveOffersSection>
   );
 };

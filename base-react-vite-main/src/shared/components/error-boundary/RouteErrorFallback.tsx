@@ -30,9 +30,10 @@ export const RouteErrorFallback: FC = () => {
 
   console.error('[RouteErrorFallback] Router error caught:', error);
 
+  const routeErr = error as { statusText?: string; message?: string } | null | undefined;
   const errorMessage =
-    (error as any)?.statusText ||
-    (error as any)?.message ||
+    routeErr?.statusText ||
+    routeErr?.message ||
     t('common:error_desc', 'Ứng dụng gặp sự cố không mong muốn. Vui lòng tải lại hoặc về trang chủ.');
 
   return (

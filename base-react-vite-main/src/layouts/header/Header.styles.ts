@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { media } from '@/styles/breakpoints';
 
-export const OuterHeader = styled.header`
+export const OuterHeader = styled.header<{ $isVisible?: boolean; $isSolid?: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -9,14 +9,38 @@ export const OuterHeader = styled.header`
   width: 100%;
   height: var(--header-public-height, 80px);
   z-index: 100;
-  background: rgba(14, 14, 15, 0.85);
+  background: ${({ $isSolid }) => ($isSolid ? 'rgba(11, 11, 12, 0.92)' : 'rgba(14, 14, 15, 0.85)')};
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0px 16px 40px -8px rgba(0, 0, 0, 0.7);
+  box-shadow: ${({ $isSolid }) =>
+    $isSolid
+      ? '0px 16px 40px -8px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 255, 255, 0.08)'
+      : '0px 16px 40px -8px rgba(0, 0, 0, 0.7)'};
+  transform: translateY(${({ $isVisible = true }) => ($isVisible ? '0' : '-100%')});
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, box-shadow 0.3s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 
   @media ${media.md} {
     height: var(--header-public-height, 68px);
   }
+`;
+
+export const ScrollProgressBar = styled.div<{ $isSolid: boolean }>`
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--scroll-p, 0));
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+  opacity: ${({ $isSolid }) => ($isSolid ? 1 : 0)};
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  will-change: transform;
 `;
 
 export const InnerContainer = styled.div`

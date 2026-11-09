@@ -136,9 +136,9 @@
     "logout": "Sign Out"
   },
   "auth": {
-    "login_title": "VIP Sign In",
+    "login_title": "Sign In",
     "login_subtitle": "Sign in to experience luxury cinematic privileges",
-    "register_title": "VIP Member Registration",
+    "register_title": "Create an Account",
     "tab_phone": "Phone Number",
     "tab_email": "Email / Password",
     "phone_label": "Ticket Phone Number",
@@ -149,8 +149,8 @@
     "password_placeholder": "Enter your password...",
     "remember_me": "Remember me",
     "forgot_password": "Forgot password?",
-    "login_btn": "VIP Sign In",
-    "register_btn": "Create VIP Account",
+    "login_btn": "Sign In",
+    "register_btn": "Create Account",
     "no_account": "Don't have an account?",
     "have_account": "Already have an account?",
     "sign_in_now": "Sign in now",
@@ -163,7 +163,7 @@
       "password_required": "Please enter your password",
       "password_min": "Password must be at least 6 characters"
     },
-    "gate_badge_login": "VIP Access Portal",
+    "gate_badge_login": "Access Portal",
     "gate_badge_register": "Member Registration",
     "welcome_back": "Welcome Back",
     "login_subtitle_desc": "Sign in to enjoy luxury cinematic privileges with",

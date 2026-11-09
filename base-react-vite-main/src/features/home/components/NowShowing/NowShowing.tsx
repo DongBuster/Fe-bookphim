@@ -60,6 +60,7 @@ export const NowShowing: FC = () => {
     >
   >(new WeakMap());
 
+  // Lucian #228 Spotlight Glow + 3D Tilt: zero-reflow cursor tracking
   const handleCardPointerEnter = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType !== 'mouse') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -72,6 +73,7 @@ export const NowShowing: FC = () => {
     gsap.set(card, { transformPerspective: 900 });
     scale(1.025);
     card.style.willChange = 'transform';
+    card.style.setProperty('--border-glow-opacity', '1');
     cardTweens.current.set(card, { rect, rotX, rotY, scale });
   };
 
@@ -88,13 +90,20 @@ export const NowShowing: FC = () => {
     const rotateX = ((y - centerY) / centerY) * -6.5;
     const rotateY = ((x - centerX) / centerX) * 6.5;
 
+    // Update 3D tilt
     tracker.rotX(rotateX);
     tracker.rotY(rotateY);
+
+    // Update Lucian #228 spotlight border coordinates
+    card.style.setProperty('--cursor-x', `${x.toFixed(1)}px`);
+    card.style.setProperty('--cursor-y', `${y.toFixed(1)}px`);
+    card.style.setProperty('--border-glow-opacity', '1');
   };
 
   const handleCardPointerLeave = (e: React.PointerEvent<HTMLDivElement>) => {
     const card = e.currentTarget;
     cardTweens.current.delete(card);
+    card.style.setProperty('--border-glow-opacity', '0');
     gsap.to(card, {
       rotateX: 0,
       rotateY: 0,
@@ -308,6 +317,7 @@ export const NowShowing: FC = () => {
                   onPointerMove={handleCardPointerMove}
                   onPointerLeave={handleCardPointerLeave}
                 >
+                  <S.MovieCardInner>
                   {/* Poster Container */}
                   <S.PosterContainer>
                     {/* Image */}
@@ -367,6 +377,7 @@ export const NowShowing: FC = () => {
                       <S.BuyButtonText>{t('home:now_showing.buy_ticket')}</S.BuyButtonText>
                     </S.BuyButton>
                   </S.BottomInfoArea>
+                  </S.MovieCardInner>
                 </S.MovieCard>
               );
             })}

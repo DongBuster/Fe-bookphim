@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu as MenuIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,51 @@ const Header: FC<HeaderProps> = ({
   const location = useLocation();
   const [, setAuthTick] = useState(0);
 
+  // Lucian UX/UI Prompt #212 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#212
+  const [isVisible, setIsVisible] = useState(true);
+  const [isSolid, setIsSolid] = useState(false);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let acc = 0;
+    let rafId = 0;
+
+    const handleScroll = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        const currentY = window.scrollY;
+        const delta = currentY - lastY;
+        lastY = currentY;
+
+        acc = (delta > 0) === (acc > 0) ? acc + delta : delta;
+
+        setIsSolid(currentY > 20);
+
+        if (currentY < 60) {
+          setIsVisible(true);
+        } else if (acc > 12) {
+          setIsVisible(false);
+        } else if (acc < -8) {
+          setIsVisible(true);
+        }
+
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (docHeight > 0 && progressBarRef.current) {
+          const ratio = Math.min(1, Math.max(0, currentY / docHeight));
+          progressBarRef.current.style.setProperty('--scroll-p', ratio.toFixed(4));
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   const handleScrollOrNavigate = (sectionId: string) => {
     if (location.pathname === '/' || location.pathname === '/home') {
       const el = document.getElementById(sectionId);
@@ -50,7 +95,8 @@ const Header: FC<HeaderProps> = ({
   };
 
   return (
-    <S.OuterHeader>
+    <S.OuterHeader $isVisible={isVisible || isSidebarOpen} $isSolid={isSolid}>
+      <S.ScrollProgressBar ref={progressBarRef} $isSolid={isSolid} aria-hidden="true" />
       <S.InnerContainer>
         {/* Left Side: Logo + Navigation */}
         <S.NavLeftGroup>

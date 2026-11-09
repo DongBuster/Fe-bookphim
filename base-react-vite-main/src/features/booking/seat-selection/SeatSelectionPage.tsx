@@ -12,6 +12,8 @@ import {
   getSeatMapApi,
   lockSeatsApi,
   unlockSeatsApi,
+  sanitizeShowtimeId,
+  isValidUUID,
 } from '../api/booking.api';
 import { useBookingTimer } from '../hooks/useBookingTimer';
 import { ScreenView } from './components/ScreenView/ScreenView';
@@ -24,8 +26,6 @@ import { CinePartyModal } from '@/features/cineparty/components/CinePartyModal';
 import { CineMateWidget } from '@/features/cinemate/components/CineMateWidget';
 import { isFeatureEnabled } from '@/config/features.config';
 import * as S from './SeatSelectionPage.styles';
-
-const DEFAULT_ACTIVE_SHOWTIME_ID = '5458e3dd-b719-4a76-a9df-904be8fcf493';
 
 export const SeatSelectionPage: FC = () => {
   const { t } = useTranslation();
@@ -44,9 +44,8 @@ export const SeatSelectionPage: FC = () => {
   // 10-minute live countdown timer
   const { formattedTime, isExpired, setTimeLeft } = useBookingTimer(600);
 
-  // Determine current active showtime ID
-  const currentShowtimeId =
-    state.session.showtimeId || DEFAULT_ACTIVE_SHOWTIME_ID;
+  // Determine current active showtime ID (sanitize against non-UUID slot IDs)
+  const currentShowtimeId = sanitizeShowtimeId(state.session.showtimeId);
 
   // Fetch real-time seat map and seat statuses from Railway backend
   const {
@@ -68,6 +67,9 @@ export const SeatSelectionPage: FC = () => {
       const updatesToSession: Record<string, string> = {};
       const updatesToMovie: Record<string, string> = {};
 
+      if (!isValidUUID(state.session.showtimeId)) {
+        updatesToSession.showtimeId = currentShowtimeId;
+      }
       if (!currentRoom && seatMap.auditoriumName) {
         updatesToSession.room = seatMap.auditoriumName;
       }
@@ -82,7 +84,7 @@ export const SeatSelectionPage: FC = () => {
         setMovieAndSession(updatesToMovie, updatesToSession);
       }
     }
-  }, [seatMap, currentRoom, currentMovieTitle, setMovieAndSession]);
+  }, [seatMap, currentRoom, currentMovieTitle, state.session.showtimeId, currentShowtimeId, setMovieAndSession]);
 
   // Handle countdown expiration
   useEffect(() => {

@@ -1,4 +1,38 @@
-import type { FC } from 'react';
+import { useState, useEffect, useRef, type FC } from 'react';
+
+// Lucian UX/UI Prompt #278 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#278
+const RollingPrice: FC<{ value: number }> = ({ value }) => {
+  const [displayVal, setDisplayVal] = useState(value);
+  const prevRef = useRef(value);
+
+  useEffect(() => {
+    const start = prevRef.current;
+    const end = value;
+    if (start === end) return;
+    prevRef.current = end;
+
+    const duration = 280;
+    const startTime = performance.now();
+
+    let rafId: number;
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(start + (end - start) * eased);
+      setDisplayVal(current);
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(animate);
+      }
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, [value]);
+
+  return <>{displayVal.toLocaleString('vi-VN')}đ</>;
+};
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ShieldCheck, Gift } from 'lucide-react';
 import { useBooking } from '../../../context/useBooking';
@@ -105,7 +139,7 @@ export const SeatSummarySidebar: FC<SeatSummarySidebarProps> = ({
         <div className="pricing-calculation">
           <div className="calc-row">
             <span className="label">{t('booking:subtotal_seats')}</span>
-            <span className="val">{seatsTotal.toLocaleString('vi-VN')}đ</span>
+            <span className="val"><RollingPrice value={seatsTotal} /></span>
           </div>
           <div className="calc-row">
             <span className="label">{t('booking:convenience_fee')}</span>
@@ -119,7 +153,7 @@ export const SeatSummarySidebar: FC<SeatSummarySidebarProps> = ({
               </span>
             </div>
             <span className="total-amount">
-              {seatsTotal.toLocaleString('vi-VN')}đ
+              <RollingPrice value={seatsTotal} />
             </span>
           </div>
         </div>

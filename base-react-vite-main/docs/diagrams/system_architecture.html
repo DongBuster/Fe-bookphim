@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PHIMBOOK - Sơ Đồ Kiến Trúc Hệ Thống (Decoupled 3-Tier Architecture)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0B0B0C;
+      --surface: #18181B;
+      --surface-2: #27272A;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --primary: #FF535A;
+      --accent: #FFB955;
+      --purple: #A855F7;
+      --blue: #38BDF8;
+      --border: rgba(255, 255, 255, 0.1);
+      --font-sans: 'Be Vietnam Pro', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      max-width: 900px;
+      margin-bottom: 30px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 83, 90, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(255, 83, 90, 0.3);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #FFFFFF;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .diagram-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      padding: 24px;
+      max-width: 1100px;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">Kiến Trúc Hệ Thống • PHIMBOOK</div>
+    <h1>Mô Hình Phân Tầng Decoupled 3-Tier Architecture</h1>
+    <p class="subtitle">Trực quan hóa luồng dữ liệu giữa Trình duyệt khách hàng, Frontend SPA, Backend Clean Architecture, Redis Cache, PostgreSQL và Google Gemini AI</p>
+  </header>
+
+  <div class="diagram-container">
+    <svg viewBox="0 0 1000 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Gradients -->
+        <linearGradient id="primary-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FF535A" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#FF535A" stop-opacity="0.05"/>
+        </linearGradient>
+        <linearGradient id="purple-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#A855F7" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#A855F7" stop-opacity="0.05"/>
+        </linearGradient>
+        <linearGradient id="blue-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.05"/>
+        </linearGradient>
+        <linearGradient id="gold-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FFB955" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#FFB955" stop-opacity="0.05"/>
+        </linearGradient>
+
+        <!-- Arrow Markers -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#94A3B8"/>
+        </marker>
+        <marker id="arrow-primary" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#FF535A"/>
+        </marker>
+        <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38BDF8"/>
+        </marker>
+        <marker id="arrow-gold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#FFB955"/>
+        </marker>
+      </defs>
+
+      <!-- ZONES / REGIONS -->
+      <!-- Tier 1: Client & Presentation -->
+      <rect x="40" y="40" width="280" height="540" rx="14" fill="#1C1B1C" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>
+      <rect x="56" y="28" width="160" height="24" rx="4" fill="#0B0B0C" stroke="rgba(255,83,90,0.4)"/>
+      <text x="136" y="44" fill="#FF535A" font-size="11" font-weight="700" text-anchor="middle" font-family="'JetBrains Mono', monospace">TẦNG TRÌNH DIỄN (FE)</text>
+
+      <!-- Tier 2: Application & Core Services -->
+      <rect x="360" y="40" width="280" height="540" rx="14" fill="#1C1B1C" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>
+      <rect x="376" y="28" width="160" height="24" rx="4" fill="#0B0B0C" stroke="rgba(56,189,248,0.4)"/>
+      <text x="456" y="44" fill="#38BDF8" font-size="11" font-weight="700" text-anchor="middle" font-family="'JetBrains Mono', monospace">TẦNG NGHIỆP VỤ (BE)</text>
+
+      <!-- Tier 3: Data & Cloud Persistence -->
+      <rect x="680" y="40" width="280" height="540" rx="14" fill="#1C1B1C" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>
+      <rect x="696" y="28" width="160" height="24" rx="4" fill="#0B0B0C" stroke="rgba(255,185,85,0.4)"/>
+      <text x="776" y="44" fill="#FFB955" font-size="11" font-weight="700" text-anchor="middle" font-family="'JetBrains Mono', monospace">TẦNG DỮ LIỆU & AI</text>
+
+      <!-- CONNECTORS (Drawn first for clean z-index) -->
+      <!-- FE to BE API Gateway -->
+      <path d="M 290 120 L 390 120" stroke="#FF535A" stroke-width="1.8" marker-end="url(#arrow-primary)"/>
+      <text x="340" y="112" fill="#FF535A" font-size="10" font-weight="600" text-anchor="middle" font-family="'JetBrains Mono'">HTTPS / REST</text>
+
+      <path d="M 290 230 L 390 230" stroke="#38BDF8" stroke-width="1.8" marker-end="url(#arrow-blue)"/>
+      <text x="340" y="222" fill="#38BDF8" font-size="10" font-weight="600" text-anchor="middle" font-family="'JetBrains Mono'">JWT Bearer</text>
+
+      <!-- BE to Redis (Lock) -->
+      <path d="M 610 230 L 710 230" stroke="#FF535A" stroke-width="1.8" marker-end="url(#arrow-primary)"/>
+      <text x="660" y="222" fill="#FF535A" font-size="10" font-weight="600" text-anchor="middle" font-family="'JetBrains Mono'">Lock (TTL 10m)</text>
+
+      <!-- BE to PostgreSQL (EF Core) -->
+      <path d="M 610 340 L 710 340" stroke="#FFB955" stroke-width="1.8" marker-end="url(#arrow-gold)"/>
+      <text x="660" y="332" fill="#FFB955" font-size="10" font-weight="600" text-anchor="middle" font-family="'JetBrains Mono'">Npgsql / SQL</text>
+
+      <!-- BE to Google Gemini -->
+      <path d="M 610 450 L 710 450" stroke="#A855F7" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <text x="660" y="442" fill="#A855F7" font-size="10" font-weight="600" text-anchor="middle" font-family="'JetBrains Mono'">gRPC / JSON</text>
+
+      <!-- NODES: TIER 1 -->
+      <!-- Browser Client -->
+      <g transform="translate(60, 70)">
+        <rect width="240" height="90" rx="10" fill="#222124" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+        <text x="18" y="32" fill="#FFFFFF" font-size="14" font-weight="700">Trình Duyệt Khách Hàng</text>
+        <text x="18" y="52" fill="#94A3B8" font-size="11">Chrome, Brave, Safari, Edge, Mobile</text>
+        <rect x="18" y="62" width="90" height="18" rx="4" fill="rgba(255,83,90,0.15)"/>
+        <text x="63" y="75" fill="#FF535A" font-size="10" font-weight="600" text-anchor="middle">Cinema Noir</text>
+        <rect x="116" y="62" width="90" height="18" rx="4" fill="rgba(56,189,248,0.15)"/>
+        <text x="161" y="75" fill="#38BDF8" font-size="10" font-weight="600" text-anchor="middle">WCAG AAA</text>
+      </g>
+
+      <!-- React 19 SPA -->
+      <g transform="translate(60, 185)">
+        <rect width="240" height="110" rx="10" fill="url(#primary-glow)" stroke="#FF535A" stroke-width="1.4"/>
+        <text x="18" y="32" fill="#FFFFFF" font-size="14" font-weight="700">React 19 + TypeScript</text>
+        <text x="18" y="52" fill="#CBD5E1" font-size="11">• Vite 7.2 + Code Splitting</text>
+        <text x="18" y="70" fill="#CBD5E1" font-size="11">• TanStack React Query v5</text>
+        <text x="18" y="88" fill="#CBD5E1" font-size="11">• Ant Design 6 + Styled-Components</text>
+      </g>
+
+      <!-- Vercel Edge Hosting -->
+      <g transform="translate(60, 320)">
+        <rect width="240" height="80" rx="10" fill="#222124" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+        <text x="18" y="32" fill="#FFFFFF" font-size="14" font-weight="700">Vercel Edge Global CDN</text>
+        <text x="18" y="52" fill="#94A3B8" font-size="11">Tự động deploy CI/CD qua GitHub</text>
+        <text x="18" y="68" fill="#38BDF8" font-size="10" font-family="'JetBrains Mono'">bookmovie-gray.vercel.app</text>
+      </g>
+
+      <!-- Subsystems in FE -->
+      <g transform="translate(60, 425)">
+        <rect width="240" height="130" rx="10" fill="#18181B" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <text x="18" y="28" fill="#FFB955" font-size="12" font-weight="700">Tính Năng Đột Phá Độc Quyền</text>
+        <text x="18" y="50" fill="#CBD5E1" font-size="11">🔮 Suất chiếu bí ẩn (Mystery Night)</text>
+        <text x="18" y="70" fill="#CBD5E1" font-size="11">❤️ Ghép đôi gu solo (CineMate)</text>
+        <text x="18" y="90" fill="#CBD5E1" font-size="11">👥 Đặt vé nhóm chia tiền (CineParty)</text>
+        <text x="18" y="110" fill="#CBD5E1" font-size="11">🛂 Hộ chiếu 3D (CinePassport)</text>
+      </g>
+
+      <!-- NODES: TIER 2 -->
+      <!-- API Gateway -->
+      <g transform="translate(380, 70)">
+        <rect width="240" height="90" rx="10" fill="url(#blue-glow)" stroke="#38BDF8" stroke-width="1.4"/>
+        <text x="18" y="32" fill="#FFFFFF" font-size="14" font-weight="700">.NET 8 Web API Gateway</text>
+        <text x="18" y="52" fill="#CBD5E1" font-size="11">Tiền tố định tuyến: /api/v1/*</text>
+        <text x="18" y="70" fill="#94A3B8" font-size="10">Xử lý CORS, Rate Limit, ProblemDetails</text>
+      </g>
+
+      <!-- Clean Architecture -->
+      <g transform="translate(380, 185)">
+        <rect width="240" height="140" rx="10" fill="#222124" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+        <text x="18" y="30" fill="#FFFFFF" font-size="14" font-weight="700">Clean Architecture Core</text>
+        <rect x="18" y="44" width="204" height="20" rx="4" fill="rgba(56,189,248,0.1)"/>
+        <text x="26" y="58" fill="#38BDF8" font-size="10" font-weight="600">API Layer: Controllers & Filters</text>
+        <rect x="18" y="68" width="204" height="20" rx="4" fill="rgba(255,185,85,0.1)"/>
+        <text x="26" y="82" fill="#FFB955" font-size="10" font-weight="600">Application: Commands, Queries, DTOs</text>
+        <rect x="18" y="92" width="204" height="20" rx="4" fill="rgba(255,83,90,0.1)"/>
+        <text x="26" y="106" fill="#FF535A" font-size="10" font-weight="600">Domain: Entities & Business Rules</text>
+        <text x="18" y="126" fill="#94A3B8" font-size="10">Infrastructure: EF Core, Redis, Auth</text>
+      </g>
+
+      <!-- Booking Engine & Seat Locking -->
+      <g transform="translate(380, 345)">
+        <rect width="240" height="100" rx="10" fill="url(#primary-glow)" stroke="#FF535A" stroke-width="1.2"/>
+        <text x="18" y="30" fill="#FFFFFF" font-size="13" font-weight="700">Động Cơ Khóa Ghế Realtime</text>
+        <text x="18" y="50" fill="#CBD5E1" font-size="11">• Redis Distributed Lock (SETNX)</text>
+        <text x="18" y="68" fill="#CBD5E1" font-size="11">• Giữ chỗ 10:00 phút đếm ngược</text>
+        <text x="18" y="86" fill="#CBD5E1" font-size="11">• Tự động nhả ghế khi hết hạn</text>
+      </g>
+
+      <!-- Railway Cloud Runtime -->
+      <g transform="translate(380, 465)">
+        <rect width="240" height="90" rx="10" fill="#222124" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+        <text x="18" y="30" fill="#FFFFFF" font-size="14" font-weight="700">Railway Cloud Container</text>
+        <text x="18" y="50" fill="#94A3B8" font-size="11">Docker Linux • High Availability</text>
+        <text x="18" y="70" fill="#38BDF8" font-size="10" font-family="'JetBrains Mono'">be-bookphim-production.up.railway.app</text>
+      </g>
+
+      <!-- NODES: TIER 3 -->
+      <!-- Redis Cache -->
+      <g transform="translate(700, 70)">
+        <rect width="240" height="90" rx="10" fill="url(#primary-glow)" stroke="#FF535A" stroke-width="1.4"/>
+        <text x="18" y="32" fill="#FFFFFF" font-size="14" font-weight="700">Redis Distributed Cache</text>
+        <text x="18" y="52" fill="#CBD5E1" font-size="11">Khóa ghế thời gian thực</text>
+        <text x="18" y="70" fill="#FF535A" font-size="10" font-family="'JetBrains Mono'">TTL = 600s (10 phút)</text>
+      </g>
+
+      <!-- PostgreSQL 16 (Supabase) -->
+      <g transform="translate(700, 185)">
+        <rect width="240" height="150" rx="10" fill="url(#gold-glow)" stroke="#FFB955" stroke-width="1.4"/>
+        <text x="18" y="32" fill="#FFFFFF" font-size="14" font-weight="700">PostgreSQL 16 (Supabase)</text>
+        <text x="18" y="52" fill="#CBD5E1" font-size="11">14+ Thực thể chuẩn 3NF</text>
+        <text x="18" y="72" fill="#94A3B8" font-size="10">• users, movies, showtimes, seats</text>
+        <text x="18" y="90" fill="#94A3B8" font-size="10">• bookings, tickets, concessions</text>
+        <text x="18" y="108" fill="#94A3B8" font-size="10">• passport_badges, cineparty_rooms</text>
+        <text x="18" y="128" fill="#FFB955" font-size="10" font-family="'JetBrains Mono'">Region: Singapore ap-southeast-2</text>
+      </g>
+
+      <!-- Google Gemini AI -->
+      <g transform="translate(700, 360)">
+        <rect width="240" height="100" rx="10" fill="url(#purple-glow)" stroke="#A855F7" stroke-width="1.4"/>
+        <text x="18" y="30" fill="#FFFFFF" font-size="13" font-weight="700">Google Gemini 2.0 AI Engine</text>
+        <text x="18" y="50" fill="#CBD5E1" font-size="11">• Trợ lý CineBot AI 24/7</text>
+        <text x="18" y="68" fill="#CBD5E1" font-size="11">• Phân tích khẩu vị Cinematic Taste</text>
+        <text x="18" y="86" fill="#A855F7" font-size="10">Xử lý ngôn ngữ tự nhiên Tiếng Việt</text>
+      </g>
+
+      <!-- Cổng Thanh Toán & Wallet -->
+      <g transform="translate(700, 480)">
+        <rect width="240" height="75" rx="10" fill="#222124" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+        <text x="18" y="28" fill="#FFFFFF" font-size="13" font-weight="700">Cổng Thanh Toán & Ví</text>
+        <text x="18" y="48" fill="#94A3B8" font-size="11">MoMo • VNPAY • ZaloPay • Quick-Pay</text>
+        <text x="18" y="64" fill="#34C759" font-size="10">Sinh mã QR vé chuẩn ký HMAC</text>
+      </g>
+    </svg>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background: #FF535A;"></div>
+        <span>Động cơ Đặt vé & Khóa ghế (Primary Flow)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #38BDF8;"></div>
+        <span>Xác thực JWT & Dịch vụ API (Security & Auth)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #FFB955;"></div>
+        <span>Dữ liệu quan hệ PostgreSQL 16 (Persistence)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #A855F7;"></div>
+        <span>Trí tuệ nhân tạo Gemini 2.0 (AI Engine)</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

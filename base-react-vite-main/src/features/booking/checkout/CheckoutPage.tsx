@@ -22,9 +22,8 @@ import { PaymentMethods } from './components/PaymentMethods/PaymentMethods';
 import { OrderSummary } from './components/OrderSummary/OrderSummary';
 import tokenManager from '@shared/utils/tokenManager';
 import { PaymentModal } from './components/PaymentModal';
+import { sanitizeShowtimeId } from '../api/booking.api';
 import * as S from './CheckoutPage.styles';
-
-const DEFAULT_ACTIVE_SHOWTIME_ID = '5458e3dd-b719-4a76-a9df-904be8fcf493';
 
 export const CheckoutPage: FC = () => {
   const { t } = useTranslation();
@@ -177,12 +176,7 @@ export const CheckoutPage: FC = () => {
       return;
     }
 
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    let showtimeId = state.session.showtimeId;
-    if (!showtimeId || !uuidRegex.test(showtimeId)) {
-      showtimeId = DEFAULT_ACTIVE_SHOWTIME_ID;
-    }
+    const showtimeId = sanitizeShowtimeId(state.session.showtimeId);
 
     const seatIds = state.selectedSeats
       .map((s) => s.seatId)
