@@ -6,6 +6,12 @@ import * as S from '../../AiCineAdvisor.styles';
 export const ChatMessage: FC = () => {
   const { t } = useTranslation();
 
+  const handleChipClick = (query: string) => {
+    window.dispatchEvent(
+      new CustomEvent('phimbook:open-cinebot', { detail: { message: query } }),
+    );
+  };
+
   return (
     <S.AICardTopGroup>
       {/* Bot Profile */}
@@ -33,6 +39,28 @@ export const ChatMessage: FC = () => {
             {t('home:advisor.bot_message')}
           </S.BotMessageText>
         </S.BotMessageBubble>
+
+        {/* Quick Interactive Prompt Chips */}
+        <S.QuickSuggestionsRow>
+          <S.QuickChip
+            type="button"
+            onClick={() => handleChipClick('Gợi ý phim hot tuần này')}
+          >
+            ✨ Phim hot tuần này
+          </S.QuickChip>
+          <S.QuickChip
+            type="button"
+            onClick={() => handleChipClick('Rạp IMAX Laser gần tôi')}
+          >
+            🏛️ Rạp IMAX Laser
+          </S.QuickChip>
+          <S.QuickChip
+            type="button"
+            onClick={() => handleChipClick('Bảng giá vé & phòng VIP')}
+          >
+            🎟️ Giá vé & VIP
+          </S.QuickChip>
+        </S.QuickSuggestionsRow>
       </S.ChatBubblesCol>
     </S.AICardTopGroup>
   );

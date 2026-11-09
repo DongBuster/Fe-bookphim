@@ -738,3 +738,29 @@ export const SendButton = styled.button`
     background-color: rgba(255, 83, 90, 0.9);
   }
 `;
+
+export const QuickSuggestionsRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+`;
+
+export const QuickChip = styled.button`
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffb955;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Be Vietnam Pro', sans-serif;
+
+  &:hover {
+    background: rgba(255, 185, 85, 0.2);
+    border-color: #ffb955;
+    transform: translateY(-1px);
+  }
+`;

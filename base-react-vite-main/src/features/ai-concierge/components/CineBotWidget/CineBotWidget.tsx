@@ -12,6 +12,11 @@ import type {
   RecommendedMovieDto,
   BookingDraftDto,
 } from '@shared/types/api.types';
+import { useSelectedCity } from '@/shared/services/location.service';
+import {
+  enhanceBackendResponse,
+  getSmartLocalConciergeResponse,
+} from '../../services/cinebot-engine';
 import * as S from './CineBotWidget.styles';
 
 interface ExtendedMessage {
@@ -25,6 +30,7 @@ interface ExtendedMessage {
 
 export const CineBotWidget: FC = () => {
   const navigate = useNavigate();
+  const [selectedCity] = useSelectedCity();
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -34,12 +40,12 @@ export const CineBotWidget: FC = () => {
     {
       id: 'welcome',
       role: 'model',
-      content:
-        'Xin chào! Tôi là CineBot - trợ lý điện ảnh AI của PhimBook. Bạn muốn tìm phim thuộc gu nào, suất chiếu ở đâu hôm nay?',
+      content: `Xin chào! Tôi là CineBot — trợ lý điện ảnh AI của PhimBook tại ${selectedCity}. Bạn muốn tìm phim thuộc gu nào, suất chiếu ở đâu hôm nay?`,
       suggestedReplies: [
         'Gợi ý phim hot tuần này',
+        `Tìm rạp IMAX tại ${selectedCity}`,
+        'Bảng giá vé & phòng VIP',
         'Phim hành động kịch tính',
-        'Tìm suất chiếu tối nay tại TP. HCM',
       ],
     },
   ]);
@@ -72,6 +78,21 @@ export const CineBotWidget: FC = () => {
         .catch(() => {});
     }
   }, [isOpen, messages.length]);
+
+  // Lắng nghe sự kiện mở CineBot từ các trang khác (ví dụ: Trang chủ AiCineAdvisor)
+  useEffect(() => {
+    const handleOpenEvent = (e: Event) => {
+      const custom = e as CustomEvent<{ message?: string }>;
+      setIsOpen(true);
+      if (custom.detail?.message) {
+        handleSendMessage(custom.detail.message);
+      }
+    };
+    window.addEventListener('phimbook:open-cinebot', handleOpenEvent);
+    return () => {
+      window.removeEventListener('phimbook:open-cinebot', handleOpenEvent);
+    };
+  }, [messages, selectedCity]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -108,30 +129,33 @@ export const CineBotWidget: FC = () => {
         conversationHistory,
       });
 
+      // Enhance response if backend returns repetitive template
+      const enhanced = enhanceBackendResponse(res, text, selectedCity);
+
       const botMsg: ExtendedMessage = {
         id: `m-${Date.now()}`,
         role: 'model',
         content:
-          res.reply ||
-          'Tôi đã hiểu yêu cầu của bạn. Bạn muốn tham khảo thêm chi tiết nào nữa không?',
-        recommendedMovies: res.recommendedMovies,
-        bookingDraft: res.bookingDraft,
-        suggestedReplies: res.suggestedReplies,
+          enhanced.reply ||
+          `Dạ CineBot xin được gợi ý những thông tin tốt nhất cho bạn tại ${selectedCity}:`,
+        recommendedMovies: enhanced.recommendedMovies,
+        bookingDraft: enhanced.bookingDraft,
+        suggestedReplies: enhanced.suggestedReplies,
       };
 
       setMessages((prev) => [...prev, botMsg]);
     } catch {
-      // Fallback friendly reply if API is down
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `err-${Date.now()}`,
-          role: 'model',
-          content:
-            'CineBot đang nhận lượng yêu cầu cao từ phòng vé. Bạn có thể duyệt trực tiếp danh sách phim tại trang Khám Phá nhé!',
-          suggestedReplies: ['Mở trang Khám Phá', 'Xem suất chiếu hôm nay'],
-        },
-      ]);
+      // Smart Fallback via CineBot Engine (rich local knowledge instead of generic error)
+      const fallback = getSmartLocalConciergeResponse(text, selectedCity);
+      const botMsg: ExtendedMessage = {
+        id: `m-${Date.now()}`,
+        role: 'model',
+        content: fallback.reply,
+        recommendedMovies: fallback.recommendedMovies,
+        bookingDraft: fallback.bookingDraft,
+        suggestedReplies: fallback.suggestedReplies,
+      };
+      setMessages((prev) => [...prev, botMsg]);
     } finally {
       setIsLoading(false);
     }
