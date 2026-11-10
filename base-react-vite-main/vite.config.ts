@@ -38,6 +38,8 @@ export default defineConfig({
           'vendor-antd': ['antd', '@ant-design/cssinjs'],
           'vendor-styled': ['styled-components'],
           'vendor-icons': ['lucide-react', 'react-icons'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-animation': ['gsap'],
         },
       },
     },

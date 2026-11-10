@@ -3,7 +3,8 @@ import styled from 'styled-components';
 export const PageWrapper = styled.div`
   width: 100%;
   min-height: 100vh;
-  background-color: #0e0e0f;
+  background-color: #0b0b0e;
+  isolation: isolate;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,38 +18,7 @@ export const PageWrapper = styled.div`
     overflow-y: hidden;
   }
 
-  /* Ambient light blur in background */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: 20%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(
-      circle,
-      rgba(255, 83, 90, 0.12) 0%,
-      transparent 70%
-    );
-    filter: blur(80px);
-    pointer-events: none;
-  }
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 10%;
-    right: 20%;
-    width: 450px;
-    height: 450px;
-    background: radial-gradient(
-      circle,
-      rgba(255, 185, 85, 0.08) 0%,
-      transparent 70%
-    );
-    filter: blur(80px);
-    pointer-events: none;
-  }
 `;
 
 export const MainContainer = styled.div`

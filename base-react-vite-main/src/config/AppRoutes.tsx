@@ -1,7 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import Home from '@features/home/Home';
-import LoginPage from '@features/auth/LoginPage';
 import PageNotFound from '@features/page-not-found/PageNotFound';
 import AuthGuard from '@guards/AuthGuard';
 import GuestGuard from '@guards/GuestGuard';
@@ -10,6 +8,16 @@ import BookingLayout from '@layouts/BookingLayout';
 import RouteErrorFallback from '@shared/components/error-boundary/RouteErrorFallback';
 import { HOME_PATH } from '@shared/constants/path';
 import { isFeatureEnabled } from './features.config';
+
+const loadHomePage = async () => {
+  const { default: Home } = await import('@features/home/Home');
+  return { Component: Home };
+};
+
+const loadLoginPage = async () => {
+  const { default: LoginPage } = await import('@features/auth/LoginPage');
+  return { Component: LoginPage };
+};
 
 const loadMovieDetailsPage = async () => {
   const { default: MovieDetailsPage } = await import(
@@ -41,8 +49,8 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     errorElement: <RouteErrorFallback />,
     children: [
-      { index: true, element: <Home /> },
-      { path: HOME_PATH, element: <Home /> },
+      { index: true, lazy: loadHomePage },
+      { path: HOME_PATH, lazy: loadHomePage },
       {
         path: 'kham-pha',
         async lazy() {
@@ -72,7 +80,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'uu-dai',
-        element: <Home />,
+        lazy: loadHomePage,
       },
       {
         element: <BookingLayout />,
@@ -203,7 +211,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <GuestGuard />,
-    children: [{ path: '/login', element: <LoginPage /> }],
+    children: [{ path: '/login', lazy: loadLoginPage }],
   },
   {
     path: '*',
