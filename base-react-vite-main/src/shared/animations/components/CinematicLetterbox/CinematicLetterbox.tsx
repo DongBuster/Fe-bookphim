@@ -16,7 +16,8 @@ let hasPlayedInSpaSession = false;
 /**
  * WOW #1: Cinematic Letterbox Opening Overlay
  * Dramatic opening curtain that splits vertically, simulating the theatre
- * screen letterbox opening when the movie starts.
+ * screen letterbox opening when the movie starts, with rich 35mm film sprockets,
+ * acoustic cinema texture, Art Deco corners, and ambient glow.
  */
 export const CinematicLetterbox: FC<CinematicLetterboxProps> = ({
   forcePlay = false,
@@ -24,8 +25,11 @@ export const CinematicLetterbox: FC<CinematicLetterboxProps> = ({
 }) => {
   const shouldSkip =
     (!forcePlay && hasPlayedInSpaSession) ||
-    (!forcePlay && typeof navigator !== 'undefined' && /HeadlessChrome/.test(navigator.userAgent)) ||
-    (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    (!forcePlay &&
+      typeof navigator !== 'undefined' &&
+      /HeadlessChrome/.test(navigator.userAgent)) ||
+    (typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   const [isDone, setIsDone] = useState(shouldSkip);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,17 +122,88 @@ export const CinematicLetterbox: FC<CinematicLetterboxProps> = ({
 
   return (
     <S.Overlay ref={containerRef} $isDone={isDone} aria-hidden="true">
-      <S.TopCurtain ref={topBarRef} />
-      <S.BottomCurtain ref={bottomBarRef} />
+      {/* 1. Màn Trập Trên */}
+      <S.TopCurtain ref={topBarRef}>
+        <S.AmbientEdgeGlow $position="top" />
+        <S.SeamGlowLine $position="top" />
 
+        {/* Họa tiết răng cưa cuộn phim 35mm hai bên */}
+        <S.SprocketColumn $side="left">
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+        </S.SprocketColumn>
+        <S.SprocketColumn $side="right">
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+        </S.SprocketColumn>
+
+        {/* Ký tự góc điện ảnh Art Deco */}
+        <S.DecoCorner $top $left>
+          ⌜ 35MM CINEMA NOIR
+        </S.DecoCorner>
+        <S.DecoCorner $top $right>
+          70MM IMAX ⌝
+        </S.DecoCorner>
+      </S.TopCurtain>
+
+      {/* 2. Màn Trập Dưới */}
+      <S.BottomCurtain ref={bottomBarRef}>
+        <S.AmbientEdgeGlow $position="bottom" />
+        <S.SeamGlowLine $position="bottom" />
+
+        {/* Họa tiết răng cưa cuộn phim 35mm hai bên */}
+        <S.SprocketColumn $side="left">
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+        </S.SprocketColumn>
+        <S.SprocketColumn $side="right">
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+          <div className="sprocket-hole" />
+        </S.SprocketColumn>
+
+        {/* Ký tự góc điện ảnh Art Deco */}
+        <S.DecoCorner $bottom $left>
+          ⌞ 24 FPS • DOLBY ATMOS
+        </S.DecoCorner>
+        <S.DecoCorner $bottom $right>
+          FIRST CLASS LOUNGE ⌟
+        </S.DecoCorner>
+      </S.BottomCurtain>
+
+      {/* 3. Khối Thương Hiệu Trung Tâm */}
       <S.CenterBranding ref={brandingRef}>
+        <div className="aura-badge-wrapper">
+          <div className="aura-ring" />
+          <div className="aura-glow" />
+          <div className="badge-icon-box">
+            <Film className="icon-reel" />
+          </div>
+        </div>
+
         <div className="brand-logo">
-          <Film className="icon-reel" />
           <h1>
             PHIM<span>BOOK</span>
           </h1>
         </div>
-        <div className="tagline">Trải nghiệm điện ảnh đỉnh cao</div>
+
+        <div className="tagline-row">
+          <span className="dot-crimson" />
+          <span className="tagline-text">Trải nghiệm điện ảnh đỉnh cao</span>
+          <span className="dot-gold" />
+        </div>
+
         <div className="flare-glow" />
       </S.CenterBranding>
     </S.Overlay>

@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Award,
   ChevronDown,
   CreditCard,
+  Crown,
   Film,
   LogIn,
   LogOut,
@@ -18,17 +20,19 @@ import * as S from './ProfileDropdown.styles';
 
 // Map icon name → component (avoids importing all icons in data file)
 const MENU_ICONS: Record<string, React.ReactNode> = {
+  crown: <Crown size={13} />,
   user: <User size={13} />,
   shield: <Shield size={13} />,
   creditcard: <CreditCard size={13} />,
   film: <Film size={13} />,
+  award: <Award size={13} />,
   camera: <BiCameraMovie size={13} />,
 };
 
 const PROFILE_MENU = [
   {
     id: 'vip',
-    icon: 'user',
+    icon: 'crown',
     labelKey: 'header:menu_vip',
     defaultLabel: 'Hồ sơ VIP Elite & Đặc quyền',
     path: '/profile/vip-elite',
