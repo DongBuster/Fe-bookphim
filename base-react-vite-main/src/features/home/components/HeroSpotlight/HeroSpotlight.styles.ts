@@ -80,11 +80,11 @@ export const SliderArrowButton = styled.button<{ $direction: 'prev' | 'next' }>`
   top: 45%;
   ${({ $direction }) =>
     $direction === 'prev'
-      ? 'left: max(24px, calc((100% - var(--content-max-width, 1280px)) / 2 - 56px));'
-      : 'right: max(24px, calc((100% - var(--content-max-width, 1280px)) / 2 - 56px));'}
+      ? 'left: max(16px, calc((100% - var(--content-max-width, 1280px)) / 2 - 56px));'
+      : 'right: max(16px, calc((100% - var(--content-max-width, 1280px)) / 2 - 56px));'}
   transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(14, 14, 15, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.15);

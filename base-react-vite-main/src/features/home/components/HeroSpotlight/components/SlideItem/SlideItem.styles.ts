@@ -79,6 +79,12 @@ export const SlideContentInner = styled.div`
   margin: 0 auto;
   padding: 40px var(--page-gutter, 24px) 24px;
   height: 100%;
+
+  /* Vùng đệm an toàn (Safe Zone) chống nút điều hướng carousel che chữ trên màn laptop/desktop */
+  @media (min-width: 1025px) and (max-width: 1480px) {
+    padding-left: 76px;
+    padding-right: 76px;
+  }
   display: flex;
   flex-direction: column;
   justify-content: center;
