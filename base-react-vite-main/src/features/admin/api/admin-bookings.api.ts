@@ -1,3 +1,4 @@
+import { unwrapPaginated } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse, MetaData } from '@shared/types/api.types';
 import type {
@@ -16,11 +17,8 @@ export interface GetAdminBookingsParams {
 export const getAdminBookingsApi = async (
   params?: GetAdminBookingsParams,
 ): Promise<{ data: BookingAdminDto[]; metaData?: MetaData }> => {
-  const res = (await axiosClient.get('/admin/bookings', { params })) as unknown as {
-    data: BookingAdminDto[];
-    metaData?: MetaData;
-  };
-  return res;
+  const res = await axiosClient.get('/admin/bookings', { params });
+  return unwrapPaginated<BookingAdminDto>(res);
 };
 
 export const getAdminBookingDetailApi = async (id: string): Promise<BookingDetailAdminDto> => {

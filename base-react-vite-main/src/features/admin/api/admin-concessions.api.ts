@@ -1,3 +1,4 @@
+import { unwrapArray, unwrapPaginated } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse, MetaData } from '@shared/types/api.types';
 import type {
@@ -9,7 +10,7 @@ import type {
 
 export const getAdminConcessionsApi = async (): Promise<ConcessionDto[]> => {
   const res = await axiosClient.get<BaseResponse<ConcessionDto[]>>('/admin/concessions');
-  return res as unknown as ConcessionDto[];
+  return unwrapArray<ConcessionDto>(res);
 };
 
 export const upsertAdminConcessionApi = async (body: UpsertConcessionDto): Promise<ConcessionDto> => {
@@ -26,11 +27,8 @@ export const getAdminVouchersApi = async (params?: {
   pageSize?: number;
   status?: string;
 }): Promise<{ data: VoucherDto[]; metaData?: MetaData }> => {
-  const res = (await axiosClient.get('/admin/vouchers', { params })) as unknown as {
-    data: VoucherDto[];
-    metaData?: MetaData;
-  };
-  return res;
+  const res = await axiosClient.get('/admin/vouchers', { params });
+  return unwrapPaginated<VoucherDto>(res);
 };
 
 export const createAdminVoucherApi = async (body: CreateVoucherDto): Promise<VoucherDto> => {

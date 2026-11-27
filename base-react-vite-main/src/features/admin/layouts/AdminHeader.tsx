@@ -17,11 +17,7 @@ export const AdminHeader: FC = () => {
     'ADMIN';
 
   const handleLogout = () => {
-    tokenManager.removeAccessToken();
-    tokenManager.removeRefreshToken();
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.userRole);
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('user_name');
+    tokenManager.clearSession();
     navigate('/login');
   };
 

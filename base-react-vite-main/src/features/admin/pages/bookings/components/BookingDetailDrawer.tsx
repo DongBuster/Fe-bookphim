@@ -110,10 +110,10 @@ export const BookingDetailDrawer: FC<BookingDetailDrawerProps> = ({
           </div>
         }
         placement="right"
-        width={560}
+        size={560}
         onClose={onClose}
         open={open}
-        destroyOnClose
+        destroyOnHidden
         styles={adminDrawerStyles}
         footer={
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

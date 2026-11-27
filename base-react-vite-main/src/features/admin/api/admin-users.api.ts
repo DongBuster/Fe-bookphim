@@ -1,3 +1,4 @@
+import { unwrapPaginated } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse, MetaData } from '@shared/types/api.types';
 import type {
@@ -20,11 +21,8 @@ export interface GetAdminUsersParams {
 export const getAdminUsersApi = async (
   params?: GetAdminUsersParams,
 ): Promise<{ data: UserAdminDto[]; metaData?: MetaData }> => {
-  const res = (await axiosClient.get('/admin/users', { params })) as unknown as {
-    data: UserAdminDto[];
-    metaData?: MetaData;
-  };
-  return res;
+  const res = await axiosClient.get('/admin/users', { params });
+  return unwrapPaginated<UserAdminDto>(res);
 };
 
 export const getAdminUserDetailApi = async (id: string): Promise<UserDetailAdminDto> => {
@@ -51,4 +49,8 @@ export const toggleUserStatusApi = async (
 ): Promise<UserAdminDto> => {
   const res = await axiosClient.patch<BaseResponse<UserAdminDto>>(`/admin/users/${id}/status`, body);
   return (res as unknown as BaseResponse<UserAdminDto>).data;
+};
+
+export const resetUserPasswordApi = async (id: string, newPassword: string): Promise<void> => {
+  await axiosClient.patch(`/admin/users/${id}/reset-password`, { newPassword });
 };

@@ -1,3 +1,4 @@
+import { unwrapPaginated } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse, MetaData } from '@shared/types/api.types';
 import type {
@@ -17,11 +18,8 @@ export interface GetAdminShowtimesParams {
 export const getAdminShowtimesApi = async (
   params?: GetAdminShowtimesParams,
 ): Promise<{ data: ShowtimeAdminDto[]; metaData?: MetaData }> => {
-  const res = (await axiosClient.get('/admin/showtimes', { params })) as unknown as {
-    data: ShowtimeAdminDto[];
-    metaData?: MetaData;
-  };
-  return res;
+  const res = await axiosClient.get('/admin/showtimes', { params });
+  return unwrapPaginated<ShowtimeAdminDto>(res);
 };
 
 export const createAdminShowtimeApi = async (body: CreateShowtimeDto): Promise<ShowtimeAdminDto> => {

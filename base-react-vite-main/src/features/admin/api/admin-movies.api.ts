@@ -1,3 +1,4 @@
+import { unwrapPaginated } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse, MetaData } from '@shared/types/api.types';
 import type {
@@ -16,11 +17,8 @@ export interface GetAdminMoviesParams {
 export const getAdminMoviesApi = async (
   params?: GetAdminMoviesParams,
 ): Promise<{ data: MovieAdminDto[]; metaData?: MetaData }> => {
-  const res = (await axiosClient.get('/admin/movies', { params })) as unknown as {
-    data: MovieAdminDto[];
-    metaData?: MetaData;
-  };
-  return res;
+  const res = await axiosClient.get('/admin/movies', { params });
+  return unwrapPaginated<MovieAdminDto>(res);
 };
 
 export const createAdminMovieApi = async (body: CreateMovieRequestDto): Promise<MovieAdminDto> => {

@@ -11,6 +11,7 @@ vi.mock('@features/admin/api/admin-users.api', () => ({
   createAdminStaffApi: vi.fn(),
   updateUserRoleApi: vi.fn(),
   toggleUserStatusApi: vi.fn(),
+  resetUserPasswordApi: vi.fn(),
 }));
 
 vi.mock('@features/admin/api/admin-theaters.api', () => ({
@@ -74,5 +75,22 @@ describe('AdminUsersPage & StaffFormModal', () => {
     });
 
     expect(usersApi.createAdminStaffApi).not.toHaveBeenCalled();
+  });
+
+  it('opens ResetPasswordModal and validates password rules before calling API', async () => {
+    renderWithQuery(<AdminUsersPage />);
+
+    expect(await screen.findByText('Nguyễn Văn Admin')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt lại mật khẩu' }));
+
+    expect(await screen.findByText('Đặt Lại Mật Khẩu')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Cập Nhật Mật Khẩu' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Vui lòng nhập mật khẩu mới')).toBeInTheDocument();
+      expect(screen.getByText('Vui lòng xác nhận mật khẩu mới')).toBeInTheDocument();
+    });
+
+    expect(usersApi.resetUserPasswordApi).not.toHaveBeenCalled();
   });
 });

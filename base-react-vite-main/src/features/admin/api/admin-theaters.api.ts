@@ -1,3 +1,4 @@
+import { unwrapArray } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse } from '@shared/types/api.types';
 import type {
@@ -9,7 +10,7 @@ import type {
 
 export const getAdminTheatersApi = async (): Promise<TheaterWithRoomsDto[]> => {
   const res = await axiosClient.get<BaseResponse<TheaterWithRoomsDto[]>>('/admin/theaters');
-  return res as unknown as TheaterWithRoomsDto[];
+  return unwrapArray<TheaterWithRoomsDto>(res);
 };
 
 export const getRoomSeatMatrixApi = async (roomId: string): Promise<RoomSeatMatrixDto> => {

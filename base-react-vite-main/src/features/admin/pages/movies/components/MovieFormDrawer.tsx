@@ -118,10 +118,10 @@ export const MovieFormDrawer: FC<MovieFormDrawerProps> = ({
           {isEdit ? 'Chỉnh Sửa Thông Tin Phim' : 'Thêm Phim Mới'}
         </span>
       }
-      width={620}
+      size={620}
       open={open}
       onClose={onClose}
-      destroyOnClose
+      destroyOnHidden
       styles={adminDrawerStyles}
       extra={
         <Space>

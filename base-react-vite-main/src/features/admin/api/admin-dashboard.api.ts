@@ -1,3 +1,4 @@
+import { unwrapArray } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse } from '@shared/types/api.types';
 import type {
@@ -25,12 +26,12 @@ export const getTopMoviesApi = async (limit = 5): Promise<TopMovieRevenueDto[]> 
   const res = await axiosClient.get<BaseResponse<TopMovieRevenueDto[]>>('/admin/dashboard/top-movies', {
     params: { limit },
   });
-  return res as unknown as TopMovieRevenueDto[];
+  return unwrapArray<TopMovieRevenueDto>(res);
 };
 
 export const getUpcomingShowtimesApi = async (withinHours = 2): Promise<ShowtimeAdminDto[]> => {
   const res = await axiosClient.get<BaseResponse<ShowtimeAdminDto[]>>('/admin/dashboard/upcoming-showtimes', {
     params: { withinHours },
   });
-  return res as unknown as ShowtimeAdminDto[];
+  return unwrapArray<ShowtimeAdminDto>(res);
 };

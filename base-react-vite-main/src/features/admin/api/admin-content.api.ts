@@ -1,3 +1,4 @@
+import { unwrapArray, unwrapPaginated } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse, MetaData } from '@shared/types/api.types';
 import type {
@@ -8,7 +9,7 @@ import type {
 
 export const getAdminBannersApi = async (): Promise<BannerAdminDto[]> => {
   const res = await axiosClient.get<BaseResponse<BannerAdminDto[]>>('/admin/banners');
-  return res as unknown as BannerAdminDto[];
+  return unwrapArray<BannerAdminDto>(res);
 };
 
 export const createAdminBannerApi = async (body: UpsertBannerDto): Promise<BannerAdminDto> => {
@@ -37,11 +38,8 @@ export const getAdminReviewsApi = async (params?: {
   page?: number;
   pageSize?: number;
 }): Promise<{ data: ReviewAdminDto[]; metaData?: MetaData }> => {
-  const res = (await axiosClient.get('/admin/reviews', { params })) as unknown as {
-    data: ReviewAdminDto[];
-    metaData?: MetaData;
-  };
-  return res;
+  const res = await axiosClient.get('/admin/reviews', { params });
+  return unwrapPaginated<ReviewAdminDto>(res);
 };
 
 export const toggleReviewVisibilityApi = async (id: string, isHidden: boolean): Promise<void> => {

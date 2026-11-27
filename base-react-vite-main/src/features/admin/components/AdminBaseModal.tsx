@@ -21,7 +21,7 @@ export const AdminBaseModal: FC<AdminBaseModalProps> = ({
   children,
   okButtonProps,
   cancelButtonProps,
-  destroyOnClose = true,
+  destroyOnHidden = true,
   ...rest
 }) => {
   return (
@@ -35,7 +35,7 @@ export const AdminBaseModal: FC<AdminBaseModalProps> = ({
         )
       }
       styles={adminModalStyles}
-      destroyOnClose={destroyOnClose}
+      destroyOnHidden={destroyOnHidden}
       okButtonProps={{
         className: 'admin-btn-primary',
         style: adminPrimaryButtonStyle,

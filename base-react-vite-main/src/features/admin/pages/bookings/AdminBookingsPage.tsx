@@ -210,7 +210,7 @@ export const AdminBookingsPage: FC = () => {
           borderRadius: 10,
           marginBottom: 20,
         }}
-        bodyStyle={{ padding: '16px 20px' }}
+        styles={{ body: {} }}
       >
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
           {/* Search Box */}
@@ -298,7 +298,7 @@ export const AdminBookingsPage: FC = () => {
           borderColor: '#2E3548',
           borderRadius: 10,
         }}
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: {} }}
       >
         <Table<BookingAdminDto>
           size="small"

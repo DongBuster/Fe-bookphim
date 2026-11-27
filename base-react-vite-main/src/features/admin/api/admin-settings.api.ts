@@ -1,3 +1,4 @@
+import { unwrapPaginated } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import type { BaseResponse, MetaData } from '@shared/types/api.types';
 import type { AuditLogDto, SystemSettingsDto } from '../types/admin.types';
@@ -22,9 +23,6 @@ export const getAdminAuditLogsApi = async (params?: {
   page?: number;
   pageSize?: number;
 }): Promise<{ data: AuditLogDto[]; metaData?: MetaData }> => {
-  const res = (await axiosClient.get('/admin/audit-logs', { params })) as unknown as {
-    data: AuditLogDto[];
-    metaData?: MetaData;
-  };
-  return res;
+  const res = await axiosClient.get('/admin/audit-logs', { params });
+  return unwrapPaginated<AuditLogDto>(res);
 };

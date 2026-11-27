@@ -64,10 +64,10 @@ export const UserDetailDrawer: FC<UserDetailDrawerProps> = ({ userId, open, onCl
           {user && <StatusBadge status={user.status} />}
         </div>
       }
-      width={600}
+      size={600}
       open={open}
       onClose={onClose}
-      destroyOnClose
+      destroyOnHidden
       styles={adminDrawerStyles}
       footer={
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

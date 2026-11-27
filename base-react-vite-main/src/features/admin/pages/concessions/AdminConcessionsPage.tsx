@@ -297,7 +297,7 @@ export const AdminConcessionsPage: FC = () => {
           borderColor: '#2E3548',
           borderRadius: 10,
         }}
-        bodyStyle={{ padding: 20 }}
+        styles={{ body: {} }}
       >
         <Tabs
           activeKey={activeTab}

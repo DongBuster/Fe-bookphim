@@ -14,7 +14,7 @@ import {
   message,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { Search, Plus, RotateCcw, Eye, Lock, Unlock, User as UserIcon } from 'lucide-react';
+import { Search, Plus, RotateCcw, Eye, Lock, Unlock, KeyRound, User as UserIcon } from 'lucide-react';
 import { AdminPageHeader } from '@features/admin/components/AdminPageHeader';
 import { StatusBadge } from '@features/admin/components/StatusBadge';
 import { adminPrimaryButtonStyle } from '@features/admin/styles/adminUi';
@@ -27,6 +27,7 @@ import {
 import type { UserAdminDto, UserRole } from '@features/admin/types/admin.types';
 import { UserDetailDrawer } from './components/UserDetailDrawer';
 import { StaffFormModal } from './components/StaffFormModal';
+import { ResetPasswordModal } from './components/ResetPasswordModal';
 
 const ROLE_COLORS: Record<string, string> = {
   ADMIN: 'red',
@@ -48,6 +49,7 @@ export const AdminUsersPage: FC = () => {
   const [detailUserId, setDetailUserId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
+  const [resetPasswordUser, setResetPasswordUser] = useState<UserAdminDto | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['admin', 'users', { search, role: roleFilter, status: statusFilter, page, pageSize }],
@@ -187,6 +189,17 @@ export const AdminUsersPage: FC = () => {
               Chi Tiết
             </Button>
 
+            {currentRole === 'ADMIN' && (
+              <Button
+                type="text"
+                aria-label="Đặt lại mật khẩu"
+                title="Đặt lại mật khẩu"
+                icon={<KeyRound size={15} />}
+                onClick={() => setResetPasswordUser(record)}
+                style={{ color: '#38BDF8' }}
+              />
+            )}
+
             <Popconfirm
               title={isLocked ? 'Mở khóa tài khoản?' : 'Khóa tài khoản này?'}
               description={
@@ -244,7 +257,7 @@ export const AdminUsersPage: FC = () => {
           borderRadius: 10,
           marginBottom: 20,
         }}
-        bodyStyle={{ padding: '16px 20px' }}
+        styles={{ body: {} }}
       >
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
           <div style={{ minWidth: 260, flex: 1.5 }}>
@@ -321,7 +334,7 @@ export const AdminUsersPage: FC = () => {
           borderColor: '#2E3548',
           borderRadius: 10,
         }}
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: {} }}
       >
         <Table<UserAdminDto>
           size="small"
@@ -355,6 +368,12 @@ export const AdminUsersPage: FC = () => {
         open={isStaffModalOpen}
         onClose={() => setIsStaffModalOpen(false)}
         onSuccess={() => refetch()}
+      />
+
+      <ResetPasswordModal
+        open={Boolean(resetPasswordUser)}
+        user={resetPasswordUser}
+        onClose={() => setResetPasswordUser(null)}
       />
     </div>
   );

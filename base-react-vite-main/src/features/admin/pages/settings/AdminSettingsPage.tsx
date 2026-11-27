@@ -107,7 +107,7 @@ export const AdminSettingsPage: FC = () => {
 
       <Card
         style={{ background: '#161922', borderColor: '#2E3548', borderRadius: 10 }}
-        bodyStyle={{ padding: 20 }}
+        styles={{ body: {} }}
       >
         <Tabs
           items={[

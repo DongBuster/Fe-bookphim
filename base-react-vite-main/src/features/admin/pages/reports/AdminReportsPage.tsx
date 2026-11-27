@@ -176,7 +176,7 @@ export const AdminReportsPage: FC = () => {
           borderRadius: 10,
           marginBottom: 20,
         }}
-        bodyStyle={{ padding: '16px 20px' }}
+        styles={{ body: {} }}
       >
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
           <div style={{ minWidth: 260 }}>
@@ -294,7 +294,7 @@ export const AdminReportsPage: FC = () => {
           <Card
             title={<span style={{ color: '#FFFFFF', fontWeight: 700 }}>Chi Tiết Doanh Thu</span>}
             style={{ background: '#161922', borderColor: '#2E3548', borderRadius: 10 }}
-            bodyStyle={{ padding: 0 }}
+            styles={{ body: {} }}
           >
             <Table
               size="small"
@@ -314,7 +314,7 @@ export const AdminReportsPage: FC = () => {
               <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Theo Cổng Thanh Toán</span>
             }
             style={{ background: '#161922', borderColor: '#2E3548', borderRadius: 10 }}
-            bodyStyle={{ padding: 0 }}
+            styles={{ body: {} }}
           >
             <Table
               size="small"

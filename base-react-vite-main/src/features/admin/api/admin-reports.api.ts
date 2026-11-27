@@ -1,3 +1,4 @@
+import { unwrapArray } from './admin-api.utils';
 import axiosClient from '@config/axios-instance';
 import axiosFileClient from '@config/axios-file-instance';
 import type { BaseResponse } from '@shared/types/api.types';
@@ -26,7 +27,7 @@ export const getAdminPaymentMethodReportApi = async (
     '/admin/reports/payment-methods',
     { params },
   );
-  return res as unknown as PaymentMethodReportDto[];
+  return unwrapArray<PaymentMethodReportDto>(res);
 };
 
 export const exportAdminRevenueCsvApi = async (params: GetRevenueReportParams): Promise<Blob> => {
