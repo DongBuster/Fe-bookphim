@@ -24,7 +24,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://be-bookphim-production.up.railway.app',
+        target: 'https://be-bookphim-production-a2d1400c.up.railway.app',
         changeOrigin: true,
         secure: false,
       },

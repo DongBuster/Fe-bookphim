@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import tokenManager from '@shared/utils/tokenManager';
+import { LOCAL_STORAGE_KEYS } from '@shared/constants/storage-key';
 import { isFeatureEnabled } from '@/config/features.config';
 import { loginApi, registerApi } from '@features/auth/api/auth.api';
 import { FoxMascot } from '@/shared/components/mascot';
@@ -80,6 +81,13 @@ export const LoginForm: FC = () => {
     setIsRegisterMode(false);
     setActiveTab('email');
     setIdentifier('testuser@phimbook.vn');
+    setCredential('Password123@');
+  };
+
+  const handleFillAdminAccount = () => {
+    setIsRegisterMode(false);
+    setActiveTab('email');
+    setIdentifier('admin@phimbook.vn');
     setCredential('Password123@');
   };
 
@@ -185,8 +193,36 @@ export const LoginForm: FC = () => {
           localStorage.setItem('user_info', JSON.stringify(loginData.user));
         }
 
-        // 3. Chuyển hướng về trang chủ
-        navigate('/', { replace: true });
+        // Lưu role người dùng (ưu tiên user.role từ response, fallback decode JWT)
+        let rawRole = loginData.user?.role;
+        if (!rawRole) {
+          try {
+            const payloadPart = loginData.accessToken.split('.')[1];
+            if (payloadPart) {
+              const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+              const payload = JSON.parse(atob(base64)) as Record<string, unknown>;
+              const claimRole =
+                payload.role ||
+                payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+                (Array.isArray(payload.roles) ? payload.roles[0] : payload.roles);
+              if (typeof claimRole === 'string') {
+                rawRole = claimRole;
+              }
+            }
+          } catch {
+            // Bỏ qua nếu token không phải JWT chuẩn
+          }
+        }
+        const userRole = (rawRole || 'CUSTOMER').toUpperCase();
+        localStorage.setItem('user_role', userRole);
+        localStorage.setItem(LOCAL_STORAGE_KEYS.userRole, userRole);
+
+        // 3. Nếu là tài khoản Admin hoặc Manager, tự động chuyển hướng vào /admin
+        if (userRole === 'ADMIN' || userRole === 'MANAGER') {
+          navigate('/admin', { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
       }
     } catch (error: unknown) {
       console.error('Đăng nhập thất bại:', error);
@@ -449,6 +485,26 @@ export const LoginForm: FC = () => {
               >
                 <Sparkles size={12} />
                 {t('auth:fill_demo_btn')}
+              </button>
+              <button
+                type="button"
+                onClick={handleFillAdminAccount}
+                style={{
+                  background: 'rgba(255, 185, 85, 0.12)',
+                  border: '1px solid rgba(255, 185, 85, 0.3)',
+                  color: '#FFB955',
+                  borderRadius: 6,
+                  padding: '2px 8px',
+                  cursor: 'pointer',
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                <ShieldCheck size={12} />
+                Admin
               </button>
             </div>
           )}

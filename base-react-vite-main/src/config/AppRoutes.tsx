@@ -6,6 +6,8 @@ import GuestGuard from '@guards/GuestGuard';
 import MainLayout from '@layouts/MainLayout';
 import BookingLayout from '@layouts/BookingLayout';
 import RouteErrorFallback from '@shared/components/error-boundary/RouteErrorFallback';
+import AdminGuard, { RoleRouteGuard } from '@features/admin/guards/AdminGuard';
+import AdminLayout from '@features/admin/layouts/AdminLayout';
 import { HOME_PATH } from '@shared/constants/path';
 import { isFeatureEnabled } from './features.config';
 
@@ -207,6 +209,131 @@ export const router = createBrowserRouter([
         ],
       },
       { path: '*', element: <PageNotFound /> },
+    ],
+  },
+  {
+    path: '/admin',
+    element: <AdminGuard />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/dashboard/AdminDashboardPage'
+              );
+              return { Component };
+            },
+          },
+          {
+            path: 'movies',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/movies/AdminMoviesPage'
+              );
+              return { Component };
+            },
+          },
+          {
+            path: 'showtimes',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/showtimes/AdminShowtimesPage'
+              );
+              return { Component };
+            },
+          },
+          {
+            path: 'theaters',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/theaters/AdminTheatersPage'
+              );
+              return { Component };
+            },
+          },
+          {
+            path: 'bookings',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/bookings/AdminBookingsPage'
+              );
+              return { Component };
+            },
+          },
+          {
+            path: 'concessions',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/concessions/AdminConcessionsPage'
+              );
+              return { Component };
+            },
+          },
+          {
+            path: 'users',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/users/AdminUsersPage'
+              );
+              return {
+                Component: () => (
+                  <RoleRouteGuard allowedRoles={['ADMIN', 'MANAGER']}>
+                    <Component />
+                  </RoleRouteGuard>
+                ),
+              };
+            },
+          },
+          {
+            path: 'reports',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/reports/AdminReportsPage'
+              );
+              return {
+                Component: () => (
+                  <RoleRouteGuard allowedRoles={['ADMIN', 'MANAGER']}>
+                    <Component />
+                  </RoleRouteGuard>
+                ),
+              };
+            },
+          },
+          {
+            path: 'content',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/content/AdminContentPage'
+              );
+              return {
+                Component: () => (
+                  <RoleRouteGuard allowedRoles={['ADMIN', 'MANAGER']}>
+                    <Component />
+                  </RoleRouteGuard>
+                ),
+              };
+            },
+          },
+          {
+            path: 'settings',
+            lazy: async () => {
+              const { default: Component } = await import(
+                '@features/admin/pages/settings/AdminSettingsPage'
+              );
+              return {
+                Component: () => (
+                  <RoleRouteGuard allowedRoles={['ADMIN']}>
+                    <Component />
+                  </RoleRouteGuard>
+                ),
+              };
+            },
+          },
+        ],
+      },
     ],
   },
   {

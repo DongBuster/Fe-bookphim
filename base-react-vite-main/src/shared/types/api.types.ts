@@ -100,6 +100,13 @@ export type TicketPassStatus =
   (typeof TicketPassStatus)[keyof typeof TicketPassStatus];
 
 // ==================== AUTH & PROFILE TYPES ====================
+export const UserRole = {
+  CUSTOMER: 'CUSTOMER',
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+} as const;
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -118,6 +125,7 @@ export interface AuthUser {
   fullName: string;
   membershipTier?: MembershipTier | string;
   totalPoints?: number;
+  role?: UserRole | string;
 }
 
 export interface LoginResponseData {
