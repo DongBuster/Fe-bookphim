@@ -24,13 +24,21 @@ export const SeatMatrixModal: FC<SeatMatrixModalProps> = ({
   roomName,
 }) => {
   const queryClient = useQueryClient();
-  const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([]);
+  const [selectionState, setSelectionState] = useState<{
+    roomId: string | null | undefined;
+    ids: string[];
+  }>({ roomId, ids: [] });
 
-  useEffect(() => {
-    if (open) {
-      setSelectedSeatIds([]);
-    }
-  }, [open, roomId]);
+  const selectedSeatIds = selectionState.roomId === roomId ? selectionState.ids : [];
+
+  const clearSelection = () => {
+    setSelectionState({ roomId, ids: [] });
+  };
+
+  const handleClose = () => {
+    clearSelection();
+    onClose();
+  };
 
   const { data: matrix, isLoading } = useQuery({
     queryKey: ['admin', 'rooms', roomId, 'seat-matrix'],
@@ -51,7 +59,7 @@ export const SeatMatrixModal: FC<SeatMatrixModalProps> = ({
           ? `Đã chuyển ${selectedSeatIds.length} ghế sang Bảo trì`
           : `Đã kích hoạt lại ${selectedSeatIds.length} ghế`,
       );
-      setSelectedSeatIds([]);
+      clearSelection();
       queryClient.invalidateQueries({ queryKey: ['admin', 'rooms', roomId, 'seat-matrix'] });
     },
     onError: (err: unknown) => {
@@ -60,9 +68,13 @@ export const SeatMatrixModal: FC<SeatMatrixModalProps> = ({
   });
 
   const toggleSeatSelection = (seatId: string) => {
-    setSelectedSeatIds((prev) =>
-      prev.includes(seatId) ? prev.filter((id) => id !== seatId) : [...prev, seatId],
-    );
+    setSelectionState((prev) => {
+      const currentIds = prev.roomId === roomId ? prev.ids : [];
+      const nextIds = currentIds.includes(seatId)
+        ? currentIds.filter((id) => id !== seatId)
+        : [...currentIds, seatId];
+      return { roomId, ids: nextIds };
+    });
   };
 
   // Group seats by rowLabel
@@ -110,13 +122,13 @@ export const SeatMatrixModal: FC<SeatMatrixModalProps> = ({
         </div>
       }
       open={open}
-      onCancel={onClose}
+      onCancel={handleClose}
       footer={[
         <Button
           key="close"
           danger
           className="admin-btn-danger"
-          onClick={onClose}
+          onClick={handleClose}
           style={adminDangerButtonStyle}
         >
           Đóng
